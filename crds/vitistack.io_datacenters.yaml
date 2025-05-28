@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.18.0
-  name: datacenters.ror.nhn.no
+  name: datacenters.vitistack.io
 spec:
-  group: ror.nhn.no
+  group: vitistack.io
   names:
     kind: Datacenter
     listKind: DatacenterList

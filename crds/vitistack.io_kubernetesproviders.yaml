@@ -4,22 +4,23 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.18.0
-  name: machineproviders.ror.nhn.no
+  name: kubernetesproviders.vitistack.io
 spec:
-  group: ror.nhn.no
+  group: vitistack.io
   names:
-    kind: MachineProvider
-    listKind: MachineProviderList
-    plural: machineproviders
+    kind: KubernetesProvider
+    listKind: KubernetesProviderList
+    plural: kubernetesproviders
     shortNames:
-    - mp
-    singular: machineprovider
+    - kp
+    singular: kubernetesprovider
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: MachineProvider is the Schema for the MachineProviders API
+        description: KubernetesProvider is the Schema for the KubernetesProviders
+          API
         properties:
           apiVersion:
             description: |-
@@ -39,11 +40,12 @@ spec:
           metadata:
             type: object
           spec:
-            description: MachineProviderSpec defines the desired state of MachineProvider
+            description: KubernetesProviderSpec defines the desired state of KuberneteProvider
             properties:
               config:
                 properties:
                   name:
+                    description: The name of the Kubernetes provider
                     type: string
                 required:
                 - name
@@ -52,7 +54,7 @@ spec:
             - config
             type: object
           status:
-            description: MachineProviderStatus defines the observed state of MachineProvider
+            description: KubernetesProviderStatus defines the observed state of KuberneteProvider
             type: object
         type: object
     served: true
