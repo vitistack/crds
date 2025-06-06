@@ -1,0 +1,257 @@
+---
+# Example AWS EC2 Machine
+apiVersion: vitistack.io/v1alpha1
+kind: Machine
+metadata:
+  name: web-server-aws
+  namespace: default
+  labels:
+    app: web-server
+    environment: production
+spec:
+  name: web-server-01
+  instanceType: t3.medium
+
+  # CPU configuration (optional, will use instance type defaults if not specified)
+  cpu:
+    cores: 2
+    threadsPerCore: 2
+
+  # Memory in bytes (optional, will use instance type defaults if not specified)
+  memory: 4294967296 # 4GB
+
+  # Disk configuration
+  disks:
+    - name: root
+      sizeGB: 20
+      type: gp3
+      boot: true
+      encrypted: true
+      iops: 3000
+      throughput: 125
+    - name: data
+      sizeGB: 100
+      type: gp3
+      encrypted: true
+      device: /dev/sdf
+
+  # Network configuration
+  network:
+    vpc: vpc-12345678
+    subnet: subnet-87654321
+    assignPublicIP: true
+    interfaces:
+      - name: eth0
+        primary: true
+        securityGroups:
+          - sg-web-server
+          - sg-common
+
+  # Operating system
+  os:
+    family: linux
+    distribution: ubuntu
+    version: "22.04"
+    architecture: amd64
+    imageID: ami-0abcdef123456789
+
+  # Provider configuration
+  providerConfig:
+    name: aws
+    region: us-west-2
+    zone: us-west-2a
+    config:
+      instanceProfile: EC2-WebServer-Role
+      placementGroup: web-servers
+      tenancy: default
+    credentialsRef:
+      secretName: aws-credentials
+      namespace: default
+
+  # SSH keys
+  sshKeys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQAB... user@example.com
+
+  # User data script
+  userData: |
+    #!/bin/bash
+    apt-get update
+    apt-get install -y nginx
+    systemctl enable nginx
+    systemctl start nginx
+    echo "Hello from $(hostname)" > /var/www/html/index.html
+
+  # Tags
+  tags:
+    Environment: production
+    Team: platform
+    Project: web-app
+    CostCenter: "12345"
+
+  # Security groups
+  securityGroups:
+    - sg-web-server
+    - sg-monitoring
+
+  # Enable monitoring
+  monitoring: true
+
+  # Backup configuration
+  backup:
+    enabled: true
+    schedule: "0 2 * * *" # Daily at 2 AM
+    retentionDays: 30
+
+---
+# Example Azure VM Machine
+apiVersion: vitistack.io/v1alpha1
+kind: Machine
+metadata:
+  name: app-server-azure
+  namespace: production
+spec:
+  name: app-server-01
+  instanceType: Standard_B2s
+
+  os:
+    family: linux
+    distribution: ubuntu
+    version: "20.04"
+    architecture: amd64
+    imageFamily: ubuntu-server-20-04-lts
+
+  disks:
+    - name: root
+      sizeGB: 30
+      type: Premium_LRS
+      boot: true
+      encrypted: true
+
+  network:
+    vpc: vnet-production
+    subnet: subnet-apps
+    assignPublicIP: false
+
+  providerConfig:
+    name: azure
+    region: westus2
+    config:
+      resourceGroup: rg-production
+      availabilitySet: as-app-servers
+    credentialsRef:
+      secretName: azure-sp-credentials
+
+  tags:
+    environment: production
+    application: api-server
+
+---
+# Example GCP Compute Engine Machine
+apiVersion: vitistack.io/v1alpha1
+kind: Machine
+metadata:
+  name: db-server-gcp
+  namespace: database
+spec:
+  name: db-server-01
+  instanceType: n2-standard-4
+
+  os:
+    family: linux
+    distribution: debian
+    version: "11"
+    architecture: amd64
+    imageFamily: debian-11
+
+  disks:
+    - name: boot
+      sizeGB: 20
+      type: pd-ssd
+      boot: true
+    - name: database
+      sizeGB: 500
+      type: pd-ssd
+      device: /dev/sdb
+
+  network:
+    vpc: vpc-production
+    subnet: subnet-database
+    assignPublicIP: false
+
+  providerConfig:
+    name: gcp
+    region: us-central1
+    zone: us-central1-a
+    config:
+      project: my-gcp-project
+      machineType: n2-standard-4
+      serviceAccount: db-service-account@my-project.iam.gserviceaccount.com
+    credentialsRef:
+      secretName: gcp-service-account-key
+
+  securityGroups:
+    - database-firewall
+
+  monitoring: true
+
+---
+# Example VMware vSphere Machine
+apiVersion: vitistack.io/v1alpha1
+kind: Machine
+metadata:
+  name: test-server-vsphere
+  namespace: testing
+spec:
+  name: test-server-01
+  instanceType: medium # Custom sizing for vSphere
+
+  cpu:
+    cores: 4
+    sockets: 2
+    threadsPerCore: 1
+
+  memory: 8589934592 # 8GB
+
+  os:
+    family: linux
+    distribution: centos
+    version: "8"
+    architecture: amd64
+    imageID: centos8-template
+
+  disks:
+    - name: root
+      sizeGB: 40
+      type: thin
+      boot: true
+    - name: app-data
+      sizeGB: 200
+      type: thick
+
+  network:
+    interfaces:
+      - name: eth0
+        primary: true
+        subnet: vlan-100-testing
+
+  providerConfig:
+    name: vsphere
+    region: datacenter-west
+    config:
+      vcenter: vcenter.example.com
+      datacenter: DC-West
+      cluster: Cluster-Test
+      datastore: datastore-ssd
+      folder: /VMs/Testing
+      resourcePool: TestingRP
+    credentialsRef:
+      secretName: vsphere-credentials
+
+  userData: |
+    #cloud-config
+    packages:
+      - docker
+      - docker-compose
+    runcmd:
+      - systemctl enable docker
+      - systemctl start docker

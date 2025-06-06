@@ -1,0 +1,883 @@
+# Comprehensive KubernetesProvider examples for different managed Kubernetes services
+
+---
+# Amazon EKS Provider with comprehensive configuration
+apiVersion: vitistack.io/v1alpha1
+kind: KubernetesProvider
+metadata:
+  name: eks-us-east-1
+  namespace: providers
+  labels:
+    provider: eks
+    region: us-east-1
+    tier: production
+spec:
+  providerType: eks
+  displayName: "Amazon EKS US East 1"
+  region: us-east-1
+  zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+  
+  endpoint:
+    url: "https://eks.us-east-1.amazonaws.com"
+    timeoutSeconds: 60
+    retryAttempts: 3
+  
+  authentication:
+    type: credentials
+    credentialsRef:
+      name: aws-eks-credentials
+      namespace: providers
+    parameters:
+      region: "us-east-1"
+      roleArn: "arn:aws:iam::123456789012:role/EKSServiceRole"
+  
+  # Cluster configuration
+  clusterConfig:
+    version: "1.28"
+    endpointPrivateAccess: true
+    endpointPublicAccess: true
+    publicAccessCidrs: ["0.0.0.0/0"]
+    loggingEnabled: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+    encryptionConfig:
+      enabled: true
+      kmsKeyId: "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+    
+    # VPC Configuration
+    vpcConfig:
+      vpcId: "vpc-12345678"
+      subnetIds: ["subnet-12345678", "subnet-87654321", "subnet-11111111"]
+      securityGroupIds: ["sg-12345678"]
+      endpointPrivateAccess: true
+      endpointPublicAccess: true
+      publicAccessCidrs: ["10.0.0.0/16"]
+    
+    # Additional settings
+    tags:
+      Environment: production
+      ManagedBy: viti-stack
+      CostCenter: platform
+  
+  # Node pool configurations
+  nodePools:
+    - name: system-nodes
+      displayName: "System Node Pool"
+      instanceType: "t3.medium"
+      minSize: 2
+      maxSize: 5
+      desiredSize: 3
+      zones: ["us-east-1a", "us-east-1b"]
+      
+      # Auto-scaling configuration
+      autoScaling:
+        enabled: true
+        minNodes: 2
+        maxNodes: 10
+        targetCPUUtilization: 70
+        targetMemoryUtilization: 80
+        scaleDownDelay: "10m"
+        scaleUpDelay: "30s"
+      
+      # Node configuration
+      nodeConfig:
+        machineType: "t3.medium"
+        diskSize: 50
+        diskType: "gp3"
+        imageType: "AL2_x86_64"
+        
+        # Taints and labels for system nodes
+        taints:
+          - key: "CriticalAddonsOnly"
+            value: "true"
+            effect: "NoSchedule"
+        labels:
+          node-role: "system"
+          workload-type: "system"
+        
+        # Security and networking
+        securityGroupIds: ["sg-system-nodes"]
+        subnetIds: ["subnet-12345678", "subnet-87654321"]
+        userData: |
+          #!/bin/bash
+          /etc/eks/bootstrap.sh production-cluster
+          yum update -y
+    
+    - name: application-nodes
+      displayName: "Application Node Pool"
+      instanceType: "m5.large"
+      minSize: 3
+      maxSize: 20
+      desiredSize: 5
+      zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+      
+      autoScaling:
+        enabled: true
+        minNodes: 3
+        maxNodes: 20
+        targetCPUUtilization: 75
+        targetMemoryUtilization: 85
+        scaleDownDelay: "5m"
+        scaleUpDelay: "30s"
+      
+      nodeConfig:
+        machineType: "m5.large"
+        diskSize: 100
+        diskType: "gp3"
+        imageType: "AL2_x86_64"
+        
+        labels:
+          node-role: "application"
+          workload-type: "general"
+        
+        securityGroupIds: ["sg-app-nodes"]
+        subnetIds: ["subnet-12345678", "subnet-87654321", "subnet-11111111"]
+    
+    - name: gpu-nodes
+      displayName: "GPU Node Pool"
+      instanceType: "g4dn.xlarge"
+      minSize: 0
+      maxSize: 5
+      desiredSize: 1
+      zones: ["us-east-1a"]
+      
+      autoScaling:
+        enabled: true
+        minNodes: 0
+        maxNodes: 10
+        targetCPUUtilization: 80
+        targetMemoryUtilization: 80
+        scaleDownDelay: "2m"
+        scaleUpDelay: "1m"
+      
+      nodeConfig:
+        machineType: "g4dn.xlarge"
+        diskSize: 200
+        diskType: "gp3"
+        imageType: "AL2_x86_64_GPU"
+        
+        taints:
+          - key: "nvidia.com/gpu"
+            value: "true"
+            effect: "NoSchedule"
+        labels:
+          node-role: "gpu"
+          workload-type: "ml"
+          accelerator: "nvidia-tesla-t4"
+        
+        securityGroupIds: ["sg-gpu-nodes"]
+        subnetIds: ["subnet-12345678"]
+  
+  # Networking configuration
+  networking:
+    cni: "aws-vpc-cni"
+    serviceCIDR: "172.20.0.0/16"
+    podCIDR: "10.244.0.0/16"
+    dnsConfig:
+      clusterDNS: "172.20.0.10"
+      clusterDomain: "cluster.local"
+    
+    # Network policies
+    networkPolicy:
+      enabled: true
+      provider: "calico"
+    
+    # Load balancer configuration
+    loadBalancer:
+      type: "nlb"
+      scheme: "internet-facing"
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+  
+  # Addons configuration
+  addons:
+    # Ingress controller
+    ingress:
+      enabled: true
+      controller: "aws-load-balancer-controller"
+      version: "v2.6.0"
+      config:
+        clusterName: "production-cluster"
+        awsRegion: "us-east-1"
+        vpcId: "vpc-12345678"
+        enableWAF: true
+        enableShield: true
+    
+    # Storage CSI driver
+    storage:
+      enabled: true
+      driver: "ebs-csi-driver"
+      version: "v1.24.0"
+      config:
+        enableVolumeScheduling: true
+        enableVolumeResizing: true
+        enableVolumeSnapshot: true
+        defaultStorageClass: "gp3-encrypted"
+    
+    # Monitoring stack
+    monitoring:
+      enabled: true
+      stack: "prometheus-operator"
+      version: "kube-prometheus-stack-51.0.0"
+      config:
+        prometheus:
+          retention: "30d"
+          storageSize: "50Gi"
+          storageClass: "gp3"
+        grafana:
+          enabled: true
+          adminPassword: "admin-secret-ref"
+          persistence:
+            enabled: true
+            size: "10Gi"
+        alertmanager:
+          enabled: true
+          config:
+            smtp_smarthost: "smtp.company.com:587"
+            smtp_from: "alerts@company.com"
+    
+    # Service mesh
+    serviceMesh:
+      enabled: true
+      provider: "istio"
+      version: "1.19.0"
+      config:
+        ingressGateways: 2
+        egressGateways: 1
+        tracing: true
+        mtls: "STRICT"
+    
+    # DNS
+    dns:
+      enabled: true
+      provider: "coredns"
+      version: "v1.10.1"
+      config:
+        replicas: 3
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "70Mi"
+          limits:
+            cpu: "500m"
+            memory: "200Mi"
+  
+  # Security configuration
+  security:
+    # Pod security standards
+    podSecurity:
+      enabled: true
+      defaultPolicy: "restricted"
+      exemptNamespaces: ["kube-system", "kube-public", "istio-system"]
+    
+    # Network security
+    networkSecurity:
+      enabled: true
+      defaultDenyAll: true
+      allowedNamespaces: ["production", "staging"]
+    
+    # RBAC
+    rbac:
+      enabled: true
+      strictMode: true
+      serviceAccountTokens: false
+    
+    # Image security
+    imageSecurity:
+      enabled: true
+      registryWhitelist: ["123456789012.dkr.ecr.us-east-1.amazonaws.com", "quay.io", "gcr.io"]
+      vulnerabilityScanning: true
+      signatureVerification: true
+  
+  # Observability configuration
+  observability:
+    # Logging
+    logging:
+      enabled: true
+      backend: "aws-cloudwatch"
+      retention: "30d"
+      config:
+        logGroup: "/aws/eks/production-cluster/logs"
+        region: "us-east-1"
+    
+    # Metrics
+    metrics:
+      enabled: true
+      backend: "aws-cloudwatch"
+      interval: "30s"
+      config:
+        namespace: "EKS/Cluster"
+        region: "us-east-1"
+    
+    # Tracing
+    tracing:
+      enabled: true
+      backend: "jaeger"
+      samplingRate: "0.1"
+      config:
+        collector: "jaeger-collector.istio-system.svc.cluster.local:14268"
+  
+  # Backup configuration
+  backup:
+    enabled: true
+    provider: "velero"
+    schedule: "0 2 * * *"
+    retention: "30d"
+    config:
+      storageLocation:
+        bucket: "eks-backups-us-east-1"
+        region: "us-east-1"
+        kmsKeyId: "arn:aws:kms:us-east-1:123456789012:key/backup-key"
+      volumeSnapshotLocation:
+        region: "us-east-1"
+        kmsKeyId: "arn:aws:kms:us-east-1:123456789012:key/snapshot-key"
+  
+  # Resource quotas and limits
+  resourceQuotas:
+    maxClusters: 10
+    maxNodesPerCluster: 100
+    maxPodsPerNode: 110
+    maxCPUPerCluster: "1000"
+    maxMemoryPerCluster: "4000Gi"
+    maxStoragePerCluster: "10Ti"
+  
+  # Capabilities
+  capabilities:
+    supportedVersions: ["1.26", "1.27", "1.28", "1.29"]
+    supportedNodeTypes: ["t3.medium", "t3.large", "m5.large", "m5.xlarge", "c5.xlarge", "r5.large", "g4dn.xlarge"]
+    supportedAddons: ["vpc-cni", "kube-proxy", "coredns", "ebs-csi-driver", "aws-load-balancer-controller"]
+    autoUpgrade: true
+    nodeAutoRepair: true
+    podAutoscaling: true
+    clusterAutoscaling: true
+    spotInstances: true
+    fargateSupport: true
+  
+  defaultTags:
+    Environment: production
+    ManagedBy: viti-stack
+    Provider: aws-eks
+    CostCenter: platform
+  
+  config:
+    region: "us-east-1"
+    clusterRoleArn: "arn:aws:iam::123456789012:role/EKSClusterServiceRole"
+    nodeGroupRoleArn: "arn:aws:iam::123456789012:role/NodeInstanceRole"
+    fargateProfileRoleArn: "arn:aws:iam::123456789012:role/EKSFargateProfileRole"
+
+---
+# Azure AKS Provider
+apiVersion: vitistack.io/v1alpha1
+kind: KubernetesProvider
+metadata:
+  name: aks-eastus
+  namespace: providers
+  labels:
+    provider: aks
+    region: eastus
+    tier: production
+spec:
+  providerType: aks
+  displayName: "Azure AKS East US"
+  region: eastus
+  zones: ["1", "2", "3"]
+  
+  endpoint:
+    url: "https://management.azure.com"
+    timeoutSeconds: 60
+    retryAttempts: 3
+  
+  authentication:
+    type: serviceAccount
+    serviceAccount:
+      accountID: "12345678-1234-1234-1234-123456789012"
+      keyRef:
+        name: azure-aks-credentials
+        namespace: providers
+      scopes: ["https://management.azure.com/.default"]
+    parameters:
+      tenantId: "87654321-4321-4321-4321-210987654321"
+      subscriptionId: "11111111-2222-3333-4444-555555555555"
+      resourceGroup: "production-rg"
+  
+  clusterConfig:
+    version: "1.28.3"
+    tier: "Standard"
+    enableRBAC: true
+    enablePodSecurityPolicy: false
+    enableAzurePolicy: true
+    
+    # Network configuration
+    networkConfig:
+      networkPlugin: "azure"
+      networkPolicy: "calico"
+      serviceCidr: "10.96.0.0/16"
+      dnsServiceIP: "10.96.0.10"
+      podCidr: "10.244.0.0/16"
+      dockerBridgeCidr: "172.17.0.1/16"
+      outboundType: "loadBalancer"
+    
+    # Azure AD integration
+    aadConfig:
+      managed: true
+      enableAzureRBAC: true
+      adminGroupObjectIDs: ["aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"]
+    
+    tags:
+      Environment: production
+      ManagedBy: viti-stack
+      CostCenter: platform
+  
+  nodePools:
+    - name: system
+      displayName: "System Node Pool"
+      instanceType: "Standard_D2s_v3"
+      minSize: 2
+      maxSize: 5
+      desiredSize: 3
+      zones: ["1", "2", "3"]
+      
+      autoScaling:
+        enabled: true
+        minNodes: 2
+        maxNodes: 10
+        targetCPUUtilization: 70
+        targetMemoryUtilization: 80
+      
+      nodeConfig:
+        machineType: "Standard_D2s_v3"
+        diskSize: 30
+        diskType: "Premium_LRS"
+        imageType: "Ubuntu"
+        
+        taints:
+          - key: "CriticalAddonsOnly"
+            value: "true"
+            effect: "NoSchedule"
+        labels:
+          node-role: "system"
+        
+        subnetIds: ["subnet-system"]
+    
+    - name: user
+      displayName: "User Node Pool"
+      instanceType: "Standard_D4s_v3"
+      minSize: 1
+      maxSize: 20
+      desiredSize: 3
+      zones: ["1", "2", "3"]
+      
+      autoScaling:
+        enabled: true
+        minNodes: 1
+        maxNodes: 20
+        targetCPUUtilization: 75
+        targetMemoryUtilization: 85
+      
+      nodeConfig:
+        machineType: "Standard_D4s_v3"
+        diskSize: 100
+        diskType: "Premium_LRS"
+        imageType: "Ubuntu"
+        
+        labels:
+          node-role: "user"
+        
+        # Spot instances for cost optimization
+        spotInstances: true
+        spotMaxPrice: "0.1"
+        
+        subnetIds: ["subnet-user"]
+  
+  networking:
+    cni: "azure"
+    serviceCIDR: "10.96.0.0/16"
+    podCIDR: "10.244.0.0/16"
+    dnsConfig:
+      clusterDNS: "10.96.0.10"
+      clusterDomain: "cluster.local"
+    
+    networkPolicy:
+      enabled: true
+      provider: "calico"
+    
+    loadBalancer:
+      type: "standard"
+      scheme: "public"
+      sku: "standard"
+  
+  addons:
+    ingress:
+      enabled: true
+      controller: "nginx"
+      version: "4.7.1"
+      config:
+        replicaCount: 3
+        service:
+          type: "LoadBalancer"
+          annotations:
+            service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: "/healthz"
+    
+    storage:
+      enabled: true
+      driver: "azure-disk-csi-driver"
+      version: "v1.28.0"
+      config:
+        enableVolumeScheduling: true
+        enableVolumeResizing: true
+        enableVolumeSnapshot: true
+        defaultStorageClass: "managed-premium"
+    
+    monitoring:
+      enabled: true
+      stack: "azure-monitor"
+      config:
+        workspaceId: "/subscriptions/.../workspaces/production-workspace"
+        enableContainerInsights: true
+        enablePrometheusMetrics: true
+    
+    dns:
+      enabled: true
+      provider: "coredns"
+      version: "v1.10.1"
+      config:
+        replicas: 2
+  
+  security:
+    podSecurity:
+      enabled: true
+      defaultPolicy: "baseline"
+    
+    networkSecurity:
+      enabled: true
+      defaultDenyAll: false
+    
+    rbac:
+      enabled: true
+      strictMode: true
+  
+  observability:
+    logging:
+      enabled: true
+      backend: "azure-monitor"
+      config:
+        workspaceId: "/subscriptions/.../workspaces/production-workspace"
+    
+    metrics:
+      enabled: true
+      backend: "azure-monitor"
+      config:
+        workspaceId: "/subscriptions/.../workspaces/production-workspace"
+  
+  backup:
+    enabled: true
+    provider: "velero"
+    schedule: "0 3 * * *"
+    retention: "30d"
+    config:
+      storageLocation:
+        bucket: "aks-backups"
+        storageAccount: "prodbackupstorage"
+        resourceGroup: "backups-rg"
+  
+  resourceQuotas:
+    maxClusters: 8
+    maxNodesPerCluster: 100
+    maxPodsPerNode: 110
+    maxCPUPerCluster: "800"
+    maxMemoryPerCluster: "3200Gi"
+    maxStoragePerCluster: "8Ti"
+  
+  capabilities:
+    supportedVersions: ["1.26", "1.27", "1.28"]
+    supportedNodeTypes: ["Standard_B2s", "Standard_D2s_v3", "Standard_D4s_v3", "Standard_F4s_v2"]
+    supportedAddons: ["azure-cni", "kube-proxy", "coredns", "azure-disk-csi-driver"]
+    autoUpgrade: true
+    nodeAutoRepair: true
+    podAutoscaling: true
+    clusterAutoscaling: true
+    spotInstances: true
+  
+  defaultTags:
+    Environment: production
+    ManagedBy: viti-stack
+    Provider: azure-aks
+  
+  config:
+    resourceGroup: "production-rg"
+    location: "eastus"
+    enablePrivateCluster: false
+    authorizedIPRanges: ["0.0.0.0/0"]
+
+---
+# On-premises Rancher RKE2 Provider
+apiVersion: vitistack.io/v1alpha1
+kind: KubernetesProvider
+metadata:
+  name: rancher-rke2-onprem
+  namespace: providers
+  labels:
+    provider: rancher
+    location: on-premises
+    tier: enterprise
+spec:
+  providerType: rancher
+  displayName: "Rancher RKE2 On-Premises"
+  region: on-premises-dc1
+  zones: ["rack-1", "rack-2", "rack-3"]
+  
+  endpoint:
+    url: "https://rancher.company.local"
+    caBundle: |
+      -----BEGIN CERTIFICATE-----
+      MIIDXTCCAkWgAwIBAgIJAKK...
+      -----END CERTIFICATE-----
+    timeoutSeconds: 60
+    retryAttempts: 2
+  
+  authentication:
+    type: token
+    credentialsRef:
+      name: rancher-api-token
+      namespace: providers
+    parameters:
+      clusterId: "local"
+  
+  clusterConfig:
+    version: "v1.28.5+rke2r1"
+    cni: "calico"
+    
+    # RKE2 specific configuration
+    rke2Config:
+      profile: "cis-1.6"
+      selinux: true
+      secretsEncryption: true
+      writeKubeconfigMode: "0640"
+      useServiceAccountCredentials: true
+      
+      # Etcd configuration
+      etcd:
+        backupConfig:
+          enabled: true
+          intervalHours: 12
+          retention: 5
+          s3:
+            endpoint: "minio.company.local:9000"
+            bucket: "etcd-backups"
+            accessKey: "etcd-backup-key"
+            secretKey: "etcd-backup-secret"
+            insecure: true
+    
+    # High availability configuration
+    controlPlane:
+      replicas: 3
+      scheduling: true
+      
+    tags:
+      Environment: production
+      ManagedBy: viti-stack
+      Infrastructure: rancher
+  
+  nodePools:
+    - name: control-plane
+      displayName: "Control Plane Nodes"
+      instanceType: "large"
+      minSize: 3
+      maxSize: 3
+      desiredSize: 3
+      zones: ["rack-1", "rack-2", "rack-3"]
+      
+      nodeConfig:
+        machineType: "large"
+        diskSize: 100
+        diskType: "ssd"
+        
+        # Control plane specific configuration
+        roles: ["controlplane", "etcd"]
+        
+        taints:
+          - key: "node-role.kubernetes.io/control-plane"
+            effect: "NoSchedule"
+        labels:
+          node-role: "control-plane"
+        
+        # Custom node configuration
+        userData: |
+          #!/bin/bash
+          # Install security updates
+          yum update -y --security
+          
+          # Configure chrony for time sync
+          systemctl enable chronyd
+          systemctl start chronyd
+    
+    - name: worker-nodes
+      displayName: "Worker Nodes"
+      instanceType: "xlarge"
+      minSize: 3
+      maxSize: 20
+      desiredSize: 6
+      zones: ["rack-1", "rack-2", "rack-3"]
+      
+      autoScaling:
+        enabled: true
+        minNodes: 3
+        maxNodes: 20
+        targetCPUUtilization: 80
+        targetMemoryUtilization: 85
+      
+      nodeConfig:
+        machineType: "xlarge"
+        diskSize: 200
+        diskType: "ssd"
+        
+        roles: ["worker"]
+        
+        labels:
+          node-role: "worker"
+          workload-type: "general"
+  
+  networking:
+    cni: "calico"
+    serviceCIDR: "10.96.0.0/16"
+    podCIDR: "10.244.0.0/16"
+    clusterDNS: "10.96.0.10"
+    clusterDomain: "cluster.local"
+    
+    # Calico configuration
+    calicoConfig:
+      mtu: 1450
+      ipipMode: "Always"
+      vxlanMode: "Never"
+      enableWireguard: true
+    
+    networkPolicy:
+      enabled: true
+      provider: "calico"
+      defaultDenyAll: true
+    
+    loadBalancer:
+      type: "metallb"
+      config:
+        ipPool: "192.168.200.100-192.168.200.200"
+        protocol: "layer2"
+  
+  addons:
+    ingress:
+      enabled: true
+      controller: "nginx"
+      version: "4.7.1"
+      config:
+        replicaCount: 3
+        service:
+          type: "LoadBalancer"
+          loadBalancerIP: "192.168.200.150"
+    
+    storage:
+      enabled: true
+      driver: "longhorn"
+      version: "v1.5.1"
+      config:
+        defaultStorageClass: "longhorn"
+        replicaCount: 3
+        enableBackup: true
+        backupTarget: "nfs://nas.company.local:/backups/longhorn"
+    
+    monitoring:
+      enabled: true
+      stack: "rancher-monitoring"
+      version: "103.0.3+up45.31.1"
+      config:
+        prometheus:
+          retention: "15d"
+          storageSize: "50Gi"
+        grafana:
+          enabled: true
+          persistence:
+            enabled: true
+            size: "10Gi"
+    
+    dns:
+      enabled: true
+      provider: "coredns"
+      version: "v1.10.1"
+      config:
+        replicas: 3
+        upstreamServers: ["192.168.1.10", "192.168.1.11"]
+  
+  security:
+    podSecurity:
+      enabled: true
+      defaultPolicy: "restricted"
+      exemptNamespaces: ["cattle-system", "kube-system"]
+    
+    networkSecurity:
+      enabled: true
+      defaultDenyAll: true
+    
+    rbac:
+      enabled: true
+      strictMode: true
+    
+    # CIS hardening
+    cisHardening:
+      enabled: true
+      profile: "rke2-cis-1.6-profile-hardened"
+  
+  observability:
+    logging:
+      enabled: true
+      backend: "rancher-logging"
+      config:
+        outputType: "elasticsearch"
+        elasticsearchHost: "elasticsearch.company.local:9200"
+    
+    metrics:
+      enabled: true
+      backend: "prometheus"
+      interval: "30s"
+    
+    tracing:
+      enabled: false
+  
+  backup:
+    enabled: true
+    provider: "rancher-backup"
+    schedule: "0 2 * * *"
+    retention: "30d"
+    config:
+      storageLocation:
+        type: "s3"
+        s3:
+          endpoint: "minio.company.local:9000"
+          bucket: "rancher-backups"
+          region: "us-east-1"
+          insecure: true
+  
+  resourceQuotas:
+    maxClusters: 5
+    maxNodesPerCluster: 50
+    maxPodsPerNode: 110
+    maxCPUPerCluster: "2000"
+    maxMemoryPerCluster: "8000Gi"
+    maxStoragePerCluster: "50Ti"
+  
+  capabilities:
+    supportedVersions: ["v1.26.8+rke2r1", "v1.27.5+rke2r1", "v1.28.5+rke2r1"]
+    supportedNodeTypes: ["small", "medium", "large", "xlarge"]
+    supportedAddons: ["calico", "cilium", "flannel", "longhorn", "rancher-monitoring"]
+    autoUpgrade: true
+    nodeAutoRepair: true
+    podAutoscaling: true
+    clusterAutoscaling: false
+  
+  defaultTags:
+    Environment: production
+    ManagedBy: viti-stack
+    Provider: rancher
+    Infrastructure: on-premises
+  
+  config:
+    rancherUrl: "https://rancher.company.local"
+    projectId: "local:p-xxxxx"
+    nodeDriver: "vsphere"
+    cloudCredentialId: "cattle-global-data:cc-xxxxx"

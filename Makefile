@@ -69,6 +69,15 @@ update-deps: ## Update dependencies
 	@go mod tidy
 	@echo "Dependencies updated!"
 
+##@ kubernetes
+.PHONY: install-crds
+install-crds: manifests ## Install CRDs into a Kubernetes cluster.
+	kubectl apply -f crds
+
+.PHONY: uninstall-crds
+uninstall-crds: ## Uninstall CRDs from a Kubernetes cluster.
+	kubectl delete -f crds
+
 ##@ Tools
 
 CONTROLLER_TOOLS_VERSION ?= latest

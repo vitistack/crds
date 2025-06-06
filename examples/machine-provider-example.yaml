@@ -1,0 +1,528 @@
+# Comprehensive MachineProvider examples for different cloud providers and virtualization platforms
+
+---
+# AWS Machine Provider with comprehensive configuration
+apiVersion: vitistack.io/v1alpha1
+kind: MachineProvider
+metadata:
+  name: aws-us-east-1
+  namespace: providers
+  labels:
+    provider: aws
+    region: us-east-1
+    tier: production
+spec:
+  providerType: aws
+  displayName: "AWS US East 1 Provider"
+  region: us-east-1
+  zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+  
+  endpoint:
+    url: "https://ec2.us-east-1.amazonaws.com"
+    timeoutSeconds: 30
+    retryAttempts: 3
+  
+  authentication:
+    type: credentials
+    credentialsRef:
+      name: aws-credentials
+      namespace: providers
+    parameters:
+      region: "us-east-1"
+  
+  capabilities:
+    instanceTypes:
+      - name: t3.micro
+        displayName: "T3 Micro"
+        vcpus: 2
+        memoryGB: "1"
+        networkPerformance: "Up to 5 Gbps"
+        costPerHour: "$0.0104"
+      - name: t3.small
+        displayName: "T3 Small"
+        vcpus: 2
+        memoryGB: "2"
+        networkPerformance: "Up to 5 Gbps"
+        costPerHour: "$0.0208"
+      - name: m5.large
+        displayName: "M5 Large"
+        vcpus: 2
+        memoryGB: "8"
+        networkPerformance: "Up to 10 Gbps"
+        costPerHour: "$0.096"
+      - name: m5.xlarge
+        displayName: "M5 XLarge"
+        vcpus: 4
+        memoryGB: "16"
+        networkPerformance: "Up to 10 Gbps"
+        costPerHour: "$0.192"
+      - name: c5.2xlarge
+        displayName: "C5 2XLarge (Compute Optimized)"
+        vcpus: 8
+        memoryGB: "16"
+        networkPerformance: "Up to 10 Gbps"
+        costPerHour: "$0.34"
+      - name: r5.large
+        displayName: "R5 Large (Memory Optimized)"
+        vcpus: 2
+        memoryGB: "16"
+        networkPerformance: "Up to 10 Gbps"
+        costPerHour: "$0.126"
+      - name: g4dn.xlarge
+        displayName: "G4dn XLarge (GPU)"
+        vcpus: 4
+        memoryGB: "16"
+        storageGB: 125
+        networkPerformance: "Up to 25 Gbps"
+        gpu: true
+        costPerHour: "$0.526"
+    
+    operatingSystems:
+      - family: "linux"
+        distribution: "ubuntu"
+        versions: ["20.04", "22.04", "24.04"]
+        architectures: ["x86_64", "arm64"]
+        defaultImageID: "ami-0abcdef1234567890"
+      - family: "linux"
+        distribution: "rhel"
+        versions: ["8", "9"]
+        architectures: ["x86_64"]
+        defaultImageID: "ami-0fedcba0987654321"
+      - family: "windows"
+        distribution: "windows-server"
+        versions: ["2019", "2022"]
+        architectures: ["x86_64"]
+        defaultImageID: "ami-0123456789abcdef0"
+    
+    storageTypes:
+      - name: "gp3"
+        displayName: "General Purpose SSD (gp3)"
+        class: "SSD"
+        iopsRange:
+          min: 3000
+          max: 16000
+        throughputRange:
+          min: 125
+          max: 1000
+        encryptionSupported: true
+      - name: "io2"
+        displayName: "Provisioned IOPS SSD (io2)"
+        class: "SSD"
+        iopsRange:
+          min: 100
+          max: 64000
+        throughputRange:
+          min: 125
+          max: 4000
+        encryptionSupported: true
+      - name: "st1"
+        displayName: "Throughput Optimized HDD"
+        class: "HDD"
+        throughputRange:
+          min: 40
+          max: 500
+        encryptionSupported: true
+    
+    networkFeatures: ["vpc", "security-groups", "elastic-ips", "load-balancers", "nat-gateways"]
+    maxMachines: 1000
+    autoScaling: true
+    loadBalancers: true
+    persistentVolumes: true
+  
+  network:
+    defaultVPC: "vpc-12345678"
+    availableVPCs:
+      - id: "vpc-12345678"
+        name: "production-vpc"
+        cidr: "10.0.0.0/16"
+        subnets:
+          - id: "subnet-12345678"
+            name: "prod-subnet-1a"
+            cidr: "10.0.1.0/24"
+            zone: "us-east-1a"
+            public: false
+          - id: "subnet-87654321"
+            name: "prod-subnet-1b"
+            cidr: "10.0.2.0/24"
+            zone: "us-east-1b"
+            public: false
+          - id: "subnet-11111111"
+            name: "public-subnet-1a"
+            cidr: "10.0.100.0/24"
+            zone: "us-east-1a"
+            public: true
+    defaultSecurityGroups: ["sg-default", "sg-web"]
+    publicIPSupport: true
+    ipv6Support: true
+    loadBalancerSupport: true
+  
+  storage:
+    defaultType: "gp3"
+    storageClasses:
+      - name: "gp3-encrypted"
+        displayName: "GP3 Encrypted"
+        provisioner: "ebs.csi.aws.com"
+        parameters:
+          type: "gp3"
+          encrypted: "true"
+        default: true
+      - name: "io2-high-performance"
+        displayName: "IO2 High Performance"
+        provisioner: "ebs.csi.aws.com"
+        parameters:
+          type: "io2"
+          iops: "10000"
+          encrypted: "true"
+    defaultEncryption: true
+    maxStorageGB: 65536
+  
+  compute:
+    defaultInstanceType: "t3.medium"
+    maxCPUs: 128
+    maxMemoryGB: 3904
+    gpuSupport: true
+    gpuTypes: ["nvidia-tesla-t4", "nvidia-tesla-v100", "nvidia-tesla-k80"]
+    nestedVirtualization: false
+  
+  defaultTags:
+    "Environment": "production"
+    "ManagedBy": "viti-stack"
+    "Provider": "aws"
+  
+  config:
+    "default-instance-type": "t3.medium"
+    "enable-detailed-monitoring": "true"
+    "default-security-group": "sg-default"
+
+---
+# Azure Machine Provider
+apiVersion: vitistack.io/v1alpha1
+kind: MachineProvider
+metadata:
+  name: azure-eastus
+  namespace: providers
+  labels:
+    provider: azure
+    region: eastus
+    tier: production
+spec:
+  providerType: azure
+  displayName: "Azure East US Provider"
+  region: eastus
+  zones: ["1", "2", "3"]
+  
+  endpoint:
+    url: "https://management.azure.com"
+    timeoutSeconds: 45
+    retryAttempts: 3
+  
+  authentication:
+    type: serviceAccount
+    serviceAccount:
+      accountID: "12345678-1234-1234-1234-123456789012"
+      keyRef:
+        name: azure-service-principal
+        namespace: providers
+      scopes: ["https://management.azure.com/.default"]
+    parameters:
+      tenantId: "87654321-4321-4321-4321-210987654321"
+      subscriptionId: "11111111-2222-3333-4444-555555555555"
+  
+  capabilities:
+    instanceTypes:
+      - name: Standard_B1s
+        displayName: "B1s Burstable"
+        vcpus: 1
+        memoryGB: "1"
+        networkPerformance: "Moderate"
+        costPerHour: "$0.0104"
+      - name: Standard_B2s
+        displayName: "B2s Burstable"
+        vcpus: 2
+        memoryGB: "4"
+        networkPerformance: "Moderate"
+        costPerHour: "$0.0416"
+      - name: Standard_D2s_v3
+        displayName: "D2s v3 General Purpose"
+        vcpus: 2
+        memoryGB: "8"
+        storageGB: 16
+        networkPerformance: "Moderate"
+        costPerHour: "$0.096"
+      - name: Standard_F4s_v2
+        displayName: "F4s v2 Compute Optimized"
+        vcpus: 4
+        memoryGB: "8"
+        storageGB: 32
+        networkPerformance: "Moderate"
+        costPerHour: "$0.169"
+      - name: Standard_E4s_v3
+        displayName: "E4s v3 Memory Optimized"
+        vcpus: 4
+        memoryGB: "32"
+        storageGB: 64
+        networkPerformance: "Moderate"
+        costPerHour: "$0.252"
+      - name: Standard_NC6
+        displayName: "NC6 GPU"
+        vcpus: 6
+        memoryGB: "56"
+        storageGB: 340
+        networkPerformance: "High"
+        gpu: true
+        costPerHour: "$0.90"
+    
+    operatingSystems:
+      - family: "linux"
+        distribution: "ubuntu"
+        versions: ["18.04", "20.04", "22.04"]
+        architectures: ["x86_64"]
+        defaultImageID: "/subscriptions/.../images/ubuntu-2204"
+      - family: "linux"
+        distribution: "centos"
+        versions: ["7", "8"]
+        architectures: ["x86_64"]
+        defaultImageID: "/subscriptions/.../images/centos-8"
+      - family: "windows"
+        distribution: "windows-server"
+        versions: ["2019", "2022"]
+        architectures: ["x86_64"]
+        defaultImageID: "/subscriptions/.../images/windows-2022"
+    
+    storageTypes:
+      - name: "Premium_LRS"
+        displayName: "Premium SSD"
+        class: "SSD"
+        iopsRange:
+          min: 120
+          max: 20000
+        throughputRange:
+          min: 25
+          max: 900
+        encryptionSupported: true
+      - name: "Standard_LRS"
+        displayName: "Standard HDD"
+        class: "HDD"
+        throughputRange:
+          min: 60
+          max: 60
+        encryptionSupported: true
+      - name: "StandardSSD_LRS"
+        displayName: "Standard SSD"
+        class: "SSD"
+        iopsRange:
+          min: 120
+          max: 6000
+        throughputRange:
+          min: 25
+          max: 750
+        encryptionSupported: true
+    
+    networkFeatures: ["virtual-networks", "nsg", "public-ips", "load-balancers", "application-gateways"]
+    maxMachines: 800
+    autoScaling: true
+    loadBalancers: true
+    persistentVolumes: true
+  
+  network:
+    defaultVPC: "/subscriptions/.../virtualNetworks/production-vnet"
+    availableVPCs:
+      - id: "/subscriptions/.../virtualNetworks/production-vnet"
+        name: "production-vnet"
+        cidr: "10.1.0.0/16"
+        subnets:
+          - id: "/subscriptions/.../subnets/production-subnet"
+            name: "production-subnet"
+            cidr: "10.1.1.0/24"
+            zone: "1"
+            public: false
+          - id: "/subscriptions/.../subnets/public-subnet"
+            name: "public-subnet"
+            cidr: "10.1.100.0/24"
+            zone: "1"
+            public: true
+    defaultSecurityGroups: ["default-nsg"]
+    publicIPSupport: true
+    ipv6Support: true
+    loadBalancerSupport: true
+  
+  storage:
+    defaultType: "Premium_LRS"
+    storageClasses:
+      - name: "managed-premium"
+        displayName: "Azure Premium SSD"
+        provisioner: "disk.csi.azure.com"
+        parameters:
+          skuName: "Premium_LRS"
+          kind: "managed"
+        default: true
+      - name: "managed-standard"
+        displayName: "Azure Standard SSD"
+        provisioner: "disk.csi.azure.com"
+        parameters:
+          skuName: "StandardSSD_LRS"
+          kind: "managed"
+    defaultEncryption: true
+    maxStorageGB: 32767
+  
+  compute:
+    defaultInstanceType: "Standard_B2s"
+    maxCPUs: 128
+    maxMemoryGB: 3892
+    gpuSupport: true
+    gpuTypes: ["nvidia-tesla-k80", "nvidia-tesla-m60", "nvidia-tesla-p40", "nvidia-tesla-v100"]
+    nestedVirtualization: true
+  
+  defaultTags:
+    "Environment": "production"
+    "ManagedBy": "viti-stack"
+    "Provider": "azure"
+  
+  config:
+    "resource-group": "production-rg"
+    "location": "eastus"
+    "enable-accelerated-networking": "true"
+
+---
+# VMware vSphere Machine Provider for on-premises
+apiVersion: vitistack.io/v1alpha1
+kind: MachineProvider
+metadata:
+  name: vsphere-datacenter-1
+  namespace: providers
+  labels:
+    provider: vsphere
+    location: on-premises
+    tier: enterprise
+spec:
+  providerType: vsphere
+  displayName: "VMware vSphere Datacenter 1"
+  region: on-premises-dc1
+  zones: ["cluster-a", "cluster-b"]
+  
+  endpoint:
+    url: "https://vcenter.company.local"
+    insecureSkipVerify: false
+    caBundle: |
+      -----BEGIN CERTIFICATE-----
+      MIIDXTCCAkWgAwIBAgIJAKK...
+      -----END CERTIFICATE-----
+    timeoutSeconds: 60
+    retryAttempts: 2
+  
+  authentication:
+    type: credentials
+    credentialsRef:
+      name: vsphere-credentials
+      namespace: providers
+    parameters:
+      datacenter: "Datacenter-1"
+      cluster: "Production-Cluster"
+  
+  capabilities:
+    instanceTypes:
+      - name: small
+        displayName: "Small VM"
+        vcpus: 2
+        memoryGB: "4"
+        storageGB: 40
+        networkPerformance: "1 Gbps"
+      - name: medium
+        displayName: "Medium VM"
+        vcpus: 4
+        memoryGB: "8"
+        storageGB: 80
+        networkPerformance: "1 Gbps"
+      - name: large
+        displayName: "Large VM"
+        vcpus: 8
+        memoryGB: "16"
+        storageGB: 160
+        networkPerformance: "10 Gbps"
+      - name: xlarge
+        displayName: "XLarge VM"
+        vcpus: 16
+        memoryGB: "32"
+        storageGB: 320
+        networkPerformance: "10 Gbps"
+    
+    operatingSystems:
+      - family: "linux"
+        distribution: "ubuntu"
+        versions: ["20.04", "22.04"]
+        architectures: ["x86_64"]
+        defaultImageID: "ubuntu-2204-template"
+      - family: "linux"
+        distribution: "rhel"
+        versions: ["8", "9"]
+        architectures: ["x86_64"]
+        defaultImageID: "rhel-9-template"
+      - family: "windows"
+        distribution: "windows-server"
+        versions: ["2019", "2022"]
+        architectures: ["x86_64"]
+        defaultImageID: "windows-2022-template"
+    
+    storageTypes:
+      - name: "thin-provisioned"
+        displayName: "Thin Provisioned"
+        class: "SSD"
+        encryptionSupported: true
+      - name: "thick-provisioned"
+        displayName: "Thick Provisioned"
+        class: "SSD"
+        encryptionSupported: true
+      - name: "vsan-storage"
+        displayName: "vSAN Storage"
+        class: "SSD"
+        encryptionSupported: true
+    
+    networkFeatures: ["distributed-switch", "port-groups", "load-balancers"]
+    maxMachines: 500
+    autoScaling: false
+    loadBalancers: true
+    persistentVolumes: true
+  
+  network:
+    defaultVPC: "production-portgroup"
+    publicIPSupport: false
+    ipv6Support: true
+    loadBalancerSupport: true
+  
+  storage:
+    defaultType: "thin-provisioned"
+    storageClasses:
+      - name: "vsphere-ssd"
+        displayName: "vSphere SSD Storage"
+        provisioner: "csi.vsphere.vmware.com"
+        parameters:
+          storagepolicyname: "VM Storage Policy - SSD"
+        default: true
+      - name: "vsan-storage-policy"
+        displayName: "vSAN Storage Policy"
+        provisioner: "csi.vsphere.vmware.com"
+        parameters:
+          storagepolicyname: "vSAN Default Storage Policy"
+    defaultEncryption: true
+    maxStorageGB: 10240
+  
+  compute:
+    defaultInstanceType: "medium"
+    maxCPUs: 64
+    maxMemoryGB: 512
+    gpuSupport: true
+    gpuTypes: ["nvidia-tesla-v100", "nvidia-quadro-rtx"]
+    nestedVirtualization: true
+  
+  defaultTags:
+    "Environment": "production"
+    "ManagedBy": "viti-stack"
+    "Provider": "vsphere"
+    "Datacenter": "DC1"
+  
+  config:
+    "datacenter": "Datacenter-1"
+    "cluster": "Production-Cluster"
+    "datastore": "shared-storage-01"
+    "network": "production-portgroup"
+    "folder": "viti-stack-vms"

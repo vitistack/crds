@@ -1,0 +1,424 @@
+# Comprehensive Datacenter examples showcasing different configurations
+
+---
+# Multi-cloud enterprise datacenter with comprehensive configuration
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: enterprise-datacenter-east
+  namespace: production
+  labels:
+    environment: production
+    tier: enterprise
+    region: us-east-1
+spec:
+  displayName: "Enterprise Datacenter East"
+  description: "Primary production datacenter in US East region with multi-cloud support"
+  region: us-east-1
+  zone: us-east-1a
+  location:
+    country: "United States"
+    city: "Virginia"
+    address: "20130 Lakeview Center Plaza, Ashburn, VA 20147"
+    coordinates:
+      latitude: "39.0458"
+      longitude: "-77.4883"
+  
+  # Machine providers available in this datacenter
+  machineProviders:
+    - name: aws-us-east-1
+      namespace: providers
+      priority: 1
+      enabled: true
+      configuration:
+        region: "us-east-1"
+        zones: "us-east-1a,us-east-1b,us-east-1c"
+    - name: azure-eastus
+      namespace: providers
+      priority: 2
+      enabled: true
+      configuration:
+        region: "eastus"
+        resourceGroup: "prod-rg"
+    - name: vsphere-dc1
+      namespace: providers
+      priority: 3
+      enabled: true
+      configuration:
+        datacenter: "DC1"
+        cluster: "Prod-Cluster"
+  
+  # Kubernetes providers available
+  kubernetesProviders:
+    - name: eks-provider
+      namespace: providers
+      priority: 1
+      enabled: true
+      configuration:
+        region: "us-east-1"
+        version: "1.28"
+    - name: aks-provider
+      namespace: providers
+      priority: 2
+      enabled: true
+      configuration:
+        region: "eastus"
+        version: "1.28"
+  
+  # Network configuration
+  networking:
+    vpcs:
+      - name: production-vpc
+        cidr: "10.0.0.0/16"
+        default: true
+        subnets:
+          - name: production-subnet-1a
+            cidr: "10.0.1.0/24"
+            zone: us-east-1a
+            public: false
+          - name: production-subnet-1b
+            cidr: "10.0.2.0/24"
+            zone: us-east-1b
+            public: false
+          - name: public-subnet-1a
+            cidr: "10.0.100.0/24"
+            zone: us-east-1a
+            public: true
+    loadBalancers:
+      - name: application-lb
+        type: application
+        scheme: internet-facing
+      - name: internal-lb
+        type: network
+        scheme: internal
+    dns:
+      servers: ["8.8.8.8", "8.8.4.4"]
+      domain: "prod.company.com"
+      searchDomains: ["company.com", "prod.company.com"]
+    firewall:
+      defaultPolicy: deny
+      rules:
+        - name: allow-https
+          action: allow
+          protocol: tcp
+          port: "443"
+          source: "0.0.0.0/0"
+        - name: allow-ssh-internal
+          action: allow
+          protocol: tcp
+          port: "22"
+          source: "10.0.0.0/16"
+  
+  # Security configuration
+  security:
+    complianceFrameworks: ["SOC2", "ISO27001", "PCI-DSS"]
+    encryption:
+      atRest: true
+      inTransit: true
+      keyManagement: "aws-kms"
+    accessControl:
+      rbac: true
+      mfa: true
+      allowedUsers: ["admin@company.com", "devops@company.com"]
+      allowedGroups: ["platform-team", "security-team"]
+    auditLogging:
+      enabled: true
+      retentionDays: 365
+      destination: "s3"
+  
+  # Monitoring configuration
+  monitoring:
+    enabled: true
+    metricsRetentionDays: 90
+    alertingEnabled: true
+    alertReceivers: ["alerts@company.com", "oncall@company.com"]
+    customDashboards: ["infra-overview", "security-metrics"]
+  
+  # Backup configuration
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"
+    retentionPolicy:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    destinations:
+      - name: primary-backup
+        type: s3
+        encryption: true
+        configuration:
+          bucket: "company-backups-east"
+          region: "us-east-1"
+      - name: secondary-backup
+        type: azure
+        encryption: true
+        configuration:
+          storageAccount: "companybackups"
+          container: "datacenter-backups"
+    disasterRecovery:
+      enabled: true
+      targetDatacenter: "enterprise-datacenter-west"
+      rpoMinutes: 15
+      rtoMinutes: 60
+  
+  # Resource quotas
+  resourceQuotas:
+    maxMachines: 1000
+    maxClusters: 50
+    maxCPUCores: 10000
+    maxMemoryGB: 50000
+    maxStorageGB: 1000000
+    maxNetworkInterfaces: 5000
+  
+  # Tags for organization
+  tags:
+    cost-center: "infrastructure"
+    department: "platform"
+    environment: "production"
+    backup-policy: "enterprise"
+
+---
+# Simple edge datacenter with minimal configuration
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: edge-datacenter-west
+  namespace: edge
+  labels:
+    environment: edge
+    tier: basic
+    region: us-west-2
+spec:
+  displayName: "Edge Datacenter West"
+  description: "Edge computing datacenter for low-latency workloads"
+  region: us-west-2
+  zone: us-west-2a
+  
+  # Single machine provider
+  machineProviders:
+    - name: aws-us-west-2
+      namespace: providers
+      priority: 1
+      enabled: true
+  
+  # Basic networking
+  networking:
+    vpcs:
+      - name: edge-vpc
+        cidr: "10.1.0.0/16"
+        default: true
+        subnets:
+          - name: edge-subnet
+            cidr: "10.1.1.0/24"
+            zone: us-west-2a
+            public: true
+    dns:
+      servers: ["1.1.1.1", "1.0.0.1"]
+      domain: "edge.company.com"
+  
+  # Basic security
+  security:
+    encryption:
+      atRest: true
+      inTransit: true
+    accessControl:
+      rbac: true
+      mfa: false
+  
+  # Basic monitoring
+  monitoring:
+    enabled: true
+    metricsRetentionDays: 30
+    alertingEnabled: true
+    alertReceivers: ["edge-ops@company.com"]
+  
+  # Simple backup
+  backup:
+    enabled: true
+    schedule: "0 3 * * *"
+    retentionPolicy:
+      daily: 3
+      weekly: 2
+      monthly: 1
+    destinations:
+      - name: edge-backup
+        type: s3
+        encryption: false
+        configuration:
+          bucket: "edge-backups-west"
+          region: "us-west-2"
+  
+  # Conservative resource limits
+  resourceQuotas:
+    maxMachines: 50
+    maxClusters: 5
+    maxCPUCores: 500
+    maxMemoryGB: 2000
+    maxStorageGB: 10000
+    maxNetworkInterfaces: 200
+  
+  tags:
+    cost-center: "edge-computing"
+    environment: "edge"
+    tier: "basic"
+
+---
+# On-premises datacenter with VMware and local storage
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: onprem-datacenter-hq
+  namespace: onprem
+  labels:
+    environment: production
+    location: on-premises
+    tier: enterprise
+spec:
+  displayName: "Headquarters Datacenter"
+  description: "On-premises datacenter with VMware vSphere and local Kubernetes"
+  region: on-premises
+  zone: rack-1
+  location:
+    country: "United States"
+    city: "San Francisco"
+    address: "123 Corporate Drive, San Francisco, CA 94105"
+    coordinates:
+      latitude: "37.7749"
+      longitude: "-122.4194"
+  
+  # On-premises providers
+  machineProviders:
+    - name: vsphere-cluster-a
+      namespace: providers
+      priority: 1
+      enabled: true
+      configuration:
+        vcenter: "vcenter.company.com"
+        datacenter: "HQ-DC"
+        cluster: "Production-Cluster-A"
+    - name: vsphere-cluster-b
+      namespace: providers
+      priority: 2
+      enabled: true
+      configuration:
+        vcenter: "vcenter.company.com"
+        datacenter: "HQ-DC"
+        cluster: "Production-Cluster-B"
+  
+  kubernetesProviders:
+    - name: rancher-provider
+      namespace: providers
+      priority: 1
+      enabled: true
+      configuration:
+        version: "1.28"
+        cni: "calico"
+  
+  # On-premises networking
+  networking:
+    vpcs:
+      - name: corporate-network
+        cidr: "192.168.0.0/16"
+        default: true
+        subnets:
+          - name: production-vlan
+            cidr: "192.168.1.0/24"
+            zone: rack-1
+            public: false
+          - name: management-vlan
+            cidr: "192.168.2.0/24"
+            zone: rack-1
+            public: false
+          - name: dmz-vlan
+            cidr: "192.168.100.0/24"
+            zone: rack-1
+            public: true
+    loadBalancers:
+      - name: f5-lb
+        type: network
+        scheme: internet-facing
+    dns:
+      servers: ["192.168.1.10", "192.168.1.11"]
+      domain: "company.local"
+      searchDomains: ["company.local", "corp.company.com"]
+    firewall:
+      defaultPolicy: deny
+      rules:
+        - name: allow-web-traffic
+          action: allow
+          protocol: tcp
+          port: "80,443"
+          source: "0.0.0.0/0"
+          destination: "192.168.100.0/24"
+        - name: allow-internal-ssh
+          action: allow
+          protocol: tcp
+          port: "22"
+          source: "192.168.0.0/16"
+  
+  # Enterprise security for on-premises
+  security:
+    complianceFrameworks: ["SOC2", "GDPR"]
+    encryption:
+      atRest: true
+      inTransit: true
+      keyManagement: "vault"
+    accessControl:
+      rbac: true
+      mfa: true
+      allowedUsers: ["admin@company.local"]
+      allowedGroups: ["domain-admins", "platform-operators"]
+    auditLogging:
+      enabled: true
+      retentionDays: 2555
+      destination: "local"
+  
+  # Local monitoring
+  monitoring:
+    enabled: true
+    metricsRetentionDays: 180
+    alertingEnabled: true
+    alertReceivers: ["hq-ops@company.com", "infrastructure@company.com"]
+    customDashboards: ["vsphere-metrics", "network-performance"]
+  
+  # Local backup with NFS
+  backup:
+    enabled: true
+    schedule: "0 1 * * *"
+    retentionPolicy:
+      daily: 14
+      weekly: 8
+      monthly: 24
+    destinations:
+      - name: primary-nas
+        type: nfs
+        encryption: true
+        configuration:
+          server: "nas01.company.local"
+          path: "/backups/datacenter"
+      - name: offsite-backup
+        type: s3
+        encryption: true
+        configuration:
+          bucket: "company-offsite-backups"
+          region: "us-west-1"
+    disasterRecovery:
+      enabled: true
+      targetDatacenter: "colo-datacenter-backup"
+      rpoMinutes: 30
+      rtoMinutes: 120
+  
+  # On-premises resource limits
+  resourceQuotas:
+    maxMachines: 200
+    maxClusters: 20
+    maxCPUCores: 2000
+    maxMemoryGB: 8000
+    maxStorageGB: 100000
+    maxNetworkInterfaces: 1000
+  
+  tags:
+    location: "headquarters"
+    infrastructure: "vmware"
+    compliance: "high"
+    backup-tier: "enterprise"

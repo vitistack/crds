@@ -1,0 +1,1502 @@
+# VitiStack Advanced Examples
+
+## Overview
+
+This document provides advanced real-world examples of using VitiStack CRDs to solve complex infrastructure challenges. These examples demonstrate sophisticated configurations and integration patterns that go beyond basic usage.
+
+## Example 1: Global Multi-Cloud E-commerce Platform
+
+This example shows how to deploy a global e-commerce platform across multiple cloud providers with disaster recovery, compliance requirements, and edge computing capabilities.
+
+### Architecture Overview
+
+```
+Global Infrastructure:
+├── US Region (Primary) - AWS
+│   ├── Production Kubernetes Cluster (EKS)
+│   ├── Staging Environment
+│   └── Edge Locations (CDN + Processing)
+├── EU Region (Compliance) - Azure
+│   ├── GDPR-Compliant Data Processing
+│   ├── European Customer Data
+│   └── Disaster Recovery Site
+└── APAC Region (Growth) - GCP
+    ├── Kubernetes Cluster (GKE)
+    ├── Machine Learning Workloads
+    └── Regional Edge Processing
+```
+
+### Global Datacenter Configuration
+
+```yaml
+# Global management datacenter
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: global-ecommerce
+  namespace: global-infrastructure
+spec:
+  region: global
+  description: "Global e-commerce platform infrastructure"
+  
+  # Global security and compliance
+  security:
+    encryption:
+      atRest: true
+      inTransit: true
+      globalKeyManagement: true
+    
+    compliance:
+      frameworks:
+        - SOC2
+        - GDPR
+        - PCI-DSS
+        - HIPAA
+      auditLogging:
+        enabled: true
+        retention: "7y"  # 7 years for compliance
+        centralized: true
+      
+    rbac:
+      enabled: true
+      globalAdminGroups:
+        - "platform-admins"
+        - "security-team"
+      regionalAdminGroups:
+        - "us-ops-team"
+        - "eu-ops-team" 
+        - "apac-ops-team"
+  
+  # Global resource quotas
+  resourceQuotas:
+    globalMaxMachines: 2000
+    globalMaxClusters: 50
+    globalMaxCPU: "10000"
+    globalMaxMemory: "40Ti"
+    globalMaxStorage: "1Pi"
+  
+  # Child datacenters
+  childDatacenters:
+    - name: us-primary
+      namespace: us-region
+      priority: 1
+      role: primary
+    - name: eu-compliance
+      namespace: eu-region
+      priority: 2
+      role: compliance
+    - name: apac-growth
+      namespace: apac-region
+      priority: 3
+      role: expansion
+  
+  # Global disaster recovery
+  disasterRecovery:
+    enabled: true
+    crossRegionReplication: true
+    rpo: "15m"  # 15 minutes recovery point objective
+    rto: "1h"   # 1 hour recovery time objective
+    
+    replicationMatrix:
+      - primary: us-primary
+        secondary: eu-compliance
+        mode: async
+        schedule: "*/15 * * * *"
+      - primary: eu-compliance
+        secondary: us-primary
+        mode: async
+        schedule: "*/15 * * * *"
+      - primary: apac-growth
+        secondary: us-primary
+        mode: async
+        schedule: "*/30 * * * *"
+  
+  # Global monitoring and observability
+  monitoring:
+    enabled: true
+    provider: prometheus
+    federation: true  # Enable Prometheus federation
+    globalView: true
+    
+    alerting:
+      enabled: true
+      escalationMatrix:
+        - severity: critical
+          primary: "platform-oncall"
+          secondary: "engineering-leadership"
+          escalationTime: "15m"
+        - severity: warning
+          primary: "platform-team"
+          escalationTime: "30m"
+  
+  # Edge computing configuration
+  edge:
+    enabled: true
+    globalCDN: true
+    edgeLocations:
+      - name: us-west-edge
+        region: us-west
+        provider: aws
+        capabilities: ["cdn", "compute", "ai-inference"]
+      - name: eu-central-edge
+        region: eu-central
+        provider: azure
+        capabilities: ["cdn", "compute", "gdpr-processing"]
+      - name: apac-southeast-edge
+        region: apac-southeast
+        provider: gcp
+        capabilities: ["cdn", "compute", "ml-training"]
+
+---
+# US Primary Datacenter
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: us-primary
+  namespace: us-region
+spec:
+  region: us-west-2
+  description: "Primary US datacenter for e-commerce platform"
+  
+  # Reference to global parent
+  parentDatacenter:
+    name: global-ecommerce
+    namespace: global-infrastructure
+  
+  # Inherit global policies
+  inheritPolicies: true
+  
+  # Region-specific networking
+  networking:
+    vpcs:
+      - name: production-vpc
+        cidr: "10.0.0.0/16"
+        subnets:
+          # Public subnets for load balancers
+          - name: public-1a
+            cidr: "10.0.1.0/24"
+            type: public
+            availabilityZone: us-west-2a
+          - name: public-1b
+            cidr: "10.0.2.0/24"
+            type: public
+            availabilityZone: us-west-2b
+          
+          # Private subnets for applications
+          - name: private-1a
+            cidr: "10.0.10.0/24"
+            type: private
+            availabilityZone: us-west-2a
+          - name: private-1b
+            cidr: "10.0.11.0/24"
+            type: private
+            availabilityZone: us-west-2b
+          
+          # Database subnets
+          - name: database-1a
+            cidr: "10.0.20.0/24"
+            type: database
+            availabilityZone: us-west-2a
+          - name: database-1b
+            cidr: "10.0.21.0/24"
+            type: database
+            availabilityZone: us-west-2b
+    
+    # Multi-tier load balancing
+    loadBalancers:
+      - name: web-tier-alb
+        type: application
+        scheme: internet-facing
+        listeners:
+          - port: 443
+            protocol: HTTPS
+            certificateArn: "arn:aws:acm:us-west-2:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+          - port: 80
+            protocol: HTTP
+            redirectToHTTPS: true
+        
+        # Advanced routing
+        routing:
+          rules:
+            - host: "api.ecommerce.com"
+              pathPatterns: ["/api/*"]
+              targetGroup: api-services
+            - host: "www.ecommerce.com"
+              pathPatterns: ["/*"]
+              targetGroup: web-frontend
+            - host: "admin.ecommerce.com"
+              pathPatterns: ["/*"]
+              targetGroup: admin-portal
+              authRequired: true
+      
+      - name: internal-nlb
+        type: network
+        scheme: internal
+        crossZoneBalancing: true
+  
+  # Advanced security configuration
+  security:
+    # Zero-trust networking
+    zeroTrust:
+      enabled: true
+      defaultDeny: true
+      microsegmentation: true
+    
+    # Web Application Firewall
+    waf:
+      enabled: true
+      rules:
+        - name: sql-injection-protection
+          type: sql-injection
+          action: block
+        - name: xss-protection
+          type: cross-site-scripting
+          action: block
+        - name: rate-limiting
+          type: rate-limit
+          rateLimit: 1000  # requests per minute per IP
+          action: throttle
+    
+    # DDoS protection
+    ddosProtection:
+      enabled: true
+      provider: aws-shield
+      advancedProtection: true
+  
+  # Regional resource quotas
+  resourceQuotas:
+    maxMachines: 800
+    maxClusters: 20
+    maxCPU: "4000"
+    maxMemory: "16Ti"
+    maxStorage: "500Ti"
+  
+  # Provider references
+  machineProviders:
+    - name: aws-us-west-provider
+      priority: 1
+      weight: 80
+    - name: aws-us-east-failover
+      priority: 2
+      weight: 20
+      conditions:
+        - type: RegionHealthy
+          operator: eq
+          value: "false"
+  
+  kubernetesProviders:
+    - name: eks-us-west-provider
+      priority: 1
+
+---
+# EU Compliance Datacenter
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: eu-compliance
+  namespace: eu-region
+spec:
+  region: eu-central-1
+  description: "GDPR-compliant EU datacenter"
+  
+  # GDPR-specific configuration
+  compliance:
+    frameworks:
+      - GDPR
+      - SOC2
+    
+    dataResidency:
+      enabled: true
+      allowedRegions: ["eu-central-1", "eu-west-1"]
+      dataClassification:
+        - type: personal-data
+          encryption: required
+          retention: "2y"  # GDPR requirement
+          deletionPolicy: automatic
+    
+    privacy:
+      rightToForget: true
+      dataPortability: true
+      consentManagement: true
+  
+  # Enhanced security for compliance
+  security:
+    encryption:
+      atRest: true
+      inTransit: true
+      keyRotation: "quarterly"
+    
+    auditLogging:
+      enabled: true
+      retention: "7y"
+      immutable: true  # Immutable audit logs
+      realTimeMonitoring: true
+  
+  # Provider references (Azure for GDPR compliance)
+  machineProviders:
+    - name: azure-eu-central-provider
+      priority: 1
+  
+  kubernetesProviders:
+    - name: aks-eu-central-provider
+      priority: 1
+
+---
+# APAC Growth Datacenter
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: apac-growth
+  namespace: apac-region
+spec:
+  region: asia-southeast1
+  description: "APAC growth region with ML capabilities"
+  
+  # ML and AI-focused configuration
+  specializedWorkloads:
+    machineLearning:
+      enabled: true
+      gpuSupport: true
+      frameworks:
+        - tensorflow
+        - pytorch
+        - kubeflow
+    
+    bigData:
+      enabled: true
+      frameworks:
+        - spark
+        - hadoop
+        - kafka
+  
+  # Cost optimization for growth region
+  costOptimization:
+    enabled: true
+    strategies:
+      - spot-instances
+      - auto-scaling
+      - scheduled-scaling
+    
+    budgets:
+      monthly: "$50000"
+      alerts:
+        - threshold: 50
+          action: notify
+        - threshold: 80
+          action: slow-scaling
+        - threshold: 95
+          action: stop-non-critical
+  
+  # Provider references (GCP for ML capabilities)
+  machineProviders:
+    - name: gcp-asia-southeast-provider
+      priority: 1
+  
+  kubernetesProviders:
+    - name: gke-asia-southeast-provider
+      priority: 1
+      features:
+        - autopilot
+        - gpu-support
+        - ml-workloads
+```
+
+### Multi-Cloud Machine Providers
+
+```yaml
+# AWS Provider for US Primary
+apiVersion: vitistack.io/v1alpha1
+kind: MachineProvider
+metadata:
+  name: aws-us-west-provider
+  namespace: us-region
+spec:
+  type: aws
+  region: us-west-2
+  description: "Primary AWS provider for US operations"
+  
+  aws:
+    credentials:
+      secretRef:
+        name: aws-production-credentials
+        namespace: us-region
+    
+    # E-commerce optimized instance types
+    instanceTypes:
+      # Web tier instances
+      - name: c5.large
+        vcpus: 2
+        memory: 4Gi
+        networkPerformance: high
+        pricing:
+          onDemand: "$0.085/hour"
+          spot: "$0.025/hour"
+        workloadTypes: ["web-frontend", "api-gateway"]
+      
+      # Application tier instances
+      - name: m5.xlarge
+        vcpus: 4
+        memory: 16Gi
+        networkPerformance: high
+        pricing:
+          onDemand: "$0.192/hour"
+          spot: "$0.058/hour"
+        workloadTypes: ["api-services", "background-jobs"]
+      
+      # Database tier instances
+      - name: r5.2xlarge
+        vcpus: 8
+        memory: 64Gi
+        networkPerformance: high
+        storageOptimized: true
+        pricing:
+          onDemand: "$0.504/hour"
+          reserved1Year: "$0.302/hour"
+        workloadTypes: ["database", "cache"]
+      
+      # ML/Analytics instances
+      - name: p3.2xlarge
+        vcpus: 8
+        memory: 61Gi
+        gpus: 1
+        gpuType: "Tesla V100"
+        networkPerformance: high
+        pricing:
+          onDemand: "$3.06/hour"
+          spot: "$0.918/hour"
+        workloadTypes: ["ml-training", "ai-inference"]
+    
+    # Multi-AZ configuration
+    networking:
+      multiAZ: true
+      subnets:
+        - subnet-1a-private  # us-west-2a
+        - subnet-1b-private  # us-west-2b
+      
+      securityGroups:
+        - name: web-tier-sg
+          rules:
+            - type: ingress
+              protocol: tcp
+              fromPort: 80
+              toPort: 80
+              source: alb-sg
+            - type: ingress
+              protocol: tcp
+              fromPort: 443
+              toPort: 443
+              source: alb-sg
+        
+        - name: app-tier-sg
+          rules:
+            - type: ingress
+              protocol: tcp
+              fromPort: 8080
+              toPort: 8080
+              source: web-tier-sg
+            - type: ingress
+              protocol: tcp
+              fromPort: 9090
+              toPort: 9090
+              source: monitoring-sg
+        
+        - name: db-tier-sg
+          rules:
+            - type: ingress
+              protocol: tcp
+              fromPort: 5432
+              toPort: 5432
+              source: app-tier-sg
+            - type: ingress
+              protocol: tcp
+              fromPort: 6379
+              toPort: 6379
+              source: app-tier-sg
+    
+    # Auto-scaling for e-commerce traffic
+    autoScaling:
+      enabled: true
+      profiles:
+        - name: web-tier-scaling
+          minSize: 4
+          maxSize: 50
+          targetCPUUtilization: 60
+          targetRequestCount: 1000
+          scaleUpCooldown: 300
+          scaleDownCooldown: 600
+          
+          # E-commerce specific scaling
+          customMetrics:
+            - name: checkout-rate
+              targetValue: 100
+              scaleUpThreshold: 150
+            - name: cart-abandonment
+              targetValue: 20
+              scaleUpThreshold: 30
+        
+        - name: app-tier-scaling
+          minSize: 6
+          maxSize: 30
+          targetCPUUtilization: 70
+          targetMemoryUtilization: 80
+          
+          # Business hours scaling
+          schedules:
+            - name: business-hours-scale-up
+              schedule: "0 6 * * 1-5"  # 6 AM weekdays
+              minSize: 10
+              desiredCapacity: 12
+            - name: business-hours-scale-down
+              schedule: "0 22 * * 1-5" # 10 PM weekdays
+              minSize: 6
+              desiredCapacity: 8
+            - name: weekend-scale-down
+              schedule: "0 0 * * 6,0"  # Weekends
+              minSize: 4
+              desiredCapacity: 6
+    
+    # Cost optimization
+    costOptimization:
+      spotInstances:
+        enabled: true
+        maxPercentage: 70  # Up to 70% spot instances
+        diversification: true
+        interruption:
+          handling: graceful
+          drainTimeout: 120
+      
+      rightsizing:
+        enabled: true
+        recommendations: true
+        autoApply: false  # Manual approval for production
+      
+      scheduling:
+        nonProd:
+          shutdownSchedule: "0 20 * * 1-5"  # Shutdown at 8 PM
+          startupSchedule: "0 8 * * 1-5"    # Start at 8 AM
+
+---
+# Azure Provider for EU Compliance
+apiVersion: vitistack.io/v1alpha1
+kind: MachineProvider
+metadata:
+  name: azure-eu-central-provider
+  namespace: eu-region
+spec:
+  type: azure
+  region: westeurope
+  description: "GDPR-compliant Azure provider for EU operations"
+  
+  azure:
+    credentials:
+      secretRef:
+        name: azure-production-credentials
+        namespace: eu-region
+    
+    # GDPR-compliant configuration
+    compliance:
+      gdpr:
+        enabled: true
+        dataResidency: eu-only
+        encryptionRequired: true
+        auditLogging: enhanced
+      
+      certifications:
+        - iso27001
+        - soc2-type2
+        - gdpr-compliant
+    
+    instanceTypes:
+      # General purpose instances
+      - name: Standard_D4s_v3
+        vcpus: 4
+        memory: 16Gi
+        storage: 32Gi
+        pricing:
+          payAsYouGo: "€0.192/hour"
+          reserved1Year: "€0.115/hour"
+        workloadTypes: ["web-services", "api-services"]
+      
+      # Memory optimized for databases
+      - name: Standard_E8s_v3
+        vcpus: 8
+        memory: 64Gi
+        storage: 128Gi
+        pricing:
+          payAsYouGo: "€0.504/hour"
+          reserved1Year: "€0.302/hour"
+        workloadTypes: ["database", "in-memory-cache"]
+    
+    # Enhanced security for GDPR
+    security:
+      diskEncryption:
+        enabled: true
+        keyVault: eu-central-kv
+        customerManagedKeys: true
+      
+      networkSecurity:
+        privateEndpoints: true
+        serviceEndpoints: true
+        nsgRulesStrict: true
+      
+      identityManagement:
+        managedIdentity: true
+        rbacIntegration: true
+    
+    # GDPR-specific monitoring
+    monitoring:
+      dataAccess:
+        logging: comprehensive
+        retention: "7y"
+        realTimeAlerts: true
+      
+      privacyControls:
+        dataMinimization: true
+        consentTracking: true
+        rightToForget: automated
+
+---
+# GCP Provider for APAC with ML Focus
+apiVersion: vitistack.io/v1alpha1
+kind: MachineProvider
+metadata:
+  name: gcp-asia-southeast-provider
+  namespace: apac-region
+spec:
+  type: gcp
+  region: asia-southeast1
+  description: "GCP provider optimized for ML workloads in APAC"
+  
+  gcp:
+    credentials:
+      secretRef:
+        name: gcp-production-credentials
+        namespace: apac-region
+    
+    # ML-optimized instance types
+    instanceTypes:
+      # Standard compute instances
+      - name: n2-standard-4
+        vcpus: 4
+        memory: 16Gi
+        pricing:
+          onDemand: "$0.194/hour"
+          preemptible: "$0.058/hour"
+        workloadTypes: ["web-services", "api-services"]
+      
+      # GPU instances for ML
+      - name: n1-standard-8-k80
+        vcpus: 8
+        memory: 30Gi
+        gpus: 1
+        gpuType: "Tesla K80"
+        pricing:
+          onDemand: "$0.676/hour"
+          preemptible: "$0.203/hour"
+        workloadTypes: ["ml-training", "gpu-compute"]
+      
+      - name: n1-standard-16-v100
+        vcpus: 16
+        memory: 60Gi
+        gpus: 1
+        gpuType: "Tesla V100"
+        pricing:
+          onDemand: "$2.48/hour"
+          preemptible: "$0.744/hour"
+        workloadTypes: ["advanced-ml", "ai-research"]
+      
+      # TPU instances for TensorFlow
+      - name: n1-standard-96-tpu
+        vcpus: 96
+        memory: 360Gi
+        tpus: 8
+        tpuType: "TPU v3"
+        pricing:
+          onDemand: "$8.00/hour"
+        workloadTypes: ["tensorflow-training", "large-scale-ml"]
+    
+    # ML-specific configuration
+    machineLearning:
+      frameworks:
+        - name: tensorflow
+          version: "2.9"
+          optimizedImages: true
+        - name: pytorch
+          version: "1.12"
+          optimizedImages: true
+        - name: scikit-learn
+          version: "1.1"
+        - name: xgboost
+          version: "1.6"
+      
+      dataProcessing:
+        bigQuery: true
+        dataflow: true
+        dataproc: true
+      
+      mlops:
+        vertexAI: true
+        mlflow: true
+        kubeflow: true
+    
+    # Cost optimization for growth market
+    costOptimization:
+      preemptibleInstances:
+        enabled: true
+        maxPercentage: 80
+        faultTolerant: true
+      
+      sustainedUseDiscounts: true
+      committedUseDiscounts:
+        enabled: true
+        term: "1y"
+        percentage: 30
+      
+      # Regional pricing optimization
+      regionOptimization:
+        enabled: true
+        alternativeRegions:
+          - asia-southeast2
+          - asia-east1
+        costThreshold: 15  # Switch if >15% cheaper
+```
+
+### Kubernetes Providers Configuration
+
+```yaml
+# EKS Provider for US Primary
+apiVersion: vitistack.io/v1alpha1
+kind: KubernetesProvider
+metadata:
+  name: eks-us-west-provider
+  namespace: us-region
+spec:
+  type: eks
+  version: "1.24"
+  region: us-west-2
+  description: "Production EKS cluster for e-commerce platform"
+  
+  eks:
+    clusterConfig:
+      name: ecommerce-production
+      
+      # High availability configuration
+      highAvailability:
+        multiAZ: true
+        availabilityZones:
+          - us-west-2a
+          - us-west-2b
+          - us-west-2c
+      
+      # API server configuration
+      endpointAccess:
+        private: true
+        public: true
+        publicCIDRs:
+          - "203.0.113.0/24"  # Office IPs
+          - "198.51.100.0/24" # VPN IPs
+      
+      # Comprehensive logging
+      logging:
+        enabled: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+        retention: "30d"
+        
+      # Encryption at rest
+      encryption:
+        enabled: true
+        kmsKeyId: "arn:aws:kms:us-west-2:123456789012:key/ecommerce-k8s-key"
+    
+    # Multi-tier node groups
+    nodeGroups:
+      # System/Infrastructure nodes
+      - name: system-nodes
+        instanceTypes: ["m5.large", "m5.xlarge"]
+        amiType: AL2_x86_64
+        capacityType: ON_DEMAND
+        
+        scaling:
+          minSize: 3
+          maxSize: 6
+          desiredSize: 3
+        
+        labels:
+          node-type: system
+          workload-tier: infrastructure
+        
+        taints:
+          - key: node-type
+            value: system
+            effect: NoSchedule
+        
+        # Dedicated to system workloads
+        nodeClassRef:
+          name: system-nodeclass
+      
+      # Web tier nodes
+      - name: web-tier-nodes
+        instanceTypes: ["c5.large", "c5.xlarge"]
+        amiType: AL2_x86_64
+        capacityType: SPOT
+        spotAllocationStrategy: price-capacity-optimized
+        
+        scaling:
+          minSize: 4
+          maxSize: 20
+          desiredSize: 6
+        
+        labels:
+          node-type: web
+          workload-tier: frontend
+        
+        # Auto-scaling based on HTTP requests
+        autoScaling:
+          metrics:
+            - type: http-requests
+              targetValue: 1000
+      
+      # Application tier nodes
+      - name: app-tier-nodes
+        instanceTypes: ["m5.xlarge", "m5.2xlarge"]
+        amiType: AL2_x86_64
+        capacityType: MIXED  # Mix of on-demand and spot
+        
+        scaling:
+          minSize: 6
+          maxSize: 30
+          desiredSize: 10
+        
+        labels:
+          node-type: application
+          workload-tier: backend
+        
+        # Business hours scaling
+        schedules:
+          - name: scale-up-business-hours
+            schedule: "0 6 * * 1-5"
+            desiredSize: 15
+          - name: scale-down-evening
+            schedule: "0 22 * * 1-5"
+            desiredSize: 8
+      
+      # Database tier nodes
+      - name: database-nodes
+        instanceTypes: ["r5.xlarge", "r5.2xlarge"]
+        amiType: AL2_x86_64
+        capacityType: ON_DEMAND  # Always on-demand for data
+        
+        scaling:
+          minSize: 3
+          maxSize: 9
+          desiredSize: 3
+        
+        labels:
+          node-type: database
+          workload-tier: data
+        
+        taints:
+          - key: workload-tier
+            value: data
+            effect: NoSchedule
+        
+        # Enhanced storage
+        storage:
+          volumeType: gp3
+          volumeSize: 200Gi
+          iops: 3000
+          encryption: true
+      
+      # ML/Analytics nodes
+      - name: ml-nodes
+        instanceTypes: ["p3.2xlarge", "p3.8xlarge"]
+        amiType: AL2_x86_64_GPU
+        capacityType: SPOT
+        
+        scaling:
+          minSize: 0
+          maxSize: 10
+          desiredSize: 2
+        
+        labels:
+          node-type: ml
+          workload-tier: analytics
+          gpu-enabled: "true"
+        
+        taints:
+          - key: gpu-workload
+            value: "true"
+            effect: NoSchedule
+  
+  # Advanced networking
+  networking:
+    cni: aws-vpc-cni
+    version: "1.11.4"
+    
+    # Service mesh for microservices
+    serviceMesh:
+      enabled: true
+      type: istio
+      version: "1.15"
+      
+      config:
+        # Security
+        mtls:
+          mode: STRICT
+        
+        # Observability
+        tracing:
+          enabled: true
+          provider: jaeger
+          samplingRate: 1.0  # 100% sampling for production debugging
+        
+        # Traffic management
+        trafficManagement:
+          loadBalancing: ROUND_ROBIN
+          circuitBreaker:
+            enabled: true
+            maxConnections: 100
+            maxRequests: 200
+          timeout: 30s
+          retries:
+            attempts: 3
+            perTryTimeout: 10s
+    
+    # Network policies for micro-segmentation
+    networkPolicies:
+      enabled: true
+      provider: calico
+      defaultDeny: true
+      
+      policies:
+        # Web tier can only communicate with app tier
+        - name: web-to-app-only
+          namespace: web-tier
+          spec:
+            podSelector:
+              matchLabels:
+                tier: web
+            egress:
+              - to:
+                - namespaceSelector:
+                    matchLabels:
+                      name: app-tier
+                ports:
+                  - protocol: TCP
+                    port: 8080
+        
+        # App tier can communicate with database tier
+        - name: app-to-db-only
+          namespace: app-tier
+          spec:
+            podSelector:
+              matchLabels:
+                tier: app
+            egress:
+              - to:
+                - namespaceSelector:
+                    matchLabels:
+                      name: database-tier
+                ports:
+                  - protocol: TCP
+                    port: 5432
+                  - protocol: TCP
+                    port: 6379
+  
+  # Comprehensive add-ons for e-commerce
+  addons:
+    # Load balancing
+    - name: aws-load-balancer-controller
+      version: "v2.4.4"
+      enabled: true
+      config:
+        clusterName: ecommerce-production
+        enableWAFv2: true
+        enableShield: true
+    
+    # Auto-scaling
+    - name: cluster-autoscaler
+      version: "1.24.0"
+      enabled: true
+      config:
+        scaleDownDelay: "10m"
+        scaleDownUnneededTime: "10m"
+        skipNodesWithLocalStorage: false
+    
+    # External DNS for multi-region
+    - name: external-dns
+      version: "0.12.2"
+      enabled: true
+      config:
+        provider: aws
+        domainFilters: ["ecommerce.com"]
+        policy: sync
+        registry: txt
+        annotationFilter: external-dns.alpha.kubernetes.io/hostname
+    
+    # Certificate management
+    - name: cert-manager
+      version: "v1.9.1"
+      enabled: true
+      config:
+        installCRDs: true
+        clusterIssuers:
+          - name: letsencrypt-prod
+            server: https://acme-v02.api.letsencrypt.org/directory
+            email: platform@ecommerce.com
+            solverType: route53
+    
+    # Monitoring stack
+    - name: prometheus-operator
+      version: "0.60.1"
+      enabled: true
+      config:
+        prometheus:
+          retention: "30d"
+          storage: "100Gi"
+          resources:
+            requests:
+              cpu: "2"
+              memory: "8Gi"
+            limits:
+              cpu: "4"
+              memory: "16Gi"
+          
+          # E-commerce specific monitoring
+          additionalScrapeConfigs:
+            - job_name: ecommerce-metrics
+              static_configs:
+                - targets: ["metrics.ecommerce.internal:9090"]
+              metrics_path: /metrics
+              scrape_interval: 15s
+        
+        grafana:
+          enabled: true
+          persistence: 20Gi
+          dashboards:
+            - name: ecommerce-overview
+              url: "https://raw.githubusercontent.com/company/dashboards/main/ecommerce-overview.json"
+            - name: business-metrics
+              configMapRef:
+                name: business-dashboard
+                key: dashboard.json
+        
+        alertmanager:
+          enabled: true
+          config:
+            global:
+              slackApiUrl: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+            
+            route:
+              groupBy: ["alertname", "cluster", "service"]
+              groupWait: 30s
+              groupInterval: 5m
+              repeatInterval: 12h
+              receiver: default-receiver
+              
+              routes:
+                # Critical business alerts
+                - match:
+                    severity: critical
+                    category: business
+                  receiver: business-critical
+                  groupWait: 0s
+                  repeatInterval: 5m
+                
+                # Infrastructure alerts
+                - match:
+                    severity: critical
+                    category: infrastructure
+                  receiver: infrastructure-critical
+                  groupWait: 30s
+                  repeatInterval: 30m
+            
+            receivers:
+              - name: default-receiver
+                slackConfigs:
+                  - channel: "#platform-alerts"
+                    title: "Platform Alert"
+                    text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
+              
+              - name: business-critical
+                slackConfigs:
+                  - channel: "#business-critical"
+                    title: "CRITICAL: Business Impact"
+                    text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
+                pagerdutyConfigs:
+                  - serviceKey: "business-critical-service-key"
+              
+              - name: infrastructure-critical
+                slackConfigs:
+                  - channel: "#infrastructure-alerts"
+                    title: "Infrastructure Critical Alert"
+                    text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
+                pagerdutyConfigs:
+                  - serviceKey: "infrastructure-service-key"
+    
+    # Security scanning
+    - name: falco
+      version: "2.0.0"
+      enabled: true
+      config:
+        syscallBufferSize: 8388608
+        modernBPF: true
+        grpc:
+          enabled: true
+          listenPort: 5060
+        rules:
+          - /etc/falco/k8s_audit_rules.yaml
+          - /etc/falco/application_rules.yaml
+    
+    # Service mesh observability
+    - name: kiali
+      version: "1.55"
+      enabled: true
+      config:
+        external_services:
+          prometheus:
+            url: "http://prometheus:9090"
+          grafana:
+            url: "http://grafana:3000"
+          jaeger:
+            url: "http://jaeger-query:16686"
+    
+    # Backup solution
+    - name: velero
+      version: "1.9.0"
+      enabled: true
+      config:
+        provider: aws
+        bucket: ecommerce-k8s-backups-us-west-2
+        backupLocation: us-west-2
+        volumeSnapshotLocation: us-west-2
+        schedule:
+          - name: daily-backup
+            schedule: "0 1 * * *"
+            ttl: "720h"  # 30 days
+          - name: weekly-backup
+            schedule: "0 2 * * 0"
+            ttl: "2160h"  # 90 days
+```
+
+This example demonstrates a sophisticated global e-commerce platform with:
+
+1. **Multi-cloud strategy** across AWS, Azure, and GCP
+2. **Compliance-focused** architecture with GDPR requirements
+3. **Advanced networking** with service mesh and micro-segmentation
+4. **Cost optimization** strategies including spot instances and auto-scaling
+5. **Comprehensive monitoring** with business and infrastructure metrics
+6. **Security-first approach** with zero-trust networking and scanning
+7. **Disaster recovery** with cross-region replication
+8. **Machine learning capabilities** for analytics and recommendations
+
+The configuration shows how VitiStack CRDs can orchestrate complex, enterprise-grade infrastructure that meets real-world business requirements while maintaining operational excellence.
+
+## Example 2: Financial Services Multi-Zone Deployment
+
+This example demonstrates a financial services platform with strict compliance, high availability, and security requirements.
+
+### Compliance-First Datacenter
+
+```yaml
+apiVersion: vitistack.io/v1alpha1
+kind: Datacenter
+metadata:
+  name: financial-services-primary
+  namespace: fintech-production
+spec:
+  region: us-east-1
+  description: "Financial services platform with regulatory compliance"
+  
+  # Regulatory compliance configuration
+  compliance:
+    frameworks:
+      - PCI-DSS
+      - SOX
+      - FFIEC
+      - GLBA
+      - SOC2-TYPE-II
+    
+    # Audit requirements
+    auditLogging:
+      enabled: true
+      retention: "7y"  # Regulatory requirement
+      immutable: true
+      realTimeMonitoring: true
+      segregationOfDuties: true
+    
+    # Data classification
+    dataClassification:
+      - type: cardholder-data
+        pciLevel: level1
+        encryption: required
+        tokenization: required
+        retention: "18m"
+      - type: financial-records
+        retention: "7y"
+        encryption: required
+        accessLogging: comprehensive
+      - type: customer-pii
+        encryption: required
+        accessControls: strict
+        dataMinimization: true
+  
+  # Enhanced security for financial services
+  security:
+    # Zero-trust architecture
+    zeroTrust:
+      enabled: true
+      defaultDeny: true
+      microsegmentation: true
+      continuousVerification: true
+    
+    # Encryption requirements
+    encryption:
+      atRest: true
+      inTransit: true
+      keyManagement: hsm  # Hardware Security Module
+      keyRotation: "quarterly"
+      quantumResistant: true
+    
+    # Access controls
+    accessControl:
+      multiFactorAuth: required
+      privilegedAccessManagement: true
+      justInTimeAccess: true
+      sessionRecording: true
+      
+      # Segregation of duties
+      segregationOfDuties:
+        enabled: true
+        roles:
+          - name: developer
+            restrictions: ["no-production-access", "no-data-export"]
+          - name: operator
+            restrictions: ["no-code-changes", "no-data-access"]
+          - name: auditor
+            permissions: ["read-only", "audit-logs", "compliance-reports"]
+    
+    # Intrusion detection and prevention
+    securityMonitoring:
+      ids: true  # Intrusion Detection System
+      ips: true  # Intrusion Prevention System
+      siem: true # Security Information and Event Management
+      
+      threatIntelligence:
+        enabled: true
+        feeds:
+          - financial-sector-threats
+          - general-threat-intel
+          - regulatory-alerts
+  
+  # High availability for financial services
+  highAvailability:
+    enabled: true
+    replicationFactor: 3
+    crossZone: true
+    crossRegion: true
+    rpo: "1m"   # Recovery Point Objective
+    rto: "5m"   # Recovery Time Objective
+    
+    # Multi-zone deployment
+    zones:
+      - name: primary-zone
+        availabilityZone: us-east-1a
+        priority: 1
+        capacity: 40
+      - name: secondary-zone
+        availabilityZone: us-east-1b
+        priority: 2
+        capacity: 35
+      - name: tertiary-zone
+        availabilityZone: us-east-1c
+        priority: 3
+        capacity: 25
+  
+  # Network security
+  networking:
+    # Segmented network architecture
+    vpcs:
+      - name: dmz-vpc
+        cidr: "10.1.0.0/16"
+        description: "DMZ for external-facing services"
+        subnets:
+          - name: web-dmz-1a
+            cidr: "10.1.1.0/24"
+            availabilityZone: us-east-1a
+            type: public
+          - name: web-dmz-1b
+            cidr: "10.1.2.0/24"
+            availabilityZone: us-east-1b
+            type: public
+      
+      - name: app-vpc
+        cidr: "10.2.0.0/16"
+        description: "Application tier network"
+        subnets:
+          - name: app-private-1a
+            cidr: "10.2.1.0/24"
+            availabilityZone: us-east-1a
+            type: private
+          - name: app-private-1b
+            cidr: "10.2.2.0/24"
+            availabilityZone: us-east-1b
+            type: private
+      
+      - name: data-vpc
+        cidr: "10.3.0.0/16"
+        description: "Database and sensitive data network"
+        subnets:
+          - name: db-private-1a
+            cidr: "10.3.1.0/24"
+            availabilityZone: us-east-1a
+            type: database
+          - name: db-private-1b
+            cidr: "10.3.2.0/24"
+            availabilityZone: us-east-1b
+            type: database
+    
+    # Advanced firewall rules
+    firewallRules:
+      # DMZ to App tier
+      - name: dmz-to-app
+        direction: outbound
+        source: "10.1.0.0/16"
+        destination: "10.2.0.0/16"
+        protocol: tcp
+        ports: "8080,8443"
+        inspection: deep-packet
+        logging: enabled
+      
+      # App to Data tier
+      - name: app-to-data
+        direction: outbound
+        source: "10.2.0.0/16"
+        destination: "10.3.0.0/16"
+        protocol: tcp
+        ports: "5432,1433,3306"
+        inspection: database-aware
+        logging: enabled
+        
+      # Deny all other inter-VPC traffic
+      - name: deny-inter-vpc
+        direction: both
+        action: deny
+        logging: enabled
+    
+    # DDoS protection
+    ddosProtection:
+      enabled: true
+      provider: aws-shield-advanced
+      rateLimiting: true
+      geoblocking: true
+      
+      # Financial sector specific protections
+      applicationLayer:
+        enabled: true
+        rules:
+          - name: api-rate-limiting
+            path: "/api/*"
+            rateLimit: 100  # requests per minute per IP
+          - name: authentication-protection
+            path: "/auth/*"
+            rateLimit: 10   # Lower limit for auth endpoints
+  
+  # Regulatory monitoring and reporting
+  monitoring:
+    enabled: true
+    provider: prometheus
+    
+    # Compliance monitoring
+    compliance:
+      enabled: true
+      frameworks:
+        - pci-dss
+        - sox
+        - ffiec
+      
+      reporting:
+        enabled: true
+        schedule: "0 0 1 * *"  # Monthly reports
+        recipients:
+          - compliance-team@company.com
+          - ciso@company.com
+        
+        customReports:
+          - name: pci-compliance-report
+            template: pci-dss-template
+            frequency: quarterly
+          - name: access-review-report
+            template: access-review-template
+            frequency: monthly
+    
+    # Financial metrics
+    businessMetrics:
+      enabled: true
+      metrics:
+        - name: transaction-volume
+          type: counter
+          labels: ["currency", "region", "channel"]
+        - name: transaction-value
+          type: histogram
+          labels: ["currency", "type"]
+        - name: fraud-detection-rate
+          type: gauge
+          alertThreshold: 0.01  # 1% fraud rate threshold
+        - name: compliance-violations
+          type: counter
+          alertThreshold: 0  # Zero tolerance
+  
+  # Backup and disaster recovery
+  backup:
+    enabled: true
+    compliance: pci-dss
+    
+    schedules:
+      - name: real-time-replication
+        type: continuous
+        retention: "7d"
+        encryption: true
+        crossRegion: true
+      - name: daily-backup
+        schedule: "0 2 * * *"
+        retention: "90d"
+        encryption: true
+        offsite: true
+      - name: weekly-backup
+        schedule: "0 3 * * 0"
+        retention: "7y"  # Regulatory requirement
+        encryption: true
+        offsite: true
+        immutable: true
+    
+    testing:
+      enabled: true
+      schedule: "0 4 * * 0"  # Weekly DR testing
+      scenarios:
+        - zone-failure
+        - region-failure
+        - data-corruption
+        - security-incident
+  
+  # Provider references
+  machineProviders:
+    - name: aws-financial-provider
+      priority: 1
+      complianceLevel: pci-dss-level1
+  
+  kubernetesProviders:
+    - name: eks-financial-provider
+      priority: 1
+      securityProfile: financial-services
+```
+
+This advanced example showcases enterprise-grade features including:
+
+- **Regulatory compliance** with multiple frameworks (PCI-DSS, SOX, FFIEC)
+- **Zero-trust security** architecture with microsegmentation
+- **Multi-zone high availability** with strict RPO/RTO requirements
+- **Advanced monitoring** with business and compliance metrics
+- **Comprehensive backup** strategies with regulatory retention
+- **Network segmentation** with DMZ, application, and data tiers
+- **Threat protection** with DDoS mitigation and intrusion prevention
+
+These examples demonstrate how VitiStack CRDs can handle complex, real-world enterprise requirements while maintaining security, compliance, and operational excellence.

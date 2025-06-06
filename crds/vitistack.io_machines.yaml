@@ -16,7 +16,23 @@ spec:
     singular: machine
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .spec.providerConfig.name
+      name: Provider
+      type: string
+    - jsonPath: .spec.instanceType
+      name: Instance Type
+      type: string
+    - jsonPath: .spec.providerConfig.region
+      name: Region
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Machine is the Schema for the Machines API
@@ -40,28 +56,303 @@ spec:
             type: object
           spec:
             properties:
+              backup:
+                description: Backup configuration
+                properties:
+                  enabled:
+                    description: Whether to enable automated backups
+                    type: boolean
+                  retentionDays:
+                    description: Retention period in days
+                    type: integer
+                  schedule:
+                    description: Backup schedule (cron format)
+                    type: string
+                type: object
+              cpu:
+                description: CPU configuration
+                properties:
+                  cores:
+                    description: Number of CPU cores
+                    maximum: 256
+                    minimum: 1
+                    type: integer
+                  sockets:
+                    description: Number of CPU sockets
+                    maximum: 16
+                    minimum: 1
+                    type: integer
+                  threadsPerCore:
+                    description: Number of threads per core
+                    maximum: 8
+                    minimum: 1
+                    type: integer
+                required:
+                - cores
+                type: object
+              disks:
+                description: Disk configuration
+                items:
+                  properties:
+                    boot:
+                      description: Whether this is the boot disk
+                      type: boolean
+                    device:
+                      description: Device name (e.g., /dev/sda, /dev/nvme0n1)
+                      type: string
+                    encrypted:
+                      description: Encryption settings
+                      type: boolean
+                    iops:
+                      description: IOPS for the disk (if supported by provider)
+                      maximum: 64000
+                      minimum: 100
+                      type: integer
+                    name:
+                      description: Name of the disk
+                      minLength: 1
+                      type: string
+                    sizeGB:
+                      description: Size of the disk in GB
+                      format: int64
+                      maximum: 65536
+                      minimum: 1
+                      type: integer
+                    throughput:
+                      description: Throughput in MB/s (if supported by provider)
+                      maximum: 4000
+                      minimum: 125
+                      type: integer
+                    type:
+                      description: Type of the disk (e.g., gp2, gp3, pd-ssd, Premium_LRS)
+                      type: string
+                  required:
+                  - name
+                  - sizeGB
+                  type: object
+                type: array
+              instanceType:
+                description: The instance type/size of the machine (e.g., t3.medium,
+                  Standard_B2s, n1-standard-2)
+                minLength: 1
+                type: string
+              machineType:
+                description: The provider-specific machine type override
+                type: string
+              memory:
+                description: Memory configuration in bytes
+                format: int64
+                minimum: 0
+                type: integer
+              monitoring:
+                description: Whether to enable monitoring
+                type: boolean
               name:
                 description: The name of the machine
+                minLength: 1
                 type: string
-              type:
-                description: The type of the machine
+              network:
+                description: Network configuration
+                properties:
+                  assignPublicIP:
+                    description: Whether to assign a public IP
+                    type: boolean
+                  interfaces:
+                    description: Network interfaces
+                    items:
+                      properties:
+                        name:
+                          description: Name of the network interface
+                          type: string
+                        primary:
+                          description: Whether this is the primary interface
+                          type: boolean
+                        securityGroups:
+                          description: Security groups for this interface
+                          items:
+                            type: string
+                          type: array
+                        subnet:
+                          description: Subnet for this interface
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  privateIP:
+                    description: Static private IP address
+                    type: string
+                  publicIP:
+                    description: Static public IP address or Elastic IP
+                    type: string
+                  subnet:
+                    description: Subnet ID
+                    type: string
+                  vpc:
+                    description: VPC/Virtual Network ID
+                    type: string
+                type: object
+              os:
+                description: Operating system configuration
+                properties:
+                  architecture:
+                    description: Architecture (amd64, arm64)
+                    enum:
+                    - amd64
+                    - arm64
+                    - x86_64
+                    type: string
+                  distribution:
+                    description: Distribution (ubuntu, centos, rhel, windows-server,
+                      debian, alpine)
+                    minLength: 1
+                    type: string
+                  family:
+                    description: Operating system family (linux, windows)
+                    enum:
+                    - linux
+                    - windows
+                    type: string
+                  imageFamily:
+                    description: Image family or marketplace image
+                    type: string
+                  imageID:
+                    description: Image ID/AMI/Template ID
+                    type: string
+                  version:
+                    description: Version of the OS
+                    minLength: 1
+                    type: string
+                required:
+                - distribution
+                - family
+                - version
+                type: object
+              providerConfig:
+                description: Cloud provider configuration
+                properties:
+                  config:
+                    additionalProperties:
+                      type: string
+                    description: Provider-specific configuration
+                    type: object
+                  credentialsRef:
+                    description: Credentials reference
+                    properties:
+                      namespace:
+                        description: Namespace of the secret (defaults to machine
+                          namespace)
+                        type: string
+                      secretName:
+                        description: Name of the secret containing credentials
+                        type: string
+                    required:
+                    - secretName
+                    type: object
+                  name:
+                    description: Provider name (aws, azure, gcp, vsphere, openstack)
+                    enum:
+                    - aws
+                    - azure
+                    - gcp
+                    - vsphere
+                    - openstack
+                    - libvirt
+                    - proxmox
+                    type: string
+                  region:
+                    description: Region where the machine should be created
+                    minLength: 1
+                    type: string
+                  zone:
+                    description: Availability zone
+                    type: string
+                required:
+                - name
+                - region
+                type: object
+              securityGroups:
+                description: Security groups or firewall rules
+                items:
+                  type: string
+                type: array
+              sshKeys:
+                description: SSH key configuration
+                items:
+                  type: string
+                type: array
+              tags:
+                additionalProperties:
+                  type: string
+                description: Tags/labels to apply to the machine
+                type: object
+              userData:
+                description: User data script to run on first boot
                 type: string
             required:
+            - instanceType
             - name
-            - type
+            - os
+            - providerConfig
             type: object
           status:
             properties:
               architecture:
-                description: Thme machine's cpu architecture
+                description: The machine's CPU architecture
                 type: string
-              cpus:
-                description: the machine's cpus
-                type: integer
-              disks:
-                description: The machine's disk size in bytes
+              bootTime:
+                description: Boot time of the machine
+                format: date-time
+                type: string
+              conditions:
+                description: Conditions represent the latest available observations
+                  of the machine's state
                 items:
                   properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition
+                      type: string
+                    status:
+                      description: Status of the condition (True, False, Unknown)
+                      type: string
+                    type:
+                      description: Type of condition
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              cpus:
+                description: Actual CPU count
+                type: integer
+              creationTime:
+                description: Creation time of the machine
+                format: date-time
+                type: string
+              disks:
+                description: Actual disk information
+                items:
+                  properties:
+                    availableBytes:
+                      description: Available space in bytes
+                      format: int64
+                      type: integer
+                    device:
+                      description: Device path (e.g., /dev/sda)
+                      type: string
                     filesystemType:
                       description: The disk's filesystem type (e.g., ext4, xfs)
                       type: string
@@ -74,35 +365,57 @@ spec:
                     name:
                       description: The disk's name
                       type: string
+                    serialNumber:
+                      description: The disk's serial number
+                      type: string
                     size:
                       description: The disk's size in bytes
                       format: int64
                       type: integer
                     type:
-                      description: The disk's type (e.g., SSD, HDD)
+                      description: The disk's type (e.g., SSD, HDD, gp2, gp3)
                       type: string
+                    usagePercent:
+                      description: Usage percentage as string (e.g., "75.5%")
+                      type: string
+                    usedBytes:
+                      description: Used space in bytes
+                      format: int64
+                      type: integer
                     uuid:
                       description: The disk's UUID
                       type: string
                   required:
+                  - availableBytes
+                  - device
                   - filesystemType
                   - label
                   - mountPoint
                   - name
+                  - serialNumber
                   - size
                   - type
+                  - usagePercent
+                  - usedBytes
                   - uuid
                   type: object
                 type: array
+              failureMessage:
+                description: Failure message if the machine failed to be created
+                type: string
+              failureReason:
+                description: Failure reason if the machine failed to be created
+                type: string
               hostname:
                 description: The machine's hostname
                 type: string
-              ipAddress:
-                description: The IP address of the machine
+              ipAddresses:
+                description: The IP addresses of the machine
                 items:
                   type: string
                 type: array
-              ipv6Address:
+              ipv6Addresses:
+                description: IPv6 addresses of the machine
                 items:
                   type: string
                 type: array
@@ -114,55 +427,89 @@ spec:
                 format: date-time
                 type: string
               machineID:
-                description: The unique identifier for the machine
+                description: Internal machine identifier
                 type: string
               memory:
-                description: The machine's memory in bytes
+                description: Actual memory in bytes
                 format: int64
                 type: integer
+              message:
+                description: Detailed status message
+                type: string
+              networkInterfaces:
+                description: Network interface information
+                items:
+                  properties:
+                    ipAddresses:
+                      description: IP addresses assigned to this interface
+                      items:
+                        type: string
+                      type: array
+                    ipv6Addresses:
+                      description: IPv6 addresses assigned to this interface
+                      items:
+                        type: string
+                      type: array
+                    macAddress:
+                      description: MAC address
+                      type: string
+                    mtu:
+                      description: MTU size
+                      type: integer
+                    name:
+                      description: Name of the network interface
+                      type: string
+                    state:
+                      description: Interface state (up, down)
+                      type: string
+                    type:
+                      description: Interface type (ethernet, wifi, etc.)
+                      type: string
+                  required:
+                  - ipAddresses
+                  - ipv6Addresses
+                  - macAddress
+                  - mtu
+                  - name
+                  - state
+                  - type
+                  type: object
+                type: array
               operatingSystem:
                 description: The machine's operating system
                 type: string
               operatingSystemVersion:
                 description: The machine's operating system version
                 type: string
-              provider:
-                description: The provider of the machine
+              phase:
+                description: Current phase of the machine (Pending, Creating, Running,
+                  Stopping, Stopped, Terminating, Terminated, Failed)
                 type: string
+              privateIPAddresses:
+                description: Private IP addresses
+                items:
+                  type: string
+                type: array
+              provider:
+                description: The provider that created this machine
+                type: string
+              providerID:
+                description: The unique identifier assigned by the provider
+                type: string
+              publicIPAddresses:
+                description: Public IP addresses
+                items:
+                  type: string
+                type: array
               region:
                 description: The region where the machine is located
                 type: string
               state:
                 description: The current state of the machine
                 type: string
-              status:
-                description: The current status of the machine
-                type: string
-              systemdID:
-                description: systemd identifier for the machine
-                type: string
               zone:
                 description: The zone where the machine is located
                 type: string
-            required:
-            - architecture
-            - cpus
-            - disks
-            - hostname
-            - ipAddress
-            - ipv6Address
-            - kernelVersion
-            - lastUpdated
-            - machineID
-            - memory
-            - operatingSystem
-            - operatingSystemVersion
-            - provider
-            - region
-            - state
-            - status
-            - systemdID
-            - zone
             type: object
         type: object
     served: true
