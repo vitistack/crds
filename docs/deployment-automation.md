@@ -5,6 +5,7 @@ This guide provides comprehensive CI/CD pipeline examples and GitOps configurati
 ## Overview
 
 Deployment automation for VitiStack includes:
+
 - CI/CD pipeline configurations for multiple platforms
 - GitOps workflows with ArgoCD and Flux
 - Infrastructure as Code patterns
@@ -24,9 +25,9 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'crds/**'
-      - 'config/**'
-      - 'pkg/**'
+      - "crds/**"
+      - "config/**"
+      - "pkg/**"
   pull_request:
     branches: [main]
 
@@ -41,31 +42,31 @@ jobs:
       matrix:
         k8s-version: [1.25.0, 1.26.0, 1.27.0]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version-file: 'go.mod'
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
 
-    - name: Run tests
-      run: |
-        make test
-        make test-integration
+      - name: Run tests
+        run: |
+          make test
+          make test-integration
 
-    - name: Create k8s cluster
-      uses: helm/kind-action@v1.8.0
-      with:
-        kubernetes_version: v${{ matrix.k8s-version }}
-        cluster_name: vitistack-test
+      - name: Create k8s cluster
+        uses: helm/kind-action@v1.8.0
+        with:
+          kubernetes_version: v${{ matrix.k8s-version }}
+          cluster_name: vitistack-test
 
-    - name: Install CRDs and test
-      run: |
-        make install
-        make deploy
-        ./scripts/wait-for-deployment.sh
-        make test-e2e
+      - name: Install CRDs and test
+        run: |
+          make install
+          make deploy
+          ./scripts/wait-for-deployment.sh
+          make test-e2e
 
   build:
     needs: test
@@ -74,44 +75,44 @@ jobs:
       image: ${{ steps.image.outputs.image }}
       digest: ${{ steps.build.outputs.digest }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,prefix={{branch}}-
-          type=raw,value=latest,enable={{is_default_branch}}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
 
-    - name: Build and push image
-      id: build
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-    - name: Output image
-      id: image
-      run: echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
+      - name: Output image
+        id: image
+        run: echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}" >> $GITHUB_OUTPUT
 
   deploy-staging:
     needs: build
@@ -119,30 +120,30 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     environment: staging
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Configure kubectl
-      uses: azure/k8s-set-context@v3
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.STAGING_KUBECONFIG }}
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.STAGING_KUBECONFIG }}
 
-    - name: Deploy to staging
-      run: |
-        # Update image in kustomization
-        cd config/staging
-        kustomize edit set image controller=${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}
-        
-        # Apply configuration
-        kubectl apply -k .
-        
-        # Wait for deployment
-        kubectl rollout status deployment/vitistack-controller -n vitistack-system --timeout=300s
+      - name: Deploy to staging
+        run: |
+          # Update image in kustomization
+          cd config/staging
+          kustomize edit set image controller=${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}
 
-    - name: Run smoke tests
-      run: |
-        ./scripts/smoke-test.sh staging
+          # Apply configuration
+          kubectl apply -k .
+
+          # Wait for deployment
+          kubectl rollout status deployment/vitistack-controller -n vitistack-system --timeout=300s
+
+      - name: Run smoke tests
+        run: |
+          ./scripts/smoke-test.sh staging
 
   deploy-production:
     needs: build
@@ -150,55 +151,55 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment: production
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Configure kubectl
-      uses: azure/k8s-set-context@v3
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.PRODUCTION_KUBECONFIG }}
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.PRODUCTION_KUBECONFIG }}
 
-    - name: Deploy to production
-      run: |
-        # Update image in kustomization
-        cd config/production
-        kustomize edit set image controller=${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}
-        
-        # Apply with canary deployment
-        kubectl apply -k . --dry-run=server
-        kubectl apply -k .
-        
-        # Wait for deployment
-        kubectl rollout status deployment/vitistack-controller -n vitistack-system --timeout=600s
+      - name: Deploy to production
+        run: |
+          # Update image in kustomization
+          cd config/production
+          kustomize edit set image controller=${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}
 
-    - name: Run production validation
-      run: |
-        ./scripts/production-validation.sh
+          # Apply with canary deployment
+          kubectl apply -k . --dry-run=server
+          kubectl apply -k .
 
-    - name: Notify deployment
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        text: "VitiStack deployed to production: ${{ needs.build.outputs.image }}"
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          # Wait for deployment
+          kubectl rollout status deployment/vitistack-controller -n vitistack-system --timeout=600s
+
+      - name: Run production validation
+        run: |
+          ./scripts/production-validation.sh
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "VitiStack deployed to production: ${{ needs.build.outputs.image }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
   security-scan:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: ${{ needs.build.outputs.image }}
-        format: 'sarif'
-        output: 'trivy-results.sarif'
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ needs.build.outputs.image }}
+          format: "sarif"
+          output: "trivy-results.sarif"
 
-    - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: 'trivy-results.sarif'
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: "trivy-results.sarif"
 ```
 
 ### GitLab CI/CD Pipeline
@@ -294,105 +295,105 @@ deploy-production:
 trigger:
   branches:
     include:
-    - main
-    - develop
+      - main
+      - develop
   paths:
     include:
-    - crds/*
-    - config/*
-    - pkg/*
+      - crds/*
+      - config/*
+      - pkg/*
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 variables:
-  containerRegistry: 'vitistack-acr'
-  imageRepository: 'vitistack/controller'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
+  containerRegistry: "vitistack-acr"
+  imageRepository: "vitistack/controller"
+  dockerfilePath: "$(Build.SourcesDirectory)/Dockerfile"
+  tag: "$(Build.BuildId)"
 
 stages:
-- stage: Test
-  displayName: Test stage
-  jobs:
-  - job: Test
-    displayName: Test
-    steps:
-    - task: GoTool@0
-      inputs:
-        version: '1.21'
-    
-    - script: |
-        make test
-        make test-integration
-      displayName: 'Run tests'
+  - stage: Test
+    displayName: Test stage
+    jobs:
+      - job: Test
+        displayName: Test
+        steps:
+          - task: GoTool@0
+            inputs:
+              version: "1.21"
 
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '**/test-results.xml'
+          - script: |
+              make test
+              make test-integration
+            displayName: "Run tests"
 
-- stage: Build
-  displayName: Build and push stage
-  dependsOn: Test
-  jobs:
-  - job: Build
-    displayName: Build
-    steps:
-    - task: Docker@2
-      displayName: Build and push image
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(containerRegistry)
-        tags: |
-          $(tag)
-          latest
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "**/test-results.xml"
 
-- stage: DeployStaging
-  displayName: Deploy to staging
-  dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
-  jobs:
-  - deployment: DeployStaging
+  - stage: Build
+    displayName: Build and push stage
+    dependsOn: Test
+    jobs:
+      - job: Build
+        displayName: Build
+        steps:
+          - task: Docker@2
+            displayName: Build and push image
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(containerRegistry)
+              tags: |
+                $(tag)
+                latest
+
+  - stage: DeployStaging
     displayName: Deploy to staging
-    environment: 'staging.vitistack-system'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Deploy to Kubernetes cluster
-            inputs:
-              action: deploy
-              manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
-              containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    jobs:
+      - deployment: DeployStaging
+        displayName: Deploy to staging
+        environment: "staging.vitistack-system"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubernetesManifest@0
+                  displayName: Deploy to Kubernetes cluster
+                  inputs:
+                    action: deploy
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/deployment.yml
+                      $(Pipeline.Workspace)/manifests/service.yml
+                    containers: |
+                      $(containerRegistry)/$(imageRepository):$(tag)
 
-- stage: DeployProduction
-  displayName: Deploy to production
-  dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  jobs:
-  - deployment: DeployProduction
+  - stage: DeployProduction
     displayName: Deploy to production
-    environment: 'production.vitistack-system'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Deploy to Kubernetes cluster
-            inputs:
-              action: deploy
-              manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
-              containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployProduction
+        displayName: Deploy to production
+        environment: "production.vitistack-system"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubernetesManifest@0
+                  displayName: Deploy to Kubernetes cluster
+                  inputs:
+                    action: deploy
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/deployment.yml
+                      $(Pipeline.Workspace)/manifests/service.yml
+                    containers: |
+                      $(containerRegistry)/$(imageRepository):$(tag)
 ```
 
 ## GitOps Configurations
@@ -417,7 +418,7 @@ spec:
     path: environments/staging
     kustomize:
       images:
-      - vitistack/controller:latest
+        - vitistack/controller:latest
   destination:
     server: https://kubernetes.default.svc
     namespace: vitistack-system
@@ -427,9 +428,9 @@ spec:
       selfHeal: true
       allowEmpty: false
     syncOptions:
-    - CreateNamespace=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
     retry:
       limit: 5
       backoff:
@@ -455,15 +456,15 @@ spec:
     path: environments/production
     kustomize:
       images:
-      - vitistack/controller:v1.0.0
+        - vitistack/controller:v1.0.0
   destination:
     server: https://kubernetes.default.svc
     namespace: vitistack-system
   syncPolicy:
     syncOptions:
-    - CreateNamespace=true
-    - PrunePropagationPolicy=foreground
-    - PruneLast=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
     retry:
       limit: 3
       backoff:
@@ -491,10 +492,10 @@ spec:
     name: vitistack-config
   validation: client
   healthChecks:
-  - apiVersion: apps/v1
-    kind: Deployment
-    name: vitistack-controller
-    namespace: vitistack-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: vitistack-controller
+      namespace: vitistack-system
   timeout: 10m
 
 ---
@@ -513,13 +514,13 @@ spec:
     name: vitistack-config
   validation: client
   healthChecks:
-  - apiVersion: apps/v1
-    kind: Deployment
-    name: vitistack-controller
-    namespace: vitistack-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: vitistack-controller
+      namespace: vitistack-system
   timeout: 15m
   dependsOn:
-  - name: vitistack-crds
+    - name: vitistack-crds
 ```
 
 ### Git Repository Structure
@@ -631,76 +632,80 @@ import * as aws from "@pulumi/aws";
 
 // Create namespace
 const vitistackNamespace = new k8s.core.v1.Namespace("vitistack-system", {
-    metadata: {
-        name: "vitistack-system",
-        labels: {
-            "app.kubernetes.io/name": "vitistack",
-        },
+  metadata: {
+    name: "vitistack-system",
+    labels: {
+      "app.kubernetes.io/name": "vitistack",
     },
+  },
 });
 
 // Create AWS credentials secret
 const awsCredentialsSecret = new k8s.core.v1.Secret("aws-credentials", {
-    metadata: {
-        name: "aws-credentials",
-        namespace: vitistackNamespace.metadata.name,
-    },
-    stringData: {
-        "access-key-id": process.env.AWS_ACCESS_KEY_ID!,
-        "secret-access-key": process.env.AWS_SECRET_ACCESS_KEY!,
-    },
+  metadata: {
+    name: "aws-credentials",
+    namespace: vitistackNamespace.metadata.name,
+  },
+  stringData: {
+    "access-key-id": process.env.AWS_ACCESS_KEY_ID!,
+    "secret-access-key": process.env.AWS_SECRET_ACCESS_KEY!,
+  },
 });
 
 // Deploy VitiStack controller
 const vitistackController = new k8s.helm.v3.Release("vitistack-controller", {
-    chart: "vitistack-controller",
-    repositoryOpts: {
-        repo: "https://charts.vitistack.io",
+  chart: "vitistack-controller",
+  repositoryOpts: {
+    repo: "https://charts.vitistack.io",
+  },
+  namespace: vitistackNamespace.metadata.name,
+  values: {
+    image: {
+      tag: "v1.0.0",
     },
-    namespace: vitistackNamespace.metadata.name,
-    values: {
-        image: {
-            tag: "v1.0.0",
-        },
-        replicaCount: 3,
-        resources: {
-            requests: {
-                cpu: "200m",
-                memory: "256Mi",
-            },
-            limits: {
-                cpu: "1000m",
-                memory: "1Gi",
-            },
-        },
+    replicaCount: 3,
+    resources: {
+      requests: {
+        cpu: "200m",
+        memory: "256Mi",
+      },
+      limits: {
+        cpu: "1000m",
+        memory: "1Gi",
+      },
     },
+  },
 });
 
 // Create datacenter
-const datacenter = new k8s.apiextensions.CustomResource("aws-datacenter", {
+const datacenter = new k8s.apiextensions.CustomResource(
+  "aws-datacenter",
+  {
     apiVersion: "vitistack.io/v1alpha1",
     kind: "Datacenter",
     metadata: {
-        name: "aws-production",
-        namespace: vitistackNamespace.metadata.name,
+      name: "aws-production",
+      namespace: vitistackNamespace.metadata.name,
     },
     spec: {
-        region: "us-west-2",
-        description: "Production datacenter in AWS US West 2",
-        machineProviders: [
-            {
-                name: "aws-ec2-provider",
-                priority: 1,
-            },
-        ],
-        kubernetesProviders: [
-            {
-                name: "aws-eks-provider",
-                priority: 1,
-            },
-        ],
+      region: "us-west-2",
+      description: "Production datacenter in AWS US West 2",
+      machineProviders: [
+        {
+          name: "aws-ec2-provider",
+          priority: 1,
+        },
+      ],
+      kubernetesProviders: [
+        {
+          name: "aws-eks-provider",
+          priority: 1,
+        },
+      ],
     },
-}, { dependsOn: [vitistackController] });
+  },
+  { dependsOn: [vitistackController] }
+);
 ```
 
 ## Deployment Scripts
@@ -749,13 +754,13 @@ esac
 # Check prerequisites
 check_prerequisites() {
     log "Checking prerequisites..."
-    
+
     command -v kubectl >/dev/null 2>&1 || error "kubectl is required but not installed"
     command -v kustomize >/dev/null 2>&1 || error "kustomize is required but not installed"
-    
+
     # Check cluster connectivity
     kubectl cluster-info >/dev/null 2>&1 || error "Cannot connect to Kubernetes cluster"
-    
+
     # Check if namespace exists
     if ! kubectl get namespace $NAMESPACE >/dev/null 2>&1; then
         log "Creating namespace $NAMESPACE"
@@ -766,15 +771,15 @@ check_prerequisites() {
 # Pre-deployment validation
 pre_deployment_validation() {
     log "Running pre-deployment validation..."
-    
+
     # Validate CRDs
     log "Validating CRDs..."
     kubectl apply --dry-run=server -f crds/ || error "CRD validation failed"
-    
+
     # Validate configuration
     log "Validating configuration..."
     kustomize build config/$ENVIRONMENT | kubectl apply --dry-run=server -f - || error "Configuration validation failed"
-    
+
     # Check resource quotas
     if [ "$ENVIRONMENT" = "production" ]; then
         log "Checking resource quotas for production..."
@@ -786,7 +791,7 @@ pre_deployment_validation() {
 deploy_crds() {
     log "Deploying CRDs..."
     kubectl apply -f crds/
-    
+
     # Wait for CRDs to be established
     log "Waiting for CRDs to be established..."
     kubectl wait --for condition=established --timeout=60s crd/datacenters.vitistack.io
@@ -798,14 +803,14 @@ deploy_crds() {
 # Deploy controller
 deploy_controller() {
     log "Deploying VitiStack controller..."
-    
+
     # Apply configuration
     kustomize build config/$ENVIRONMENT | kubectl apply -f -
-    
+
     # Wait for deployment to be ready
     log "Waiting for controller deployment to be ready..."
     kubectl rollout status deployment/vitistack-controller -n $NAMESPACE --timeout=${TIMEOUT}s
-    
+
     # Wait for webhook to be ready
     log "Waiting for webhook to be ready..."
     kubectl wait --for=condition=Available deployment/vitistack-controller -n $NAMESPACE --timeout=300s
@@ -814,17 +819,17 @@ deploy_controller() {
 # Post-deployment validation
 post_deployment_validation() {
     log "Running post-deployment validation..."
-    
+
     # Check controller logs for errors
     log "Checking controller logs..."
     if kubectl logs -n $NAMESPACE deployment/vitistack-controller --tail=50 | grep -i error; then
         warn "Found errors in controller logs"
     fi
-    
+
     # Validate webhook
     log "Validating webhook..."
     kubectl get validatingwebhookconfiguration vitistack-validating-webhook-configuration || error "Webhook configuration not found"
-    
+
     # Test basic functionality
     log "Testing basic functionality..."
     ./scripts/smoke-test.sh $ENVIRONMENT || error "Smoke test failed"
@@ -840,16 +845,16 @@ rollback() {
 # Main deployment flow
 main() {
     log "Starting VitiStack deployment to $ENVIRONMENT"
-    
+
     # Set up error handling
     trap 'error "Deployment failed. Check logs above."' ERR
-    
+
     check_prerequisites
     pre_deployment_validation
     deploy_crds
     deploy_controller
     post_deployment_validation
-    
+
     log "Deployment to $ENVIRONMENT completed successfully!"
 }
 
@@ -910,21 +915,21 @@ trap cleanup EXIT
 
 smoke_test() {
     log "Starting smoke test for $ENVIRONMENT environment"
-    
+
     # Create test namespace
     kubectl create namespace $TEST_NAMESPACE
-    
+
     # Test 1: Controller health
     log "Test 1: Checking controller health..."
     kubectl get deployment vitistack-controller -n $NAMESPACE -o jsonpath='{.status.readyReplicas}' | grep -q "3" || error "Controller not healthy"
-    
+
     # Test 2: CRD availability
     log "Test 2: Checking CRD availability..."
     kubectl get crd datacenters.vitistack.io >/dev/null 2>&1 || error "Datacenter CRD not available"
     kubectl get crd machineproviders.vitistack.io >/dev/null 2>&1 || error "MachineProvider CRD not available"
     kubectl get crd kubernetesproviders.vitistack.io >/dev/null 2>&1 || error "KubernetesProvider CRD not available"
     kubectl get crd machines.vitistack.io >/dev/null 2>&1 || error "Machine CRD not available"
-    
+
     # Test 3: Webhook functionality
     log "Test 3: Testing webhook functionality..."
     cat <<EOF | kubectl apply -f - || error "Webhook validation failed"
@@ -939,12 +944,12 @@ spec:
   machineProviders: []
   kubernetesProviders: []
 EOF
-    
+
     # Test 4: Controller reconciliation
     log "Test 4: Testing controller reconciliation..."
     sleep 5
     kubectl get datacenter smoke-test-datacenter -n $TEST_NAMESPACE -o jsonpath='{.status.phase}' | grep -q "Ready\|Pending" || error "Controller not reconciling"
-    
+
     # Test 5: Metrics endpoint
     log "Test 5: Checking metrics endpoint..."
     kubectl port-forward -n $NAMESPACE deployment/vitistack-controller 8080:8080 &
@@ -952,7 +957,7 @@ EOF
     sleep 5
     curl -sf http://localhost:8080/metrics >/dev/null || error "Metrics endpoint not available"
     kill $PORTFORWARD_PID
-    
+
     log "All smoke tests passed!"
 }
 
@@ -980,33 +985,33 @@ error() {
 
 production_validation() {
     log "Starting production validation..."
-    
+
     # Check controller replicas
     log "Validating controller replicas..."
     REPLICAS=$(kubectl get deployment vitistack-controller -n $NAMESPACE -o jsonpath='{.spec.replicas}')
     [[ $REPLICAS -ge 3 ]] || error "Production should have at least 3 controller replicas"
-    
+
     # Check resource limits
     log "Validating resource limits..."
     CPU_LIMIT=$(kubectl get deployment vitistack-controller -n $NAMESPACE -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}')
     [[ -n "$CPU_LIMIT" ]] || error "CPU limits must be set in production"
-    
+
     # Check PodDisruptionBudget
     log "Validating PodDisruptionBudget..."
     kubectl get pdb vitistack-controller-pdb -n $NAMESPACE >/dev/null 2>&1 || error "PodDisruptionBudget must be configured"
-    
+
     # Check monitoring
     log "Validating monitoring setup..."
     kubectl get servicemonitor vitistack-controller -n $NAMESPACE >/dev/null 2>&1 || error "ServiceMonitor must be configured"
-    
+
     # Check security policies
     log "Validating security policies..."
     kubectl get networkpolicy -n $NAMESPACE | grep -q vitistack || error "NetworkPolicies must be configured"
-    
+
     # Validate SSL/TLS
     log "Validating webhook SSL configuration..."
     kubectl get secret webhook-server-certs -n $NAMESPACE >/dev/null 2>&1 || error "Webhook SSL certificates not found"
-    
+
     log "Production validation completed successfully!"
 }
 
@@ -1090,7 +1095,7 @@ securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-    - ALL
+      - ALL
   readOnlyRootFilesystem: true
 
 service:
@@ -1190,15 +1195,15 @@ networkPolicy:
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - vitistack-controller
-        topologyKey: kubernetes.io/hostname
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - vitistack-controller
+          topologyKey: kubernetes.io/hostname
 ```
 
 ## Environment Promotion Strategy
@@ -1230,29 +1235,29 @@ fi
 
 promote_to_production() {
     log "Promoting $STAGING_TAG to production as $PRODUCTION_TAG"
-    
+
     # 1. Validate staging deployment
     log "Validating staging deployment..."
     ./scripts/smoke-test.sh staging || error "Staging validation failed"
-    
+
     # 2. Tag image for production
     log "Tagging image for production..."
     docker pull vitistack/controller:$STAGING_TAG
     docker tag vitistack/controller:$STAGING_TAG vitistack/controller:$PRODUCTION_TAG
     docker push vitistack/controller:$PRODUCTION_TAG
-    
+
     # 3. Update production configuration
     log "Updating production configuration..."
     cd config/production
     kustomize edit set image controller=vitistack/controller:$PRODUCTION_TAG
-    
+
     # 4. Create pull request for production deployment
     log "Creating pull request for production deployment..."
     git checkout -b "promote-$PRODUCTION_TAG"
     git add config/production/kustomization.yaml
     git commit -m "Promote $STAGING_TAG to production as $PRODUCTION_TAG"
     git push origin "promote-$PRODUCTION_TAG"
-    
+
     # Create PR using GitHub CLI if available
     if command -v gh >/dev/null 2>&1; then
         gh pr create \
@@ -1261,7 +1266,7 @@ promote_to_production() {
             --base main \
             --head "promote-$PRODUCTION_TAG"
     fi
-    
+
     log "Promotion process completed. Please review and merge the PR to deploy to production."
 }
 

@@ -22,6 +22,7 @@ This guide provides comprehensive strategies for optimizing the performance of V
 ### High-Performance Design Principles
 
 #### 1. Asynchronous Processing
+
 ```go
 // High-performance controller architecture
 type OptimizedController struct {
@@ -63,6 +64,7 @@ func (c *OptimizedController) processWorkItem() bool {
 ```
 
 #### 2. Batch Processing Architecture
+
 ```yaml
 # controller-performance-config.yaml
 apiVersion: v1
@@ -110,6 +112,7 @@ data:
 ### Multi-Worker Architecture
 
 #### Optimized Controller Deployment
+
 ```yaml
 # optimized-controller-deployment.yaml
 apiVersion: apps/v1
@@ -118,7 +121,7 @@ metadata:
   name: vitistack-controller
   namespace: vitistack-system
 spec:
-  replicas: 3  # For high availability
+  replicas: 3 # For high availability
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -132,83 +135,84 @@ spec:
     spec:
       serviceAccountName: vitistack-controller
       containers:
-      - name: manager
-        image: vitistack/controller:latest
-        imagePullPolicy: Always
-        resources:
-          requests:
-            cpu: 500m
-            memory: 1Gi
-          limits:
-            cpu: 2000m
-            memory: 4Gi
-        env:
-        - name: GOMAXPROCS
-          value: "4"
-        - name: RECONCILE_WORKERS
-          value: "20"
-        - name: BATCH_SIZE
-          value: "50"
-        - name: CACHE_SIZE
-          value: "10000"
-        - name: ENABLE_PPROF
-          value: "true"
-        - name: METRICS_BIND_ADDR
-          value: ":8080"
-        - name: HEALTH_PROBE_BIND_ADDR
-          value: ":8081"
-        - name: LEADER_ELECT
-          value: "true"
-        ports:
-        - containerPort: 8080
-          name: metrics
-          protocol: TCP
-        - containerPort: 8081
-          name: health
-          protocol: TCP
-        - containerPort: 6060
-          name: pprof
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8081
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: 8081
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        volumeMounts:
-        - name: performance-config
-          mountPath: /etc/config
+        - name: manager
+          image: vitistack/controller:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+          env:
+            - name: GOMAXPROCS
+              value: "4"
+            - name: RECONCILE_WORKERS
+              value: "20"
+            - name: BATCH_SIZE
+              value: "50"
+            - name: CACHE_SIZE
+              value: "10000"
+            - name: ENABLE_PPROF
+              value: "true"
+            - name: METRICS_BIND_ADDR
+              value: ":8080"
+            - name: HEALTH_PROBE_BIND_ADDR
+              value: ":8081"
+            - name: LEADER_ELECT
+              value: "true"
+          ports:
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+            - containerPort: 8081
+              name: health
+              protocol: TCP
+            - containerPort: 6060
+              name: pprof
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: performance-config
+              mountPath: /etc/config
       volumes:
-      - name: performance-config
-        configMap:
-          name: vitistack-performance-config
+        - name: performance-config
+          configMap:
+            name: vitistack-performance-config
       nodeSelector:
         node-type: controller
       tolerations:
-      - key: node-type
-        operator: Equal
-        value: controller
-        effect: NoSchedule
+        - key: node-type
+          operator: Equal
+          value: controller
+          effect: NoSchedule
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app: vitistack-controller
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: vitistack-controller
+                topologyKey: kubernetes.io/hostname
 ```
 
 ### Controller Performance Tuning
 
 #### Optimized Reconciliation Logic
+
 ```go
 // pkg/controller/optimized_reconciler.go
 package controller
@@ -313,6 +317,7 @@ func (bp *BatchProcessor) processBatch() {
 ```
 
 #### Resource Cache Implementation
+
 ```go
 // pkg/cache/resource_cache.go
 package cache
@@ -340,10 +345,10 @@ func NewResourceCache(ttl time.Duration) *ResourceCache {
         items: make(map[string]*CacheItem),
         ttl:   ttl,
     }
-    
+
     // Start cleanup goroutine
     go cache.cleanup()
-    
+
     return cache
 }
 
@@ -392,7 +397,7 @@ func (c *ResourceCache) cleanup() {
         c.mutex.Lock()
         now := time.Now()
         for key, item := range c.items {
-            if now.Sub(item.LastUpdate) > c.ttl || 
+            if now.Sub(item.LastUpdate) > c.ttl ||
                now.Sub(item.AccessTime) > 2*c.ttl {
                 delete(c.items, key)
             }
@@ -427,6 +432,7 @@ type CacheStats struct {
 ### Memory Optimization
 
 #### Memory-Efficient Controller Configuration
+
 ```go
 // pkg/controller/memory_optimized.go
 package controller
@@ -475,6 +481,7 @@ func (c *MemoryOptimizedController) startMemoryMonitoring() {
 ```
 
 #### Resource Pool Management
+
 ```go
 // pkg/pool/resource_pool.go
 package pool
@@ -533,6 +540,7 @@ var httpClientPool = NewResourcePool(
 ### CPU Optimization
 
 #### CPU-Efficient Processing
+
 ```go
 // pkg/processor/cpu_optimized.go
 package processor
@@ -557,12 +565,12 @@ type WorkItem struct {
 
 func NewCPUOptimizedProcessor() *CPUOptimizedProcessor {
     workerCount := runtime.GOMAXPROCS(0) * 2 // 2x CPU cores
-    
+
     processor := &CPUOptimizedProcessor{
         workerCount: workerCount,
         workQueue:   make(chan WorkItem, workerCount*10),
     }
-    
+
     processor.startWorkers()
     return processor
 }
@@ -598,7 +606,7 @@ func (p *CPUOptimizedProcessor) processItem(item WorkItem) {
             // Handle panic gracefully
         }
     }()
-    
+
     // CPU-intensive processing logic
     switch data := item.Data.(type) {
     case *DatacenterSpec:
@@ -614,6 +622,7 @@ func (p *CPUOptimizedProcessor) processItem(item WorkItem) {
 ### Horizontal Pod Autoscaling
 
 #### HPA Configuration for Controller
+
 ```yaml
 # controller-hpa.yaml
 apiVersion: autoscaling/v2
@@ -629,49 +638,50 @@ spec:
   minReplicas: 3
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
-  - type: Pods
-    pods:
-      metric:
-        name: reconcile_queue_depth
-        selector:
-          matchLabels:
-            app: vitistack-controller
-      target:
-        type: AverageValue
-        averageValue: "100"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Pods
+      pods:
+        metric:
+          name: reconcile_queue_depth
+          selector:
+            matchLabels:
+              app: vitistack-controller
+        target:
+          type: AverageValue
+          averageValue: "100"
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60
       policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 15
-      - type: Pods
-        value: 4
-        periodSeconds: 60
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 60
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 10
-        periodSeconds: 60
+        - type: Percent
+          value: 10
+          periodSeconds: 60
 ```
 
 ### Vertical Pod Autoscaling
 
 #### VPA Configuration
+
 ```yaml
 # controller-vpa.yaml
 apiVersion: autoscaling.k8s.io/v1
@@ -688,27 +698,28 @@ spec:
     updateMode: "Auto"
   resourcePolicy:
     containerPolicies:
-    - containerName: manager
-      minAllowed:
-        cpu: 100m
-        memory: 128Mi
-      maxAllowed:
-        cpu: 4000m
-        memory: 8Gi
-      controlledResources: ["cpu", "memory"]
-      controlledValues: RequestsAndLimits
+      - containerName: manager
+        minAllowed:
+          cpu: 100m
+          memory: 128Mi
+        maxAllowed:
+          cpu: 4000m
+          memory: 8Gi
+        controlledResources: ["cpu", "memory"]
+        controlledValues: RequestsAndLimits
 ```
 
 ### Custom Metrics Scaling
 
 #### Custom Metrics for Scaling
+
 ```go
 // pkg/metrics/custom_metrics.go
 package metrics
 
 import (
     "context"
-    
+
     "k8s.io/metrics/pkg/apis/custom_metrics/v1beta1"
     "sigs.k8s.io/custom-metrics-apiserver/pkg/provider"
 )
@@ -723,7 +734,7 @@ func (p *VitiStackMetricsProvider) GetMetricByName(
     info provider.CustomMetricInfo,
     metricSelector labels.Selector,
 ) (*custom_metrics.MetricValue, error) {
-    
+
     switch info.Metric {
     case "reconcile_queue_depth":
         return p.getReconcileQueueDepth(ctx, name)
@@ -739,7 +750,7 @@ func (p *VitiStackMetricsProvider) GetMetricByName(
 func (p *VitiStackMetricsProvider) getReconcileQueueDepth(ctx context.Context, name types.NamespacedName) (*custom_metrics.MetricValue, error) {
     // Get current queue depth from controller metrics
     queueDepth := getCurrentQueueDepth()
-    
+
     return &custom_metrics.MetricValue{
         DescribedObject: custom_metrics.ObjectReference{
             Kind:      "Pod",
@@ -758,6 +769,7 @@ func (p *VitiStackMetricsProvider) getReconcileQueueDepth(ctx context.Context, n
 ### Multi-Level Caching Strategy
 
 #### L1 Cache (In-Memory)
+
 ```go
 // pkg/cache/l1_cache.go
 package cache
@@ -789,7 +801,7 @@ func NewL1Cache(capacity int, ttl time.Duration) *L1Cache {
         lru:      list.New(),
         ttl:      ttl,
     }
-    
+
     go cache.evictionTicker()
     return cache
 }
@@ -830,7 +842,7 @@ func (c *L1Cache) Set(key string, value interface{}) {
         value:      value,
         expiration: time.Now().Add(c.ttl),
     }
-    
+
     elem := c.lru.PushFront(entry)
     c.items[key] = elem
 }
@@ -851,7 +863,7 @@ func (c *L1Cache) evictionTicker() {
     for range ticker.C {
         c.mutex.Lock()
         now := time.Now()
-        
+
         for key, elem := range c.items {
             entry := elem.Value.(*cacheEntry)
             if now.After(entry.expiration) {
@@ -865,6 +877,7 @@ func (c *L1Cache) evictionTicker() {
 ```
 
 #### L2 Cache (Redis)
+
 ```go
 // pkg/cache/l2_cache.go
 package cache
@@ -915,7 +928,7 @@ func (c *L2Cache) Get(ctx context.Context, key string) (interface{}, error) {
 
 func (c *L2Cache) Set(ctx context.Context, key string, value interface{}) error {
     fullKey := c.prefix + ":" + key
-    
+
     data, err := json.Marshal(value)
     if err != nil {
         return err
@@ -931,6 +944,7 @@ func (c *L2Cache) Delete(ctx context.Context, key string) error {
 ```
 
 ### Write-Through Caching Pattern
+
 ```go
 // pkg/cache/write_through.go
 package cache
@@ -1005,6 +1019,7 @@ func (c *WriteThroughCache) Set(ctx context.Context, key string, value interface
 ### Connection Pooling and Reuse
 
 #### Optimized HTTP Client Configuration
+
 ```go
 // pkg/client/optimized_client.go
 package client
@@ -1023,24 +1038,24 @@ func NewOptimizedHTTPClient() *http.Client {
         MaxIdleConnsPerHost: 20,
         MaxConnsPerHost:     50,
         IdleConnTimeout:     90 * time.Second,
-        
+
         // Connection timing
         DialContext: (&net.Dialer{
             Timeout:   10 * time.Second,
             KeepAlive: 30 * time.Second,
         }).DialContext,
-        
+
         // TLS optimization
         TLSHandshakeTimeout: 10 * time.Second,
         TLSClientConfig: &tls.Config{
             InsecureSkipVerify: false,
             MinVersion:         tls.VersionTLS12,
         },
-        
+
         // HTTP/2 optimization
         ForceAttemptHTTP2:     true,
         MaxResponseHeaderBytes: 4096,
-        
+
         // Compression
         DisableCompression: false,
     }
@@ -1053,6 +1068,7 @@ func NewOptimizedHTTPClient() *http.Client {
 ```
 
 #### Cloud Provider Client Optimization
+
 ```go
 // pkg/provider/optimized_aws_client.go
 package provider
@@ -1099,22 +1115,22 @@ func (c *OptimizedAWSClient) CreateInstancesBatch(ctx context.Context, requests 
     // Batch multiple requests together
     batchSize := 10
     var results []InstanceResult
-    
+
     for i := 0; i < len(requests); i += batchSize {
         end := i + batchSize
         if end > len(requests) {
             end = len(requests)
         }
-        
+
         batch := requests[i:end]
         batchResults, err := c.processBatch(ctx, batch)
         if err != nil {
             return nil, err
         }
-        
+
         results = append(results, batchResults...)
     }
-    
+
     return results, nil
 }
 ```
@@ -1122,6 +1138,7 @@ func (c *OptimizedAWSClient) CreateInstancesBatch(ctx context.Context, requests 
 ### Request Batching and Multiplexing
 
 #### Batch Request Processor
+
 ```go
 // pkg/batch/request_processor.go
 package batch
@@ -1136,7 +1153,7 @@ type BatchProcessor struct {
     batchSize    int
     flushTimeout time.Duration
     processor    func([]Request) error
-    
+
     requests []Request
     mutex    sync.Mutex
     timer    *time.Timer
@@ -1183,7 +1200,7 @@ func (bp *BatchProcessor) flush() {
     requests := make([]Request, len(bp.requests))
     copy(requests, bp.requests)
     bp.requests = bp.requests[:0]
-    
+
     if bp.timer != nil {
         bp.timer.Stop()
         bp.timer = nil
@@ -1212,6 +1229,7 @@ func (bp *BatchProcessor) flush() {
 ### Efficient Data Serialization
 
 #### Optimized JSON Marshaling
+
 ```go
 // pkg/serialization/optimized_json.go
 package serialization
@@ -1266,6 +1284,7 @@ func (s *OptimizedSerializer) UnmarshalFromReader(r io.Reader, v interface{}) er
 ### Database Connection Optimization
 
 #### Optimized Database Pool
+
 ```go
 // pkg/storage/db_pool.go
 package storage
@@ -1297,7 +1316,7 @@ func NewOptimizedDBPool(databaseURL string) (*OptimizedDBPool, error) {
     // Verify connection
     ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
     defer cancel()
-    
+
     if err := db.PingContext(ctx); err != nil {
         return nil, err
     }
@@ -1320,6 +1339,7 @@ func (p *OptimizedDBPool) PrepareStatement(query string) (*sql.Stmt, error) {
 ### Performance Metrics Collection
 
 #### Custom Performance Metrics
+
 ```go
 // pkg/metrics/performance_metrics.go
 package metrics
@@ -1414,6 +1434,7 @@ func (m *MetricsRecorder) EndAPICall(key string, provider string, operation stri
 ```
 
 ### Performance Dashboard Configuration
+
 ```yaml
 # performance-dashboard.yaml
 apiVersion: v1
@@ -1503,6 +1524,7 @@ data:
 ### Performance Best Practices Checklist
 
 #### Controller Optimization
+
 - ✅ Use batch processing for bulk operations
 - ✅ Implement proper caching strategies
 - ✅ Optimize resource allocation (CPU/Memory)
@@ -1513,6 +1535,7 @@ data:
 - ✅ Implement proper garbage collection tuning
 
 #### Resource Management
+
 - ✅ Set appropriate resource limits and requests
 - ✅ Use horizontal and vertical pod autoscaling
 - ✅ Implement resource quotas and limits
@@ -1521,6 +1544,7 @@ data:
 - ✅ Implement proper cleanup of unused resources
 
 #### Networking Optimization
+
 - ✅ Use HTTP/2 where possible
 - ✅ Implement request batching
 - ✅ Use connection keep-alive
@@ -1529,6 +1553,7 @@ data:
 - ✅ Use compression for large payloads
 
 #### Storage Performance
+
 - ✅ Use efficient serialization formats
 - ✅ Implement write-through caching
 - ✅ Optimize database queries
@@ -1536,6 +1561,7 @@ data:
 - ✅ Implement proper indexing strategies
 
 ### Performance Testing Framework
+
 ```bash
 #!/bin/bash
 # performance-test-suite.sh

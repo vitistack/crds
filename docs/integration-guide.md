@@ -21,7 +21,7 @@ metadata:
 spec:
   region: us-west-2
   description: "Production datacenter in AWS US West 2"
-  
+
   # Network Configuration
   networking:
     vpcs:
@@ -40,12 +40,12 @@ spec:
             cidr: "10.0.3.0/24"
             type: private
             availabilityZone: us-west-2b
-    
+
     loadBalancers:
       - name: k8s-api-lb
         type: network
         internal: false
-    
+
     firewallRules:
       - name: k8s-api-access
         direction: inbound
@@ -57,40 +57,40 @@ spec:
         protocol: tcp
         port: 22
         source: "10.0.0.0/16"
-  
+
   # Security Configuration
   security:
     encryption:
       atRest: true
       inTransit: true
-    
+
     rbac:
       enabled: true
       adminGroups:
         - "aws-admins"
         - "k8s-admins"
-    
+
     auditLogging:
       enabled: true
       retention: "90d"
-  
+
   # Resource Quotas
   resourceQuotas:
     maxMachines: 100
     maxClusters: 5
     maxProviders: 10
-    
+
   # Provider References
   machineProviders:
     - name: aws-ec2-provider
       priority: 1
       namespace: production
-  
+
   kubernetesProviders:
     - name: aws-eks-provider
       priority: 1
       namespace: production
-  
+
   # Monitoring & Backup
   monitoring:
     enabled: true
@@ -98,7 +98,7 @@ spec:
     exporters:
       - node
       - cluster
-  
+
   backup:
     enabled: true
     schedule: "0 2 * * *"
@@ -116,14 +116,14 @@ metadata:
 spec:
   type: aws
   region: us-west-2
-  
+
   # AWS-specific configuration
   aws:
     credentials:
       secretRef:
         name: aws-credentials
         namespace: production
-    
+
     instanceTypes:
       - name: m5.large
         vcpus: 2
@@ -133,7 +133,7 @@ spec:
         pricing:
           onDemand: "$0.096/hour"
           spot: "$0.038/hour"
-      
+
       - name: m5.xlarge
         vcpus: 4
         memory: 16Gi
@@ -142,7 +142,7 @@ spec:
         pricing:
           onDemand: "$0.192/hour"
           spot: "$0.076/hour"
-    
+
     # Machine Images
     machineImages:
       - name: ubuntu-20.04
@@ -150,19 +150,19 @@ spec:
         architecture: x86_64
         operatingSystem: ubuntu
         version: "20.04"
-      
+
       - name: amazon-linux-2
         imageId: ami-0c02fb55956c7d316
         architecture: x86_64
         operatingSystem: amazon-linux
         version: "2"
-    
+
     # Networking
     networking:
-      vpcId: "vpc-12345678"  # Reference to VPC created by Datacenter
+      vpcId: "vpc-12345678" # Reference to VPC created by Datacenter
       subnets:
-        - subnet-12345678  # private-subnet-1
-        - subnet-87654321  # private-subnet-2
+        - subnet-12345678 # private-subnet-1
+        - subnet-87654321 # private-subnet-2
       securityGroups:
         - name: k8s-nodes
           rules:
@@ -172,20 +172,20 @@ spec:
             - protocol: tcp
               ports: "30000-32767"
               source: "10.0.0.0/16"
-    
+
     # Storage
     storage:
       defaultVolumeType: gp3
       defaultVolumeSize: 20Gi
       encryption: true
-  
+
   # Health Monitoring
   healthCheck:
     enabled: true
     interval: 30s
     timeout: 10s
     retries: 3
-  
+
   # Auto-scaling
   autoScaling:
     enabled: true
@@ -194,13 +194,13 @@ spec:
     targetCPUUtilization: 70
     scaleUpCooldown: 5m
     scaleDownCooldown: 10m
-  
+
   # Lifecycle Management
   lifecycle:
     preDelete:
       enabled: true
       drainTimeout: 10m
-    
+
     updateStrategy:
       type: RollingUpdate
       maxUnavailable: 1
@@ -219,28 +219,29 @@ spec:
   type: eks
   version: "1.24"
   region: us-west-2
-  
+
   # EKS-specific configuration
   eks:
     credentials:
       secretRef:
         name: aws-credentials
         namespace: production
-    
+
     clusterConfig:
       endpointAccess:
         private: true
         public: true
         publicCIDRs:
           - "0.0.0.0/0"
-      
+
       logging:
-        enabled: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-      
+        enabled:
+          ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
       encryption:
         enabled: true
         kmsKeyId: "arn:aws:kms:us-west-2:123456789012:key/12345678-1234-1234-1234-123456789012"
-    
+
     # Node Groups
     nodeGroups:
       - name: system-nodes
@@ -263,7 +264,7 @@ spec:
           - key: node-type
             value: system
             effect: NoSchedule
-      
+
       - name: worker-nodes
         machineProvider:
           name: aws-ec2-provider
@@ -280,33 +281,33 @@ spec:
           - subnet-87654321
         labels:
           node-type: worker
-  
+
   # Networking
   networking:
     cni: aws-vpc-cni
     serviceCIDR: "172.20.0.0/16"
     podCIDR: "10.244.0.0/16"
-    
+
     # Network Policies
     networkPolicies:
       enabled: true
       defaultDeny: true
-    
+
     # Service Mesh
     serviceMesh:
       enabled: true
       type: istio
       version: "1.15"
-  
+
   # Security
   security:
     rbac:
       enabled: true
-    
+
     podSecurityStandards:
       enabled: true
       policy: restricted
-    
+
     networkSecurity:
       enabled: true
       policies:
@@ -315,33 +316,33 @@ spec:
         - name: allow-system-communication
           type: allow
           namespaces: ["kube-system", "istio-system"]
-  
+
   # Add-ons
   addons:
     - name: aws-load-balancer-controller
       version: "v2.4.4"
       enabled: true
-    
+
     - name: cluster-autoscaler
       version: "1.24.0"
       enabled: true
       config:
         autoDiscovery:
           clusterName: aws-production-cluster
-    
+
     - name: external-dns
       version: "0.12.2"
       enabled: true
       config:
         provider: aws
         domainFilters: ["example.com"]
-    
+
     - name: cert-manager
       version: "v1.9.1"
       enabled: true
       config:
         installCRDs: true
-  
+
   # Monitoring
   monitoring:
     enabled: true
@@ -349,14 +350,14 @@ spec:
       enabled: true
       retention: "15d"
       storage: 10Gi
-    
+
     grafana:
       enabled: true
       adminPassword:
         secretRef:
           name: grafana-admin
           key: password
-    
+
     alertmanager:
       enabled: true
       config:
@@ -365,7 +366,7 @@ spec:
             slackConfigs:
               - apiURL: https://hooks.slack.com/services/xxx
                 channel: "#alerts"
-  
+
   # Backup
   backup:
     enabled: true
@@ -389,23 +390,23 @@ spec:
   machineProvider:
     name: aws-ec2-provider
     namespace: production
-  
+
   # Machine specifications
   instanceType: t3.micro
   machineImage: ubuntu-20.04
-  
+
   # Networking
   networking:
-    subnet: subnet-12345678  # public-subnet-1
+    subnet: subnet-12345678 # public-subnet-1
     publicIP: true
     securityGroups:
       - bastion-sg
-  
+
   # SSH Access
   sshKeys:
     - name: admin-key
       publicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAA..."
-  
+
   # Software Installation
   software:
     packages:
@@ -415,7 +416,7 @@ spec:
         version: "1.24.*"
       - name: helm
         version: "3.9.*"
-    
+
     scripts:
       - name: setup-monitoring
         content: |
@@ -424,13 +425,13 @@ spec:
           curl -sSL https://install.datadoghq.com/scripts/install_script.sh | bash
           systemctl enable datadog-agent
           systemctl start datadog-agent
-  
+
   # Labels and Annotations
   labels:
     environment: production
     role: bastion
     team: platform
-  
+
   annotations:
     description: "Bastion host for secure access to production environment"
 ```
@@ -469,7 +470,7 @@ metadata:
 spec:
   region: us-west-2
   description: "Primary production datacenter"
-  
+
   # Disaster Recovery Configuration
   disasterRecovery:
     enabled: true
@@ -479,14 +480,14 @@ spec:
         region: us-east-1
         provider: aws
         replicationMode: async
-        rpo: "1h"  # Recovery Point Objective
+        rpo: "1h" # Recovery Point Objective
         rto: "30m" # Recovery Time Objective
-  
+
   # Primary providers
   machineProviders:
     - name: aws-west-provider
       priority: 1
-  
+
   kubernetesProviders:
     - name: eks-west-provider
       priority: 1
@@ -503,20 +504,20 @@ metadata:
 spec:
   region: east-us
   description: "Secondary datacenter for disaster recovery"
-  
+
   # Mark as DR datacenter
   role: disaster-recovery
-  
+
   # Reference to primary
   primaryDatacenter:
     name: primary-datacenter
     namespace: production
-  
+
   # Secondary providers
   machineProviders:
     - name: azure-east-provider
       priority: 1
-  
+
   kubernetesProviders:
     - name: aks-east-provider
       priority: 1
@@ -537,7 +538,7 @@ metadata:
 spec:
   region: central
   description: "Central management for edge deployments"
-  
+
   # Edge management configuration
   edgeManagement:
     enabled: true
@@ -550,12 +551,12 @@ spec:
         region: us-east
         maxMachines: 10
         maxClusters: 2
-  
+
   # Central monitoring and logging
   monitoring:
     enabled: true
     aggregateEdgeMetrics: true
-    
+
   logging:
     enabled: true
     aggregateEdgeLogs: true
@@ -572,15 +573,15 @@ metadata:
 spec:
   region: us-west
   description: "Edge location in US West"
-  
+
   # Mark as edge datacenter
   role: edge
-  
+
   # Reference to central management
   managementDatacenter:
     name: central-management
     namespace: edge-system
-  
+
   # Resource constraints for edge
   resourceQuotas:
     maxMachines: 10
@@ -588,14 +589,14 @@ spec:
     maxCPU: "100"
     maxMemory: "200Gi"
     maxStorage: "1Ti"
-  
+
   # Edge-specific configuration
   edge:
     connectivity:
       type: satellite
       bandwidth: "100Mbps"
       latency: "500ms"
-    
+
     autonomy:
       enabled: true
       offlineTimeout: "1h"
@@ -617,7 +618,7 @@ metadata:
 spec:
   type: aws
   # ... configuration
-  
+
   # Failover configuration
   failover:
     enabled: true
@@ -625,7 +626,7 @@ spec:
       interval: 30s
       timeout: 10s
       failureThreshold: 3
-    
+
     targets:
       - name: secondary-provider
         namespace: production
@@ -658,14 +659,14 @@ metadata:
 spec:
   type: aws
   # ... configuration
-  
+
   # Make available to multiple datacenters
   shareWith:
     - datacenter: primary-datacenter
       namespace: production
     - datacenter: secondary-datacenter
       namespace: production
-  
+
   # Shared storage configuration
   storage:
     shared:
@@ -690,7 +691,7 @@ metadata:
 spec:
   region: global
   description: "Global datacenter for centralized management"
-  
+
   # Child datacenters
   childDatacenters:
     - name: us-datacenter
@@ -699,19 +700,19 @@ spec:
       namespace: eu-region
     - name: asia-datacenter
       namespace: asia-region
-  
+
   # Global policies
   globalPolicies:
     security:
       enforceEncryption: true
       requireMFA: true
-    
+
     compliance:
       frameworks:
         - SOC2
         - GDPR
         - HIPAA
-    
+
     resourceLimits:
       globalMaxMachines: 1000
       globalMaxClusters: 50
@@ -726,15 +727,15 @@ metadata:
 spec:
   region: us
   description: "US regional datacenter"
-  
+
   # Reference to parent
   parentDatacenter:
     name: global-datacenter
     namespace: default
-  
+
   # Inherit policies from parent
   inheritPolicies: true
-  
+
   # Region-specific configuration
   resourceQuotas:
     maxMachines: 500
@@ -778,7 +779,7 @@ spec:
           annotations:
             summary: "Datacenter provider is down"
             description: "Provider {{ $labels.provider }} in datacenter {{ $labels.datacenter }} has been down for more than 5 minutes"
-    
+
     - name: machine.rules
       rules:
         - alert: MachineProvisioningFailed
@@ -788,7 +789,7 @@ spec:
           annotations:
             summary: "Machine provisioning is failing"
             description: "{{ $value }} machine provisioning failures in the last 5 minutes"
-    
+
     - name: kubernetes.rules
       rules:
         - alert: KubernetesClusterUnhealthy
@@ -806,6 +807,7 @@ spec:
 ### Common Integration Problems
 
 1. **Provider Reference Errors**
+
    ```bash
    # Check provider references
    kubectl get datacenter datacenter-name -o yaml | grep -A 10 machineProviders
@@ -813,28 +815,31 @@ spec:
    ```
 
 2. **Cross-Namespace Reference Issues**
+
    ```bash
    # Check RBAC permissions
    kubectl auth can-i get machineproviders --as=system:serviceaccount:namespace:controller-name
-   
+
    # Check if resources exist in target namespace
    kubectl get machineproviders -n target-namespace
    ```
 
 3. **Credential and Secret Issues**
+
    ```bash
    # Verify secrets exist
    kubectl get secrets -n namespace-name
-   
+
    # Check secret content (be careful with sensitive data)
    kubectl get secret secret-name -o yaml
    ```
 
 4. **Network Connectivity Issues**
+
    ```bash
    # Test connectivity between components
    kubectl run test-pod --image=busybox -it --rm -- nslookup provider-service.namespace.svc.cluster.local
-   
+
    # Check network policies
    kubectl get networkpolicies -A
    ```

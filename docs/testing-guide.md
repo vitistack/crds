@@ -39,30 +39,35 @@ This guide provides comprehensive testing strategies, test cases, integration sc
 ### Test Categories
 
 #### 1. Unit Tests
+
 - Controller logic validation
 - CRD specification validation
 - Provider interface testing
 - Utility function testing
 
 #### 2. Integration Tests
+
 - CRD lifecycle testing
 - Provider integration
 - Cross-component communication
 - Event handling
 
 #### 3. End-to-End Tests
+
 - Complete workflow scenarios
 - Multi-cloud deployments
 - Real provider interactions
 - User journey validation
 
 #### 4. Performance Tests
+
 - Load testing
 - Stress testing
 - Scalability testing
 - Resource utilization
 
 #### 5. Chaos Tests
+
 - Failure injection
 - Recovery testing
 - Resilience validation
@@ -73,6 +78,7 @@ This guide provides comprehensive testing strategies, test cases, integration sc
 ### Controller Unit Tests
 
 #### Test Structure
+
 ```go
 // pkg/controller/datacenter_controller_test.go
 package controller
@@ -172,7 +178,7 @@ func TestDatacenterController_Reconcile(t *testing.T) {
             // Setup fake client
             scheme := runtime.NewScheme()
             require.NoError(t, vitistackv1alpha1.AddToScheme(scheme))
-            
+
             objs := append(tt.existingObjs, tt.datacenter)
             fakeClient := fake.NewClientBuilder().
                 WithScheme(scheme).
@@ -280,6 +286,7 @@ func TestDatacenterValidation(t *testing.T) {
 ```
 
 ### Running Unit Tests
+
 ```bash
 #!/bin/bash
 # run-unit-tests.sh
@@ -307,6 +314,7 @@ echo "Unit tests completed with $COVERAGE% coverage"
 ### CRD Lifecycle Integration Tests
 
 #### Test Environment Setup
+
 ```bash
 #!/bin/bash
 # setup-integration-test-env.sh
@@ -338,6 +346,7 @@ echo "Integration test environment ready"
 ```
 
 #### Integration Test Suite
+
 ```go
 // test/integration/datacenter_integration_test.go
 package integration
@@ -366,7 +375,7 @@ func (suite *DatacenterIntegrationTestSuite) SetupSuite() {
 
 func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
     ctx := context.Background()
-    
+
     // Create machine provider
     machineProvider := &vitistackv1alpha1.MachineProvider{
         ObjectMeta: metav1.ObjectMeta{
@@ -383,10 +392,10 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
             },
         },
     }
-    
+
     err := suite.k8sClient.Create(ctx, machineProvider)
     suite.Require().NoError(err)
-    
+
     // Wait for provider to be ready
     err = wait.PollImmediate(5*time.Second, 2*time.Minute, func() (bool, error) {
         var provider vitistackv1alpha1.MachineProvider
@@ -400,7 +409,7 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
         return provider.Status.Phase == vitistackv1alpha1.MachineProviderPhaseReady, nil
     })
     suite.Require().NoError(err)
-    
+
     // Create datacenter
     datacenter := &vitistackv1alpha1.Datacenter{
         ObjectMeta: metav1.ObjectMeta{
@@ -417,10 +426,10 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
             },
         },
     }
-    
+
     err = suite.k8sClient.Create(ctx, datacenter)
     suite.Require().NoError(err)
-    
+
     // Wait for datacenter to be ready
     err = wait.PollImmediate(10*time.Second, 5*time.Minute, func() (bool, error) {
         var dc vitistackv1alpha1.Datacenter
@@ -434,7 +443,7 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
         return dc.Status.Phase == vitistackv1alpha1.DatacenterPhaseReady, nil
     })
     suite.Require().NoError(err)
-    
+
     // Create machine
     machine := &vitistackv1alpha1.Machine{
         ObjectMeta: metav1.ObjectMeta{
@@ -452,10 +461,10 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
             },
         },
     }
-    
+
     err = suite.k8sClient.Create(ctx, machine)
     suite.Require().NoError(err)
-    
+
     // Wait for machine to be ready
     err = wait.PollImmediate(30*time.Second, 10*time.Minute, func() (bool, error) {
         var m vitistackv1alpha1.Machine
@@ -469,7 +478,7 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
         return m.Status.Phase == vitistackv1alpha1.MachinePhaseRunning, nil
     })
     suite.Require().NoError(err)
-    
+
     // Cleanup
     suite.cleanup()
 }
@@ -485,13 +494,13 @@ func (suite *DatacenterIntegrationTestSuite) TestCrossDatacenterMachine() {
 
 func (suite *DatacenterIntegrationTestSuite) cleanup() {
     ctx := context.Background()
-    
+
     // Delete all test resources
-    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Machine{}, 
+    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Machine{},
         client.InNamespace(suite.testNamespace))
-    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Datacenter{}, 
+    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Datacenter{},
         client.InNamespace(suite.testNamespace))
-    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.MachineProvider{}, 
+    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.MachineProvider{},
         client.InNamespace(suite.testNamespace))
 }
 
@@ -501,6 +510,7 @@ func TestDatacenterIntegrationSuite(t *testing.T) {
 ```
 
 ### Multi-Cloud Integration Tests
+
 ```bash
 #!/bin/bash
 # multi-cloud-integration-test.sh
@@ -543,6 +553,7 @@ echo "Multi-cloud integration tests completed"
 ### Comprehensive E2E Test Scenarios
 
 #### E2E Test Framework
+
 ```yaml
 # test/e2e/test-scenarios.yaml
 apiVersion: v1
@@ -603,6 +614,7 @@ data:
 ```
 
 #### E2E Test Runner
+
 ```bash
 #!/bin/bash
 # run-e2e-tests.sh
@@ -612,19 +624,19 @@ TEST_NAMESPACE="vitistack-e2e-$(date +%s)"
 
 setup_test_environment() {
     echo "Setting up E2E test environment..."
-    
+
     # Create test namespace
     kubectl create namespace $TEST_NAMESPACE
-    
+
     # Apply CRDs
     kubectl apply -f crds/
-    
+
     # Deploy controller
     kubectl apply -f config/
-    
+
     # Wait for controller to be ready
     kubectl wait --for=condition=Available deployment/vitistack-controller -n vitistack-system --timeout=300s
-    
+
     # Create test secrets
     create_test_secrets
 }
@@ -635,14 +647,14 @@ create_test_secrets() {
         --from-literal=access-key="$AWS_ACCESS_KEY_ID" \
         --from-literal=secret-key="$AWS_SECRET_ACCESS_KEY" \
         -n $TEST_NAMESPACE
-    
+
     # Azure credentials
     kubectl create secret generic azure-e2e-creds \
         --from-literal=client-id="$AZURE_CLIENT_ID" \
         --from-literal=client-secret="$AZURE_CLIENT_SECRET" \
         --from-literal=tenant-id="$AZURE_TENANT_ID" \
         -n $TEST_NAMESPACE
-    
+
     # GCP credentials
     kubectl create secret generic gcp-e2e-creds \
         --from-file=service-account-key="$GOOGLE_APPLICATION_CREDENTIALS" \
@@ -652,7 +664,7 @@ create_test_secrets() {
 run_scenario() {
     local scenario_name=$1
     echo "Running scenario: $scenario_name"
-    
+
     case $scenario_name in
         "single-cloud-deployment")
             run_single_cloud_test
@@ -678,87 +690,87 @@ run_scenario() {
 
 run_single_cloud_test() {
     echo "Executing single cloud deployment test..."
-    
+
     # Apply single cloud configuration
     envsubst < test/e2e/scenarios/single-cloud.yaml | kubectl apply -f - -n $TEST_NAMESPACE
-    
+
     # Wait for datacenter to be ready
     kubectl wait --for=condition=Ready datacenter/single-cloud-dc -n $TEST_NAMESPACE --timeout=600s
-    
+
     # Create test machines
     for i in {1..3}; do
         envsubst < test/e2e/templates/machine.yaml | \
             sed "s/MACHINE_NAME/test-machine-$i/" | \
             kubectl apply -f - -n $TEST_NAMESPACE
     done
-    
+
     # Wait for machines to be running
     kubectl wait --for=condition=Ready machines --all -n $TEST_NAMESPACE --timeout=900s
-    
+
     # Verify connectivity
     verify_machine_connectivity $TEST_NAMESPACE
-    
+
     # Run application tests
     run_application_tests $TEST_NAMESPACE
-    
+
     echo "Single cloud test completed successfully"
 }
 
 run_multi_cloud_test() {
     echo "Executing multi-cloud deployment test..."
-    
+
     # Apply multi-cloud configuration
     envsubst < test/e2e/scenarios/multi-cloud.yaml | kubectl apply -f - -n $TEST_NAMESPACE
-    
+
     # Wait for all datacenters to be ready
     kubectl wait --for=condition=Ready datacenters --all -n $TEST_NAMESPACE --timeout=900s
-    
+
     # Create machines across clouds
     create_distributed_machines $TEST_NAMESPACE
-    
+
     # Verify cross-cloud networking
     verify_cross_cloud_networking $TEST_NAMESPACE
-    
+
     # Test load balancing
     test_load_balancing $TEST_NAMESPACE
-    
+
     echo "Multi-cloud test completed successfully"
 }
 
 run_disaster_recovery_test() {
     echo "Executing disaster recovery test..."
-    
+
     # Deploy primary and secondary datacenters
     envsubst < test/e2e/scenarios/disaster-recovery.yaml | kubectl apply -f - -n $TEST_NAMESPACE
-    
+
     # Wait for primary datacenter
     kubectl wait --for=condition=Ready datacenter/primary-dc -n $TEST_NAMESPACE --timeout=600s
-    
+
     # Deploy application to primary
     kubectl apply -f test/e2e/apps/sample-app.yaml -n $TEST_NAMESPACE
-    
+
     # Wait for application to be ready
     kubectl wait --for=condition=Available deployment/sample-app -n $TEST_NAMESPACE --timeout=300s
-    
+
     # Simulate disaster
     simulate_datacenter_failure "primary-dc" $TEST_NAMESPACE
-    
+
     # Verify failover to secondary
     kubectl wait --for=condition=Ready datacenter/secondary-dc -n $TEST_NAMESPACE --timeout=600s
-    
+
     # Verify application recovery
     verify_application_recovery $TEST_NAMESPACE
-    
+
     echo "Disaster recovery test completed successfully"
 }
 
 verify_machine_connectivity() {
     local namespace=$1
     echo "Verifying machine connectivity..."
-    
+
     # Get machine IPs
     machines=$(kubectl get machines -n $namespace -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
-    
+
     # Test connectivity between machines
     for machine_ip in $machines; do
         kubectl run connectivity-test-$(date +%s) --rm -i --tty --restart=Never \
@@ -769,16 +781,16 @@ verify_machine_connectivity() {
 verify_cross_cloud_networking() {
     local namespace=$1
     echo "Verifying cross-cloud networking..."
-    
+
     # Get machines from different providers
     aws_machines=$(kubectl get machines -n $namespace -l provider=aws -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
     azure_machines=$(kubectl get machines -n $namespace -l provider=azure -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')
-    
+
     # Test connectivity between cloud providers
     if [ -n "$aws_machines" ] && [ -n "$azure_machines" ]; then
         aws_ip=$(echo $aws_machines | cut -d' ' -f1)
         azure_ip=$(echo $azure_machines | cut -d' ' -f1)
-        
+
         kubectl run cross-cloud-test-$(date +%s) --rm -i --tty --restart=Never \
             --image=busybox -n $namespace -- ping -c 3 $azure_ip
     fi
@@ -788,20 +800,20 @@ simulate_datacenter_failure() {
     local datacenter_name=$1
     local namespace=$2
     echo "Simulating failure of datacenter: $datacenter_name"
-    
+
     # Disable datacenter
     kubectl patch datacenter $datacenter_name -n $namespace -p='{"spec":{"enabled":false}}'
-    
+
     # Wait for machines to be drained
     kubectl wait --for=delete machines -l datacenter=$datacenter_name -n $namespace --timeout=600s
 }
 
 cleanup_test_environment() {
     echo "Cleaning up test environment..."
-    
+
     # Delete test namespace
     kubectl delete namespace $TEST_NAMESPACE --timeout=600s
-    
+
     # Clean up any external resources
     cleanup_external_resources
 }
@@ -816,9 +828,9 @@ cleanup_external_resources() {
 # Main execution
 main() {
     trap cleanup_test_environment EXIT
-    
+
     setup_test_environment
-    
+
     if [ "$SCENARIO" = "all" ]; then
         scenarios=("single-cloud-deployment" "multi-cloud-deployment" "disaster-recovery")
         for scenario in "${scenarios[@]}"; do
@@ -827,7 +839,7 @@ main() {
     else
         run_scenario "$SCENARIO"
     fi
-    
+
     echo "All E2E tests completed successfully"
 }
 
@@ -839,6 +851,7 @@ main "$@"
 ### Load Testing Framework
 
 #### Machine Provisioning Load Test
+
 ```bash
 #!/bin/bash
 # load-test-machine-provisioning.sh
@@ -859,7 +872,7 @@ kubectl apply -f test/load/provider-config.yaml -n $TEST_NAMESPACE
 create_machine_batch() {
     local batch_start=$1
     local batch_size=$2
-    
+
     for ((i=$batch_start; i<$batch_start+$batch_size; i++)); do
         cat <<EOF | kubectl apply -f -
 apiVersion: vitistack.io/v1alpha1
@@ -884,13 +897,13 @@ monitor_provisioning() {
         running=$(kubectl get machines -n $TEST_NAMESPACE --field-selector=status.phase=Running --no-headers | wc -l)
         provisioning=$(kubectl get machines -n $TEST_NAMESPACE --field-selector=status.phase=Provisioning --no-headers | wc -l)
         failed=$(kubectl get machines -n $TEST_NAMESPACE --field-selector=status.phase=Failed --no-headers | wc -l)
-        
+
         echo "$(date): Running: $running, Provisioning: $provisioning, Failed: $failed"
-        
+
         if [ $((running + failed)) -ge $TOTAL_MACHINES ]; then
             break
         fi
-        
+
         sleep 10
     done
 }
@@ -904,10 +917,10 @@ for ((batch=0; batch<$TOTAL_MACHINES; batch+=$CONCURRENT_MACHINES)); do
     if [ $((batch + batch_size)) -gt $TOTAL_MACHINES ]; then
         batch_size=$((TOTAL_MACHINES - batch))
     fi
-    
+
     echo "Creating batch starting at machine $batch (size: $batch_size)"
     create_machine_batch $batch $batch_size
-    
+
     # Wait a bit to control concurrency
     sleep 2
 done
@@ -927,6 +940,7 @@ kubectl delete namespace $TEST_NAMESPACE
 ```
 
 #### Performance Benchmarking
+
 ```go
 // test/performance/benchmark_test.go
 package performance
@@ -943,9 +957,9 @@ import (
 func BenchmarkDatacenterReconciliation(b *testing.B) {
     // Setup test environment
     ctx := context.Background()
-    
+
     b.ResetTimer()
-    
+
     for i := 0; i < b.N; i++ {
         datacenter := &vitistackv1alpha1.Datacenter{
             ObjectMeta: metav1.ObjectMeta{
@@ -959,22 +973,22 @@ func BenchmarkDatacenterReconciliation(b *testing.B) {
                 },
             },
         }
-        
+
         start := time.Now()
         err := k8sClient.Create(ctx, datacenter)
         if err != nil {
             b.Fatalf("Failed to create datacenter: %v", err)
         }
-        
+
         // Wait for reconciliation
         err = waitForDatacenterReady(ctx, datacenter.Name, 5*time.Minute)
         if err != nil {
             b.Fatalf("Datacenter not ready: %v", err)
         }
-        
+
         elapsed := time.Since(start)
         b.Logf("Datacenter %d reconciled in %v", i, elapsed)
-        
+
         // Cleanup
         k8sClient.Delete(ctx, datacenter)
     }
@@ -982,13 +996,13 @@ func BenchmarkDatacenterReconciliation(b *testing.B) {
 
 func BenchmarkMachineProvisioning(b *testing.B) {
     ctx := context.Background()
-    
+
     // Pre-create datacenter
     datacenter := createTestDatacenter(ctx, "benchmark-datacenter")
     defer k8sClient.Delete(ctx, datacenter)
-    
+
     b.ResetTimer()
-    
+
     for i := 0; i < b.N; i++ {
         machine := &vitistackv1alpha1.Machine{
             ObjectMeta: metav1.ObjectMeta{
@@ -1002,22 +1016,22 @@ func BenchmarkMachineProvisioning(b *testing.B) {
                 MachineType: "t3.micro",
             },
         }
-        
+
         start := time.Now()
         err := k8sClient.Create(ctx, machine)
         if err != nil {
             b.Fatalf("Failed to create machine: %v", err)
         }
-        
+
         // Wait for provisioning
         err = waitForMachineRunning(ctx, machine.Name, 10*time.Minute)
         if err != nil {
             b.Fatalf("Machine not running: %v", err)
         }
-        
+
         elapsed := time.Since(start)
         b.Logf("Machine %d provisioned in %v", i, elapsed)
-        
+
         // Cleanup
         k8sClient.Delete(ctx, machine)
     }
@@ -1026,31 +1040,31 @@ func BenchmarkMachineProvisioning(b *testing.B) {
 func BenchmarkConcurrentReconciliation(b *testing.B) {
     ctx := context.Background()
     concurrency := 10
-    
+
     b.ResetTimer()
-    
+
     for i := 0; i < b.N; i++ {
         var wg sync.WaitGroup
         errors := make(chan error, concurrency)
-        
+
         for j := 0; j < concurrency; j++ {
             wg.Add(1)
             go func(index int) {
                 defer wg.Done()
-                
+
                 datacenter := createTestDatacenter(ctx, fmt.Sprintf("concurrent-dc-%d-%d", i, index))
                 defer k8sClient.Delete(ctx, datacenter)
-                
+
                 err := waitForDatacenterReady(ctx, datacenter.Name, 5*time.Minute)
                 if err != nil {
                     errors <- err
                 }
             }(j)
         }
-        
+
         wg.Wait()
         close(errors)
-        
+
         for err := range errors {
             if err != nil {
                 b.Fatalf("Concurrent reconciliation failed: %v", err)
@@ -1065,6 +1079,7 @@ func BenchmarkConcurrentReconciliation(b *testing.B) {
 ### Chaos Testing Framework
 
 #### Infrastructure Chaos Tests
+
 ```bash
 #!/bin/bash
 # chaos-test-infrastructure.sh
@@ -1112,6 +1127,7 @@ echo "Chaos tests completed"
 ```
 
 #### Failure Injection Framework
+
 ```yaml
 # test/chaos/chaos-experiments.yaml
 apiVersion: v1
@@ -1165,6 +1181,7 @@ data:
 ```
 
 ### Resilience Testing
+
 ```bash
 #!/bin/bash
 # resilience-test.sh
@@ -1175,10 +1192,10 @@ echo "Starting resilience testing..."
 check_system_health() {
     local expected_datacenters=$1
     local expected_machines=$2
-    
+
     local actual_datacenters=$(kubectl get datacenters --no-headers | wc -l)
     local actual_machines=$(kubectl get machines --all-namespaces --no-headers | wc -l)
-    
+
     if [ "$actual_datacenters" -eq "$expected_datacenters" ] && [ "$actual_machines" -eq "$expected_machines" ]; then
         echo "✅ System health check passed"
         return 0
@@ -1210,13 +1227,13 @@ test_scenarios=(
 
 for scenario in "${test_scenarios[@]}"; do
     echo "Running resilience test: $scenario"
-    
+
     # Execute scenario
     ./test/resilience/scenarios/$scenario.sh
-    
+
     # Wait for system to stabilize
     sleep 30
-    
+
     # Check system health
     if check_system_health $initial_datacenters $initial_machines; then
         echo "✅ Resilience test $scenario passed"
@@ -1234,6 +1251,7 @@ echo "All resilience tests passed"
 ### Security Test Suite
 
 #### Authentication and Authorization Tests
+
 ```bash
 #!/bin/bash
 # security-test-auth.sh
@@ -1306,6 +1324,7 @@ kubectl delete serviceaccount test-user
 ```
 
 #### Encryption and Data Protection Tests
+
 ```bash
 #!/bin/bash
 # security-test-encryption.sh
@@ -1384,6 +1403,7 @@ kubectl delete secret test-secret
 ### Compliance Validation Framework
 
 #### Regulatory Compliance Tests
+
 ```bash
 #!/bin/bash
 # compliance-test.sh
@@ -1485,9 +1505,9 @@ generate_compliance_report() {
     echo "=== Compliance Report ===" > compliance-report.txt
     echo "Generated: $(date)" >> compliance-report.txt
     echo "" >> compliance-report.txt
-    
+
     kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.complianceFrameworks}{"\t"}{.status.compliance}{"\n"}{end}' >> compliance-report.txt
-    
+
     echo "Compliance report generated: compliance-report.txt"
 }
 
@@ -1504,34 +1524,35 @@ kubectl delete datacenter hipaa-compliant-datacenter
 ### CI/CD Pipeline Integration
 
 #### GitHub Actions Workflow
+
 ```yaml
 # .github/workflows/vitistack-test.yml
 name: VitiStack Test Suite
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
-    
-    - name: Run unit tests
-      run: |
-        go test -v -race -coverprofile=coverage.out ./pkg/...
-        go tool cover -html=coverage.out -o coverage.html
-    
-    - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Run unit tests
+        run: |
+          go test -v -race -coverprofile=coverage.out ./pkg/...
+          go tool cover -html=coverage.out -o coverage.html
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -1540,127 +1561,127 @@ jobs:
       matrix:
         k8s-version: [1.25.0, 1.26.0, 1.27.0]
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Create k8s cluster
-      uses: helm/kind-action@v1.5.0
-      with:
-        kubernetes_version: v${{ matrix.k8s-version }}
-    
-    - name: Run integration tests
-      run: |
-        make install-crds
-        make deploy-controller
-        ./test/integration/run-integration-tests.sh
-    
-    - name: Collect logs
-      if: failure()
-      run: |
-        kubectl logs -n vitistack-system deployment/vitistack-controller
-        kubectl get events --all-namespaces
+      - uses: actions/checkout@v3
+
+      - name: Create k8s cluster
+        uses: helm/kind-action@v1.5.0
+        with:
+          kubernetes_version: v${{ matrix.k8s-version }}
+
+      - name: Run integration tests
+        run: |
+          make install-crds
+          make deploy-controller
+          ./test/integration/run-integration-tests.sh
+
+      - name: Collect logs
+        if: failure()
+        run: |
+          kubectl logs -n vitistack-system deployment/vitistack-controller
+          kubectl get events --all-namespaces
 
   e2e-tests:
     runs-on: ubuntu-latest
     needs: integration-tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up cloud credentials
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      run: |
-        echo "Setting up cloud credentials..."
-    
-    - name: Create k8s cluster
-      uses: helm/kind-action@v1.5.0
-      with:
-        kubernetes_version: v1.27.0
-    
-    - name: Run E2E tests
-      run: |
-        make install-crds
-        make deploy-controller
-        ./test/e2e/run-e2e-tests.sh
-    
-    - name: Cleanup resources
-      if: always()
-      run: |
-        ./test/e2e/cleanup-resources.sh
+      - uses: actions/checkout@v3
+
+      - name: Set up cloud credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          echo "Setting up cloud credentials..."
+
+      - name: Create k8s cluster
+        uses: helm/kind-action@v1.5.0
+        with:
+          kubernetes_version: v1.27.0
+
+      - name: Run E2E tests
+        run: |
+          make install-crds
+          make deploy-controller
+          ./test/e2e/run-e2e-tests.sh
+
+      - name: Cleanup resources
+        if: always()
+        run: |
+          ./test/e2e/cleanup-resources.sh
 
   security-tests:
     runs-on: ubuntu-latest
     needs: unit-tests
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Run security scans
-      run: |
-        # Static analysis
-        go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
-        gosec ./...
-        
-        # Dependency vulnerability check
-        go mod download
-        go list -json -m all | nancy sleuth
-        
-        # Container image scanning
-        docker build -t vitistack/controller:test .
-        trivy image vitistack/controller:test
-    
-    - name: Run security tests
-      run: |
-        ./test/security/run-security-tests.sh
+      - uses: actions/checkout@v3
+
+      - name: Run security scans
+        run: |
+          # Static analysis
+          go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
+          gosec ./...
+
+          # Dependency vulnerability check
+          go mod download
+          go list -json -m all | nancy sleuth
+
+          # Container image scanning
+          docker build -t vitistack/controller:test .
+          trivy image vitistack/controller:test
+
+      - name: Run security tests
+        run: |
+          ./test/security/run-security-tests.sh
 
   performance-tests:
     runs-on: ubuntu-latest
     needs: integration-tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up performance test environment
-      run: |
-        # Create larger k8s cluster for performance testing
-        kind create cluster --config=test/performance/kind-config.yaml
-    
-    - name: Run performance benchmarks
-      run: |
-        make install-crds
-        make deploy-controller
-        ./test/performance/run-benchmarks.sh
-    
-    - name: Upload performance results
-      uses: actions/upload-artifact@v3
-      with:
-        name: performance-results
-        path: test/performance/results/
+      - uses: actions/checkout@v3
+
+      - name: Set up performance test environment
+        run: |
+          # Create larger k8s cluster for performance testing
+          kind create cluster --config=test/performance/kind-config.yaml
+
+      - name: Run performance benchmarks
+        run: |
+          make install-crds
+          make deploy-controller
+          ./test/performance/run-benchmarks.sh
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results
+          path: test/performance/results/
 
   chaos-tests:
     runs-on: ubuntu-latest
     needs: integration-tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Create k8s cluster
-      uses: helm/kind-action@v1.5.0
-    
-    - name: Install chaos engineering tools
-      run: |
-        kubectl apply -f https://raw.githubusercontent.com/chaos-mesh/chaos-mesh/master/manifests/crd.yaml
-        kubectl apply -f https://raw.githubusercontent.com/chaos-mesh/chaos-mesh/master/manifests/rbac.yaml
-        kubectl apply -f https://raw.githubusercontent.com/chaos-mesh/chaos-mesh/master/manifests/chaos-mesh.yaml
-    
-    - name: Run chaos tests
-      run: |
-        make install-crds
-        make deploy-controller
-        ./test/chaos/run-chaos-tests.sh
+      - uses: actions/checkout@v3
+
+      - name: Create k8s cluster
+        uses: helm/kind-action@v1.5.0
+
+      - name: Install chaos engineering tools
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/chaos-mesh/chaos-mesh/master/manifests/crd.yaml
+          kubectl apply -f https://raw.githubusercontent.com/chaos-mesh/chaos-mesh/master/manifests/rbac.yaml
+          kubectl apply -f https://raw.githubusercontent.com/chaos-mesh/chaos-mesh/master/manifests/chaos-mesh.yaml
+
+      - name: Run chaos tests
+        run: |
+          make install-crds
+          make deploy-controller
+          ./test/chaos/run-chaos-tests.sh
 ```
 
 This comprehensive testing guide provides a complete framework for testing VitiStack CRDs across all dimensions - from unit tests to chaos engineering. It includes practical scripts, test scenarios, and automation frameworks that ensure the reliability, performance, and security of the VitiStack platform.

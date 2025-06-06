@@ -16,12 +16,12 @@ spec:
   displayName: "AWS US East 1 Provider"
   region: us-east-1
   zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
-  
+
   endpoint:
     url: "https://ec2.us-east-1.amazonaws.com"
     timeoutSeconds: 30
     retryAttempts: 3
-  
+
   authentication:
     type: credentials
     credentialsRef:
@@ -29,7 +29,7 @@ spec:
       namespace: providers
     parameters:
       region: "us-east-1"
-  
+
   capabilities:
     instanceTypes:
       - name: t3.micro
@@ -76,7 +76,7 @@ spec:
         networkPerformance: "Up to 25 Gbps"
         gpu: true
         costPerHour: "$0.526"
-    
+
     operatingSystems:
       - family: "linux"
         distribution: "ubuntu"
@@ -93,7 +93,7 @@ spec:
         versions: ["2019", "2022"]
         architectures: ["x86_64"]
         defaultImageID: "ami-0123456789abcdef0"
-    
+
     storageTypes:
       - name: "gp3"
         displayName: "General Purpose SSD (gp3)"
@@ -122,13 +122,20 @@ spec:
           min: 40
           max: 500
         encryptionSupported: true
-    
-    networkFeatures: ["vpc", "security-groups", "elastic-ips", "load-balancers", "nat-gateways"]
+
+    networkFeatures:
+      [
+        "vpc",
+        "security-groups",
+        "elastic-ips",
+        "load-balancers",
+        "nat-gateways",
+      ]
     maxMachines: 1000
     autoScaling: true
     loadBalancers: true
     persistentVolumes: true
-  
+
   network:
     defaultVPC: "vpc-12345678"
     availableVPCs:
@@ -155,7 +162,7 @@ spec:
     publicIPSupport: true
     ipv6Support: true
     loadBalancerSupport: true
-  
+
   storage:
     defaultType: "gp3"
     storageClasses:
@@ -175,7 +182,7 @@ spec:
           encrypted: "true"
     defaultEncryption: true
     maxStorageGB: 65536
-  
+
   compute:
     defaultInstanceType: "t3.medium"
     maxCPUs: 128
@@ -183,12 +190,12 @@ spec:
     gpuSupport: true
     gpuTypes: ["nvidia-tesla-t4", "nvidia-tesla-v100", "nvidia-tesla-k80"]
     nestedVirtualization: false
-  
+
   defaultTags:
     "Environment": "production"
     "ManagedBy": "viti-stack"
     "Provider": "aws"
-  
+
   config:
     "default-instance-type": "t3.medium"
     "enable-detailed-monitoring": "true"
@@ -210,12 +217,12 @@ spec:
   displayName: "Azure East US Provider"
   region: eastus
   zones: ["1", "2", "3"]
-  
+
   endpoint:
     url: "https://management.azure.com"
     timeoutSeconds: 45
     retryAttempts: 3
-  
+
   authentication:
     type: serviceAccount
     serviceAccount:
@@ -227,7 +234,7 @@ spec:
     parameters:
       tenantId: "87654321-4321-4321-4321-210987654321"
       subscriptionId: "11111111-2222-3333-4444-555555555555"
-  
+
   capabilities:
     instanceTypes:
       - name: Standard_B1s
@@ -271,7 +278,7 @@ spec:
         networkPerformance: "High"
         gpu: true
         costPerHour: "$0.90"
-    
+
     operatingSystems:
       - family: "linux"
         distribution: "ubuntu"
@@ -288,7 +295,7 @@ spec:
         versions: ["2019", "2022"]
         architectures: ["x86_64"]
         defaultImageID: "/subscriptions/.../images/windows-2022"
-    
+
     storageTypes:
       - name: "Premium_LRS"
         displayName: "Premium SSD"
@@ -317,13 +324,20 @@ spec:
           min: 25
           max: 750
         encryptionSupported: true
-    
-    networkFeatures: ["virtual-networks", "nsg", "public-ips", "load-balancers", "application-gateways"]
+
+    networkFeatures:
+      [
+        "virtual-networks",
+        "nsg",
+        "public-ips",
+        "load-balancers",
+        "application-gateways",
+      ]
     maxMachines: 800
     autoScaling: true
     loadBalancers: true
     persistentVolumes: true
-  
+
   network:
     defaultVPC: "/subscriptions/.../virtualNetworks/production-vnet"
     availableVPCs:
@@ -345,7 +359,7 @@ spec:
     publicIPSupport: true
     ipv6Support: true
     loadBalancerSupport: true
-  
+
   storage:
     defaultType: "Premium_LRS"
     storageClasses:
@@ -364,20 +378,26 @@ spec:
           kind: "managed"
     defaultEncryption: true
     maxStorageGB: 32767
-  
+
   compute:
     defaultInstanceType: "Standard_B2s"
     maxCPUs: 128
     maxMemoryGB: 3892
     gpuSupport: true
-    gpuTypes: ["nvidia-tesla-k80", "nvidia-tesla-m60", "nvidia-tesla-p40", "nvidia-tesla-v100"]
+    gpuTypes:
+      [
+        "nvidia-tesla-k80",
+        "nvidia-tesla-m60",
+        "nvidia-tesla-p40",
+        "nvidia-tesla-v100",
+      ]
     nestedVirtualization: true
-  
+
   defaultTags:
     "Environment": "production"
     "ManagedBy": "viti-stack"
     "Provider": "azure"
-  
+
   config:
     "resource-group": "production-rg"
     "location": "eastus"
@@ -399,7 +419,7 @@ spec:
   displayName: "VMware vSphere Datacenter 1"
   region: on-premises-dc1
   zones: ["cluster-a", "cluster-b"]
-  
+
   endpoint:
     url: "https://vcenter.company.local"
     insecureSkipVerify: false
@@ -409,7 +429,7 @@ spec:
       -----END CERTIFICATE-----
     timeoutSeconds: 60
     retryAttempts: 2
-  
+
   authentication:
     type: credentials
     credentialsRef:
@@ -418,7 +438,7 @@ spec:
     parameters:
       datacenter: "Datacenter-1"
       cluster: "Production-Cluster"
-  
+
   capabilities:
     instanceTypes:
       - name: small
@@ -445,7 +465,7 @@ spec:
         memoryGB: "32"
         storageGB: 320
         networkPerformance: "10 Gbps"
-    
+
     operatingSystems:
       - family: "linux"
         distribution: "ubuntu"
@@ -462,7 +482,7 @@ spec:
         versions: ["2019", "2022"]
         architectures: ["x86_64"]
         defaultImageID: "windows-2022-template"
-    
+
     storageTypes:
       - name: "thin-provisioned"
         displayName: "Thin Provisioned"
@@ -476,19 +496,19 @@ spec:
         displayName: "vSAN Storage"
         class: "SSD"
         encryptionSupported: true
-    
+
     networkFeatures: ["distributed-switch", "port-groups", "load-balancers"]
     maxMachines: 500
     autoScaling: false
     loadBalancers: true
     persistentVolumes: true
-  
+
   network:
     defaultVPC: "production-portgroup"
     publicIPSupport: false
     ipv6Support: true
     loadBalancerSupport: true
-  
+
   storage:
     defaultType: "thin-provisioned"
     storageClasses:
@@ -505,7 +525,7 @@ spec:
           storagepolicyname: "vSAN Default Storage Policy"
     defaultEncryption: true
     maxStorageGB: 10240
-  
+
   compute:
     defaultInstanceType: "medium"
     maxCPUs: 64
@@ -513,13 +533,13 @@ spec:
     gpuSupport: true
     gpuTypes: ["nvidia-tesla-v100", "nvidia-quadro-rtx"]
     nestedVirtualization: true
-  
+
   defaultTags:
     "Environment": "production"
     "ManagedBy": "viti-stack"
     "Provider": "vsphere"
     "Datacenter": "DC1"
-  
+
   config:
     "datacenter": "Datacenter-1"
     "cluster": "Production-Cluster"

@@ -7,9 +7,11 @@ VitiStack is a comprehensive Kubernetes-native infrastructure management platfor
 ## Core Components
 
 ### 1. Datacenter CRD
+
 The foundational component that represents a logical datacenter or infrastructure region.
 
 **Responsibilities:**
+
 - Define geographical boundaries and zones
 - Coordinate multiple infrastructure providers
 - Enforce security policies and compliance frameworks
@@ -17,16 +19,19 @@ The foundational component that represents a logical datacenter or infrastructur
 - Control resource quotas and limits
 
 **Key Features:**
+
 - Multi-cloud provider orchestration
 - Comprehensive networking (VPCs, subnets, load balancers, firewalls)
 - Security governance (encryption, RBAC, audit logging)
 - Resource quota management
 - Backup and disaster recovery
 
-### 2. MachineProvider CRD  
+### 2. MachineProvider CRD
+
 Defines how to provision and manage compute instances across different infrastructure providers.
 
 **Responsibilities:**
+
 - Configure cloud provider credentials and settings
 - Define instance types, pricing, and availability
 - Manage provider-specific networking and storage
@@ -34,6 +39,7 @@ Defines how to provision and manage compute instances across different infrastru
 - Provide health monitoring and auto-scaling capabilities
 
 **Supported Providers:**
+
 - AWS EC2
 - Azure Virtual Machines
 - Google Compute Engine
@@ -42,9 +48,11 @@ Defines how to provision and manage compute instances across different infrastru
 - Bare Metal
 
 ### 3. KubernetesProvider CRD
+
 Manages Kubernetes cluster lifecycle and configuration across different Kubernetes distributions.
 
 **Responsibilities:**
+
 - Configure Kubernetes cluster specifications
 - Manage cluster networking (CNI, service mesh)
 - Handle cluster security (RBAC, pod security, network policies)
@@ -52,6 +60,7 @@ Manages Kubernetes cluster lifecycle and configuration across different Kubernet
 - Manage cluster add-ons and extensions
 
 **Supported Distributions:**
+
 - Amazon EKS
 - Azure AKS
 - Google GKE
@@ -60,9 +69,11 @@ Manages Kubernetes cluster lifecycle and configuration across different Kubernet
 - Vanilla Kubernetes
 
 ### 4. Machine CRD
+
 Represents individual compute instances that make up Kubernetes clusters or standalone workloads.
 
 **Responsibilities:**
+
 - Define machine specifications (CPU, memory, storage)
 - Configure operating system and software packages
 - Manage machine lifecycle (creation, updates, deletion)
@@ -121,6 +132,7 @@ Datacenter (namespace-scoped)
 ## Data Flow
 
 ### 1. Datacenter Initialization
+
 ```
 1. User creates Datacenter resource
 2. Datacenter controller validates configuration
@@ -131,6 +143,7 @@ Datacenter (namespace-scoped)
 ```
 
 ### 2. Machine Provisioning
+
 ```
 1. User creates Machine resource
 2. Machine controller resolves MachineProvider reference
@@ -142,6 +155,7 @@ Datacenter (namespace-scoped)
 ```
 
 ### 3. Kubernetes Cluster Creation
+
 ```
 1. User creates KubernetesProvider resource
 2. Controller provisions control plane components
@@ -346,16 +360,19 @@ spec:
 ### Common Issues
 
 1. **Provider Authentication Failures**
+
    - Check credential configuration
    - Verify IAM permissions
    - Test connectivity to provider APIs
 
 2. **Resource Provisioning Failures**
+
    - Check resource quotas and limits
    - Verify network connectivity
    - Review provider-specific logs
 
 3. **Networking Issues**
+
    - Validate CIDR configurations
    - Check firewall rules
    - Verify DNS settings

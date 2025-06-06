@@ -28,189 +28,189 @@ The Datacenter Custom Resource Definition (CRD) represents a logical datacenter 
 
 ### Core Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `displayName` | string | ✅ | Human-readable name for the datacenter |
-| `description` | string | ❌ | Additional context about the datacenter |
-| `region` | string | ✅ | Geographical region where the datacenter is located |
-| `zone` | string | ❌ | Availability zone within the region |
-| `location` | object | ❌ | Detailed location information including coordinates |
+| Field         | Type   | Required | Description                                         |
+| ------------- | ------ | -------- | --------------------------------------------------- |
+| `displayName` | string | ✅       | Human-readable name for the datacenter              |
+| `description` | string | ❌       | Additional context about the datacenter             |
+| `region`      | string | ✅       | Geographical region where the datacenter is located |
+| `zone`        | string | ❌       | Availability zone within the region                 |
+| `location`    | object | ❌       | Detailed location information including coordinates |
 
 ### Provider References
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `machineProviders` | array | ✅ | List of machine providers available in this datacenter |
-| `kubernetesProviders` | array | ❌ | List of Kubernetes providers available in this datacenter |
+| Field                 | Type  | Required | Description                                               |
+| --------------------- | ----- | -------- | --------------------------------------------------------- |
+| `machineProviders`    | array | ✅       | List of machine providers available in this datacenter    |
+| `kubernetesProviders` | array | ❌       | List of Kubernetes providers available in this datacenter |
 
 #### Provider Reference Structure
 
 ```yaml
 machineProviders:
-  - name: string              # Provider resource name (required)
-    namespace: string         # Provider namespace (optional)
-    priority: int32          # Preference order (1 = highest)
-    enabled: bool            # Whether provider is active
-    configuration: map       # Provider-specific settings
+  - name: string # Provider resource name (required)
+    namespace: string # Provider namespace (optional)
+    priority: int32 # Preference order (1 = highest)
+    enabled: bool # Whether provider is active
+    configuration: map # Provider-specific settings
 ```
 
 ### Networking Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `networking.vpcs` | array | ❌ | Virtual private clouds/networks |
-| `networking.loadBalancers` | array | ❌ | Load balancer configurations |
-| `networking.dns` | object | ❌ | DNS configuration |
-| `networking.firewall` | object | ❌ | Firewall rules and policies |
+| Field                      | Type   | Required | Description                     |
+| -------------------------- | ------ | -------- | ------------------------------- |
+| `networking.vpcs`          | array  | ❌       | Virtual private clouds/networks |
+| `networking.loadBalancers` | array  | ❌       | Load balancer configurations    |
+| `networking.dns`           | object | ❌       | DNS configuration               |
+| `networking.firewall`      | object | ❌       | Firewall rules and policies     |
 
 #### VPC Structure
 
 ```yaml
 vpcs:
-  - name: string              # VPC name (required)
-    cidr: string             # CIDR block (required, validated)
-    default: bool            # Whether this is the default VPC
-    subnets:                 # Subnets within the VPC
-      - name: string         # Subnet name (required)
-        cidr: string         # Subnet CIDR (required, validated)
-        zone: string         # Availability zone
-        public: bool         # Whether subnet has internet access
+  - name: string # VPC name (required)
+    cidr: string # CIDR block (required, validated)
+    default: bool # Whether this is the default VPC
+    subnets: # Subnets within the VPC
+      - name: string # Subnet name (required)
+        cidr: string # Subnet CIDR (required, validated)
+        zone: string # Availability zone
+        public: bool # Whether subnet has internet access
 ```
 
 #### Load Balancer Structure
 
 ```yaml
 loadBalancers:
-  - name: string              # Load balancer name (required)
-    type: string             # Type: application, network, classic
-    scheme: string           # internet-facing or internal
+  - name: string # Load balancer name (required)
+    type: string # Type: application, network, classic
+    scheme: string # internet-facing or internal
 ```
 
 #### DNS Configuration
 
 ```yaml
 dns:
-  servers: [string]          # DNS server addresses
-  domain: string             # Default domain
-  searchDomains: [string]    # Search domains for resolution
+  servers: [string] # DNS server addresses
+  domain: string # Default domain
+  searchDomains: [string] # Search domains for resolution
 ```
 
 #### Firewall Configuration
 
 ```yaml
 firewall:
-  defaultPolicy: string      # Default policy: allow or deny
-  rules:                     # Specific firewall rules
-    - name: string           # Rule name (required)
-      action: string         # Action: allow or deny (required)
-      protocol: string       # Protocol: tcp, udp, icmp, all
-      port: string           # Port or port range
-      source: string         # Source CIDR or IP range
-      destination: string    # Destination CIDR or IP range
+  defaultPolicy: string # Default policy: allow or deny
+  rules: # Specific firewall rules
+    - name: string # Rule name (required)
+      action: string # Action: allow or deny (required)
+      protocol: string # Protocol: tcp, udp, icmp, all
+      port: string # Port or port range
+      source: string # Source CIDR or IP range
+      destination: string # Destination CIDR or IP range
 ```
 
 ### Security Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `security.complianceFrameworks` | array | ❌ | Required compliance frameworks |
-| `security.encryption` | object | ❌ | Encryption requirements |
-| `security.accessControl` | object | ❌ | Access control policies |
-| `security.auditLogging` | object | ❌ | Audit logging configuration |
+| Field                           | Type   | Required | Description                    |
+| ------------------------------- | ------ | -------- | ------------------------------ |
+| `security.complianceFrameworks` | array  | ❌       | Required compliance frameworks |
+| `security.encryption`           | object | ❌       | Encryption requirements        |
+| `security.accessControl`        | object | ❌       | Access control policies        |
+| `security.auditLogging`         | object | ❌       | Audit logging configuration    |
 
 #### Encryption Configuration
 
 ```yaml
 encryption:
-  atRest: bool              # Data at rest encryption (default: true)
-  inTransit: bool           # Data in transit encryption (default: true)
-  keyManagement: string     # Key management service
+  atRest: bool # Data at rest encryption (default: true)
+  inTransit: bool # Data in transit encryption (default: true)
+  keyManagement: string # Key management service
 ```
 
 #### Access Control Configuration
 
 ```yaml
 accessControl:
-  rbac: bool                # Role-based access control (default: true)
-  mfa: bool                 # Multi-factor authentication required
-  allowedUsers: [string]    # Permitted users
-  allowedGroups: [string]   # Permitted groups
+  rbac: bool # Role-based access control (default: true)
+  mfa: bool # Multi-factor authentication required
+  allowedUsers: [string] # Permitted users
+  allowedGroups: [string] # Permitted groups
 ```
 
 #### Audit Logging Configuration
 
 ```yaml
 auditLogging:
-  enabled: bool             # Enable audit logging (default: true)
-  retentionDays: int32      # Log retention period (1-2555 days)
-  destination: string       # Log destination: local, s3, azure, gcs, elasticsearch
+  enabled: bool # Enable audit logging (default: true)
+  retentionDays: int32 # Log retention period (1-2555 days)
+  destination: string # Log destination: local, s3, azure, gcs, elasticsearch
 ```
 
 ### Monitoring Configuration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `monitoring.enabled` | bool | ❌ | Enable monitoring (default: true) |
-| `monitoring.metricsRetentionDays` | int32 | ❌ | Metrics retention period (1-365 days) |
-| `monitoring.alertingEnabled` | bool | ❌ | Enable alerting (default: true) |
-| `monitoring.alertReceivers` | array | ❌ | Alert contact points |
-| `monitoring.customDashboards` | array | ❌ | Custom monitoring dashboards |
+| Field                             | Type  | Required | Description                           |
+| --------------------------------- | ----- | -------- | ------------------------------------- |
+| `monitoring.enabled`              | bool  | ❌       | Enable monitoring (default: true)     |
+| `monitoring.metricsRetentionDays` | int32 | ❌       | Metrics retention period (1-365 days) |
+| `monitoring.alertingEnabled`      | bool  | ❌       | Enable alerting (default: true)       |
+| `monitoring.alertReceivers`       | array | ❌       | Alert contact points                  |
+| `monitoring.customDashboards`     | array | ❌       | Custom monitoring dashboards          |
 
 ### Backup and Disaster Recovery
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `backup.enabled` | bool | ❌ | Enable backup (default: true) |
-| `backup.schedule` | string | ❌ | Backup schedule (cron format) |
-| `backup.retentionPolicy` | object | ❌ | Backup retention policies |
-| `backup.destinations` | array | ❌ | Backup storage destinations |
-| `backup.disasterRecovery` | object | ❌ | Disaster recovery configuration |
+| Field                     | Type   | Required | Description                     |
+| ------------------------- | ------ | -------- | ------------------------------- |
+| `backup.enabled`          | bool   | ❌       | Enable backup (default: true)   |
+| `backup.schedule`         | string | ❌       | Backup schedule (cron format)   |
+| `backup.retentionPolicy`  | object | ❌       | Backup retention policies       |
+| `backup.destinations`     | array  | ❌       | Backup storage destinations     |
+| `backup.disasterRecovery` | object | ❌       | Disaster recovery configuration |
 
 #### Backup Retention Policy
 
 ```yaml
 retentionPolicy:
-  daily: int32              # Daily backups to keep (default: 7)
-  weekly: int32             # Weekly backups to keep (default: 4)
-  monthly: int32            # Monthly backups to keep (default: 12)
+  daily: int32 # Daily backups to keep (default: 7)
+  weekly: int32 # Weekly backups to keep (default: 4)
+  monthly: int32 # Monthly backups to keep (default: 12)
 ```
 
 #### Backup Destination
 
 ```yaml
 destinations:
-  - name: string            # Destination name (required)
-    type: string            # Type: s3, azure, gcs, local, nfs (required)
-    configuration: map      # Destination-specific config
-    encryption: bool        # Enable encryption for destination
+  - name: string # Destination name (required)
+    type: string # Type: s3, azure, gcs, local, nfs (required)
+    configuration: map # Destination-specific config
+    encryption: bool # Enable encryption for destination
 ```
 
 #### Disaster Recovery Configuration
 
 ```yaml
 disasterRecovery:
-  enabled: bool             # Enable disaster recovery
-  targetDatacenter: string  # Target datacenter for DR
-  rpoMinutes: int32         # Recovery Point Objective (minutes)
-  rtoMinutes: int32         # Recovery Time Objective (minutes)
+  enabled: bool # Enable disaster recovery
+  targetDatacenter: string # Target datacenter for DR
+  rpoMinutes: int32 # Recovery Point Objective (minutes)
+  rtoMinutes: int32 # Recovery Time Objective (minutes)
 ```
 
 ### Resource Quotas
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `resourceQuotas.maxMachines` | int32 | ❌ | Maximum number of machines |
-| `resourceQuotas.maxClusters` | int32 | ❌ | Maximum number of Kubernetes clusters |
-| `resourceQuotas.maxCPUCores` | int32 | ❌ | Maximum total CPU cores |
-| `resourceQuotas.maxMemoryGB` | int32 | ❌ | Maximum total memory in GB |
-| `resourceQuotas.maxStorageGB` | int32 | ❌ | Maximum total storage in GB |
-| `resourceQuotas.maxNetworkInterfaces` | int32 | ❌ | Maximum network interfaces |
+| Field                                 | Type  | Required | Description                           |
+| ------------------------------------- | ----- | -------- | ------------------------------------- |
+| `resourceQuotas.maxMachines`          | int32 | ❌       | Maximum number of machines            |
+| `resourceQuotas.maxClusters`          | int32 | ❌       | Maximum number of Kubernetes clusters |
+| `resourceQuotas.maxCPUCores`          | int32 | ❌       | Maximum total CPU cores               |
+| `resourceQuotas.maxMemoryGB`          | int32 | ❌       | Maximum total memory in GB            |
+| `resourceQuotas.maxStorageGB`         | int32 | ❌       | Maximum total storage in GB           |
+| `resourceQuotas.maxNetworkInterfaces` | int32 | ❌       | Maximum network interfaces            |
 
 ### Tags
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `tags` | map | ❌ | Key-value pairs for organizing and categorizing datacenters |
+| Field  | Type | Required | Description                                                 |
+| ------ | ---- | -------- | ----------------------------------------------------------- |
+| `tags` | map  | ❌       | Key-value pairs for organizing and categorizing datacenters |
 
 ## Status Fields
 
@@ -218,66 +218,66 @@ The status section provides real-time information about the datacenter's operati
 
 ### Core Status
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `phase` | string | Current datacenter phase |
-| `conditions` | array | Latest observations of datacenter state |
-| `machineProviderCount` | int32 | Number of active machine providers |
-| `kubernetesProviderCount` | int32 | Number of active Kubernetes providers |
-| `activeMachines` | int32 | Number of active machines |
-| `activeClusters` | int32 | Number of active Kubernetes clusters |
-| `lastReconcileTime` | time | When the datacenter was last reconciled |
-| `observedGeneration` | int64 | Generation of the most recently observed Datacenter |
+| Field                     | Type   | Description                                         |
+| ------------------------- | ------ | --------------------------------------------------- |
+| `phase`                   | string | Current datacenter phase                            |
+| `conditions`              | array  | Latest observations of datacenter state             |
+| `machineProviderCount`    | int32  | Number of active machine providers                  |
+| `kubernetesProviderCount` | int32  | Number of active Kubernetes providers               |
+| `activeMachines`          | int32  | Number of active machines                           |
+| `activeClusters`          | int32  | Number of active Kubernetes clusters                |
+| `lastReconcileTime`       | time   | When the datacenter was last reconciled             |
+| `observedGeneration`      | int64  | Generation of the most recently observed Datacenter |
 
 ### Resource Usage
 
 ```yaml
 resourceUsage:
-  cpuCoresUsed: int32       # Used CPU cores
-  cpuCoresTotal: int32      # Total available CPU cores
-  memoryGBUsed: int32       # Used memory in GB
-  memoryGBTotal: int32      # Total available memory in GB
-  storageGBUsed: int32      # Used storage in GB
-  storageGBTotal: int32     # Total available storage in GB
-  networkInterfacesUsed: int32    # Used network interfaces
-  networkInterfacesTotal: int32   # Total available network interfaces
+  cpuCoresUsed: int32 # Used CPU cores
+  cpuCoresTotal: int32 # Total available CPU cores
+  memoryGBUsed: int32 # Used memory in GB
+  memoryGBTotal: int32 # Total available memory in GB
+  storageGBUsed: int32 # Used storage in GB
+  storageGBTotal: int32 # Total available storage in GB
+  networkInterfacesUsed: int32 # Used network interfaces
+  networkInterfacesTotal: int32 # Total available network interfaces
 ```
 
 ### Provider Statuses
 
 ```yaml
 providerStatuses:
-  - name: string            # Provider name
-    type: string            # Provider type: machine or kubernetes
-    phase: string           # Provider phase
-    healthy: bool           # Provider health status
-    lastHealthCheck: time   # Last health check time
-    message: string         # Status message
+  - name: string # Provider name
+    type: string # Provider type: machine or kubernetes
+    phase: string # Provider phase
+    healthy: bool # Provider health status
+    lastHealthCheck: time # Last health check time
+    message: string # Status message
     resourcesManaged: int32 # Resources managed by provider
 ```
 
 ## Phases
 
-| Phase | Description |
-|-------|-------------|
+| Phase          | Description                     |
+| -------------- | ------------------------------- |
 | `Initializing` | Datacenter is being initialized |
 | `Provisioning` | Resources are being provisioned |
-| `Ready` | Datacenter is operational |
-| `Degraded` | Some components are unhealthy |
-| `Deleting` | Datacenter is being deleted |
-| `Failed` | Datacenter setup failed |
+| `Ready`        | Datacenter is operational       |
+| `Degraded`     | Some components are unhealthy   |
+| `Deleting`     | Datacenter is being deleted     |
+| `Failed`       | Datacenter setup failed         |
 
 ## Conditions
 
-| Type | Description |
-|------|-------------|
-| `Ready` | Datacenter is ready for use |
-| `ProvidersHealthy` | All providers are healthy |
-| `NetworkingReady` | Network configuration is ready |
-| `MonitoringReady` | Monitoring is configured |
-| `BackupReady` | Backup is configured |
+| Type                | Description                    |
+| ------------------- | ------------------------------ |
+| `Ready`             | Datacenter is ready for use    |
+| `ProvidersHealthy`  | All providers are healthy      |
+| `NetworkingReady`   | Network configuration is ready |
+| `MonitoringReady`   | Monitoring is configured       |
+| `BackupReady`       | Backup is configured           |
 | `SecurityCompliant` | Security policies are enforced |
-| `QuotaAvailable` | Resource quotas are available |
+| `QuotaAvailable`    | Resource quotas are available  |
 
 ## Validation Rules
 
@@ -312,15 +312,15 @@ providerStatuses:
 
 When listing datacenters with `kubectl get datacenters`, the following columns are displayed:
 
-| Column | Description |
-|--------|-------------|
-| NAME | Datacenter name |
-| PHASE | Current phase |
-| REGION | Geographical region |
-| MACHINE PROVIDERS | Number of machine providers |
-| K8S PROVIDERS | Number of Kubernetes providers |
-| READY | Ready condition status |
-| AGE | Age of the datacenter |
+| Column            | Description                    |
+| ----------------- | ------------------------------ |
+| NAME              | Datacenter name                |
+| PHASE             | Current phase                  |
+| REGION            | Geographical region            |
+| MACHINE PROVIDERS | Number of machine providers    |
+| K8S PROVIDERS     | Number of Kubernetes providers |
+| READY             | Ready condition status         |
+| AGE               | Age of the datacenter          |
 
 ## Examples
 
@@ -336,7 +336,7 @@ spec:
   displayName: "Enterprise Datacenter East"
   region: us-east-1
   zone: us-east-1a
-  
+
   machineProviders:
     - name: aws-us-east-1
       priority: 1
@@ -344,12 +344,12 @@ spec:
     - name: azure-eastus
       priority: 2
       enabled: true
-  
+
   kubernetesProviders:
     - name: eks-provider
       priority: 1
       enabled: true
-  
+
   networking:
     vpcs:
       - name: production-vpc
@@ -360,7 +360,7 @@ spec:
             cidr: "10.0.1.0/24"
             zone: us-east-1a
             public: false
-  
+
   security:
     complianceFrameworks: ["SOC2", "ISO27001"]
     encryption:
@@ -369,7 +369,7 @@ spec:
     accessControl:
       rbac: true
       mfa: true
-  
+
   resourceQuotas:
     maxMachines: 1000
     maxClusters: 50
@@ -388,12 +388,12 @@ metadata:
 spec:
   displayName: "Edge Datacenter West"
   region: us-west-2
-  
+
   machineProviders:
     - name: aws-us-west-2
       priority: 1
       enabled: true
-  
+
   resourceQuotas:
     maxMachines: 50
     maxClusters: 5
@@ -415,7 +415,7 @@ spec:
   location:
     country: "United States"
     city: "San Francisco"
-  
+
   machineProviders:
     - name: vsphere-cluster-a
       priority: 1
@@ -423,18 +423,18 @@ spec:
       configuration:
         vcenter: "vcenter.company.com"
         datacenter: "HQ-DC"
-  
+
   kubernetesProviders:
     - name: rancher-provider
       priority: 1
       enabled: true
-  
+
   networking:
     vpcs:
       - name: corporate-network
         cidr: "192.168.0.0/16"
         default: true
-  
+
   backup:
     destinations:
       - name: primary-nas
