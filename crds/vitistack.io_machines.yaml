@@ -110,7 +110,6 @@ spec:
                       type: integer
                     name:
                       description: Name of the disk
-                      minLength: 1
                       type: string
                     sizeGB:
                       description: Size of the disk in GB
@@ -205,13 +204,9 @@ spec:
                   distribution:
                     description: Distribution (ubuntu, centos, rhel, windows-server,
                       debian, alpine)
-                    minLength: 1
                     type: string
                   family:
                     description: Operating system family (linux, windows)
-                    enum:
-                    - linux
-                    - windows
                     type: string
                   imageFamily:
                     description: Image family or marketplace image
@@ -221,7 +216,6 @@ spec:
                     type: string
                   version:
                     description: Version of the OS
-                    minLength: 1
                     type: string
                 required:
                 - distribution
@@ -251,18 +245,9 @@ spec:
                     type: object
                   name:
                     description: Provider name (aws, azure, gcp, vsphere, openstack)
-                    enum:
-                    - aws
-                    - azure
-                    - gcp
-                    - vsphere
-                    - openstack
-                    - libvirt
-                    - proxmox
                     type: string
                   region:
                     description: Region where the machine should be created
-                    minLength: 1
                     type: string
                   zone:
                     description: Availability zone
