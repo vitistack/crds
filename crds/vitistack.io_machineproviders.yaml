@@ -67,8 +67,6 @@ spec:
                       secretName:
                         description: Name of the secret containing credentials
                         type: string
-                    required:
-                    - secretName
                     type: object
                   parameters:
                     additionalProperties:
@@ -91,8 +89,6 @@ spec:
                           secretName:
                             description: Name of the secret containing credentials
                             type: string
-                        required:
-                        - secretName
                         type: object
                       scopes:
                         description: Scopes for the service account

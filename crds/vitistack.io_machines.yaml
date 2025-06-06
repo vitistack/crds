@@ -87,8 +87,6 @@ spec:
                     maximum: 8
                     minimum: 1
                     type: integer
-                required:
-                - cores
                 type: object
               disks:
                 description: Disk configuration
@@ -125,9 +123,6 @@ spec:
                     type:
                       description: Type of the disk (e.g., gp2, gp3, pd-ssd, Premium_LRS)
                       type: string
-                  required:
-                  - name
-                  - sizeGB
                   type: object
                 type: array
               instanceType:
@@ -174,8 +169,6 @@ spec:
                         subnet:
                           description: Subnet for this interface
                           type: string
-                      required:
-                      - name
                       type: object
                     type: array
                   privateIP:
@@ -217,10 +210,6 @@ spec:
                   version:
                     description: Version of the OS
                     type: string
-                required:
-                - distribution
-                - family
-                - version
                 type: object
               providerConfig:
                 description: Cloud provider configuration
@@ -240,8 +229,6 @@ spec:
                       secretName:
                         description: Name of the secret containing credentials
                         type: string
-                    required:
-                    - secretName
                     type: object
                   name:
                     description: Provider name (aws, azure, gcp, vsphere, openstack)
@@ -252,9 +239,6 @@ spec:
                   zone:
                     description: Availability zone
                     type: string
-                required:
-                - name
-                - region
                 type: object
               securityGroups:
                 description: Security groups or firewall rules
@@ -274,11 +258,6 @@ spec:
               userData:
                 description: User data script to run on first boot
                 type: string
-            required:
-            - instanceType
-            - name
-            - os
-            - providerConfig
             type: object
           status:
             properties:
@@ -312,12 +291,6 @@ spec:
                     type:
                       description: Type of condition
                       type: string
-                  required:
-                  - lastTransitionTime
-                  - message
-                  - reason
-                  - status
-                  - type
                   type: object
                 type: array
               cpus:
@@ -370,19 +343,6 @@ spec:
                     uuid:
                       description: The disk's UUID
                       type: string
-                  required:
-                  - availableBytes
-                  - device
-                  - filesystemType
-                  - label
-                  - mountPoint
-                  - name
-                  - serialNumber
-                  - size
-                  - type
-                  - usagePercent
-                  - usedBytes
-                  - uuid
                   type: object
                 type: array
               failureMessage:
@@ -450,14 +410,6 @@ spec:
                     type:
                       description: Interface type (ethernet, wifi, etc.)
                       type: string
-                  required:
-                  - ipAddresses
-                  - ipv6Addresses
-                  - macAddress
-                  - mtu
-                  - name
-                  - state
-                  - type
                   type: object
                 type: array
               operatingSystem:

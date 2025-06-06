@@ -26,13 +26,12 @@ type Machine struct {
 
 type MachineSpec struct {
 	// The name of the machine
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 
 	// The instance type/size of the machine (e.g., t3.medium, Standard_B2s, n1-standard-2)
 	// +kubebuilder:validation:MinLength=1
-	InstanceType string `json:"instanceType"`
+	InstanceType string `json:"instanceType,omitempty"`
 
 	// The provider-specific machine type override
 	MachineType string `json:"machineType,omitempty"`
@@ -51,10 +50,10 @@ type MachineSpec struct {
 	Network MachineNetwork `json:"network,omitempty"`
 
 	// Operating system configuration
-	OS MachineOS `json:"os"`
+	OS MachineOS `json:"os,omitempty"`
 
 	// Cloud provider configuration
-	ProviderConfig CloudProviderConfig `json:"providerConfig"`
+	ProviderConfig CloudProviderConfig `json:"providerConfig,omitempty"`
 
 	// SSH key configuration
 	SSHKeys []string `json:"sshKeys,omitempty"`
@@ -79,7 +78,7 @@ type MachineCPU struct {
 	// Number of CPU cores
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=256
-	Cores int `json:"cores"`
+	Cores int `json:"cores,omitempty"`
 	// Number of threads per core
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=8
@@ -92,11 +91,11 @@ type MachineCPU struct {
 
 type MachineSpecDisk struct {
 	// Name of the disk
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// Size of the disk in GB
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65536
-	SizeGB int64 `json:"sizeGB"`
+	SizeGB int64 `json:"sizeGB,omitempty"`
 	// Type of the disk (e.g., gp2, gp3, pd-ssd, Premium_LRS)
 	Type string `json:"type,omitempty"`
 	// Whether this is the boot disk
@@ -132,7 +131,7 @@ type MachineNetwork struct {
 
 type NetworkInterface struct {
 	// Name of the network interface
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// Subnet for this interface
 	Subnet string `json:"subnet,omitempty"`
 	// Security groups for this interface
@@ -143,11 +142,11 @@ type NetworkInterface struct {
 
 type MachineOS struct {
 	// Operating system family (linux, windows)
-	Family string `json:"family"`
+	Family string `json:"family,omitempty"`
 	// Distribution (ubuntu, centos, rhel, windows-server, debian, alpine)
-	Distribution string `json:"distribution"`
+	Distribution string `json:"distribution,omitempty"`
 	// Version of the OS
-	Version string `json:"version"`
+	Version string `json:"version,omitempty"`
 	// Architecture (amd64, arm64)
 	// +kubebuilder:validation:Enum=amd64;arm64;x86_64
 	Architecture string `json:"architecture,omitempty"`
@@ -159,9 +158,9 @@ type MachineOS struct {
 
 type CloudProviderConfig struct {
 	// Provider name (aws, azure, gcp, vsphere, openstack)
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// Region where the machine should be created
-	Region string `json:"region"`
+	Region string `json:"region,omitempty"`
 	// Availability zone
 	Zone string `json:"zone,omitempty"`
 	// Provider-specific configuration
@@ -172,7 +171,7 @@ type CloudProviderConfig struct {
 
 type CredentialsReference struct {
 	// Name of the secret containing credentials
-	SecretName string `json:"secretName"`
+	SecretName string `json:"secretName,omitempty"`
 	// Namespace of the secret (defaults to machine namespace)
 	Namespace string `json:"namespace,omitempty"`
 }
@@ -290,59 +289,59 @@ type MachineDisk struct {
 
 type MachineStatusDisk struct {
 	// The disk's name
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// The disk's size in bytes
-	Size int64 `json:"size"`
+	Size int64 `json:"size,omitempty"`
 	// The disk's type (e.g., SSD, HDD, gp2, gp3)
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 	// The disk's mount point
-	MountPoint string `json:"mountPoint"`
+	MountPoint string `json:"mountPoint,omitempty"`
 	// The disk's filesystem type (e.g., ext4, xfs)
-	FilesystemType string `json:"filesystemType"`
+	FilesystemType string `json:"filesystemType,omitempty"`
 	// The disk's UUID
-	UUID string `json:"uuid"`
+	UUID string `json:"uuid,omitempty"`
 	// The disk's label
-	Label string `json:"label"`
+	Label string `json:"label,omitempty"`
 	// The disk's serial number
-	SerialNumber string `json:"serialNumber"`
+	SerialNumber string `json:"serialNumber,omitempty"`
 	// Device path (e.g., /dev/sda)
-	Device string `json:"device"`
+	Device string `json:"device,omitempty"`
 	// Used space in bytes
-	UsedBytes int64 `json:"usedBytes"`
+	UsedBytes int64 `json:"usedBytes,omitempty"`
 	// Available space in bytes
-	AvailableBytes int64 `json:"availableBytes"`
+	AvailableBytes int64 `json:"availableBytes,omitempty"`
 	// Usage percentage as string (e.g., "75.5%")
-	UsagePercent string `json:"usagePercent"`
+	UsagePercent string `json:"usagePercent,omitempty"`
 }
 
 type NetworkInterfaceStatus struct {
 	// Name of the network interface
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// MAC address
-	MACAddress string `json:"macAddress"`
+	MACAddress string `json:"macAddress,omitempty"`
 	// IP addresses assigned to this interface
-	IPAddresses []string `json:"ipAddresses"`
+	IPAddresses []string `json:"ipAddresses,omitempty"`
 	// IPv6 addresses assigned to this interface
-	IPv6Addresses []string `json:"ipv6Addresses"`
+	IPv6Addresses []string `json:"ipv6Addresses,omitempty"`
 	// Interface state (up, down)
-	State string `json:"state"`
+	State string `json:"state,omitempty"`
 	// MTU size
-	MTU int `json:"mtu"`
+	MTU int `json:"mtu,omitempty"`
 	// Interface type (ethernet, wifi, etc.)
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 }
 
 type MachineCondition struct {
 	// Type of condition
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 	// Status of the condition (True, False, Unknown)
-	Status string `json:"status"`
+	Status string `json:"status,omitempty"`
 	// Last time the condition transitioned from one status to another
-	LastTransitionTime metav1.Time `json:"lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 	// The reason for the condition's last transition
-	Reason string `json:"reason"`
+	Reason string `json:"reason,omitempty"`
 	// A human readable message indicating details about the transition
-	Message string `json:"message"`
+	Message string `json:"message,omitempty"`
 }
 
 // Common machine phases

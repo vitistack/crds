@@ -179,8 +179,6 @@ spec:
                           secretName:
                             description: Name of the secret containing credentials
                             type: string
-                        required:
-                        - secretName
                         type: object
                       groupSearchBase:
                         description: Group search base
@@ -213,8 +211,6 @@ spec:
                           secretName:
                             description: Name of the secret containing credentials
                             type: string
-                        required:
-                        - secretName
                         type: object
                       groupsClaim:
                         description: Groups claim
@@ -265,8 +261,6 @@ spec:
                           secretName:
                             description: Name of the secret containing credentials
                             type: string
-                        required:
-                        - secretName
                         type: object
                     type: object
                 type: object
