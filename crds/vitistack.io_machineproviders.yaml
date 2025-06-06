@@ -381,6 +381,8 @@ spec:
                 description: Provider type (aws, azure, gcp, vsphere, openstack, libvirt,
                   proxmox)
                 enum:
+                - kubevirt
+                - proxmox
                 - aws
                 - azure
                 - gcp

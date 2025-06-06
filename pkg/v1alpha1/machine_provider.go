@@ -27,7 +27,7 @@ type MachineProvider struct {
 type MachineProviderSpec struct {
 	// Provider type (aws, azure, gcp, vsphere, openstack, libvirt, proxmox)
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=aws;azure;gcp;vsphere;openstack;libvirt;proxmox;cloudstack;nutanix;ovirt
+	// +kubebuilder:validation:Enum=kubevirt;proxmox;aws;azure;gcp;vsphere;openstack;libvirt;proxmox;cloudstack;nutanix;ovirt
 	ProviderType string `json:"providerType"`
 
 	// Human-readable name for this provider instance

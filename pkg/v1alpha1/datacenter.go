@@ -58,7 +58,7 @@ type DatacenterSpec struct {
 
 	// Region specifies the geographical region where the datacenter is located
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MinLength=0
 	Region string `json:"region"`
 
 	// Zone specifies the availability zone within the region (optional)
@@ -71,7 +71,7 @@ type DatacenterSpec struct {
 
 	// MachineProviders lists the machine providers available in this datacenter
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MinItems=0
 	MachineProviders []DatacenterProviderReference `json:"machineProviders"`
 
 	// KubernetesProviders lists the Kubernetes providers available in this datacenter

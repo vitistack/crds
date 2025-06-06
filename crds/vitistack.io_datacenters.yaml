@@ -247,7 +247,7 @@ spec:
                   required:
                   - name
                   type: object
-                minItems: 1
+                minItems: 0
                 type: array
               monitoring:
                 description: Monitoring configures monitoring and observability for
@@ -426,7 +426,7 @@ spec:
               region:
                 description: Region specifies the geographical region where the datacenter
                   is located
-                minLength: 1
+                minLength: 0
                 type: string
               resourceQuotas:
                 description: ResourceQuotas define resource limits for the datacenter

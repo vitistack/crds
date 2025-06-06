@@ -31,7 +31,6 @@ type MachineSpec struct {
 	Name string `json:"name"`
 
 	// The instance type/size of the machine (e.g., t3.medium, Standard_B2s, n1-standard-2)
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
 	InstanceType string `json:"instanceType"`
 
@@ -52,11 +51,9 @@ type MachineSpec struct {
 	Network MachineNetwork `json:"network,omitempty"`
 
 	// Operating system configuration
-	// +kubebuilder:validation:Required
 	OS MachineOS `json:"os"`
 
 	// Cloud provider configuration
-	// +kubebuilder:validation:Required
 	ProviderConfig CloudProviderConfig `json:"providerConfig"`
 
 	// SSH key configuration
