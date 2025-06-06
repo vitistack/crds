@@ -16,13 +16,13 @@ const (
 
 // Datacenter condition types
 const (
-	DatacenterConditionReady              = "Ready"
-	DatacenterConditionProvidersHealthy   = "ProvidersHealthy"
-	DatacenterConditionNetworkingReady    = "NetworkingReady"
-	DatacenterConditionMonitoringReady    = "MonitoringReady"
-	DatacenterConditionBackupReady        = "BackupReady"
-	DatacenterConditionSecurityCompliant  = "SecurityCompliant"
-	DatacenterConditionQuotaAvailable     = "QuotaAvailable"
+	DatacenterConditionReady             = "Ready"
+	DatacenterConditionProvidersHealthy  = "ProvidersHealthy"
+	DatacenterConditionNetworkingReady   = "NetworkingReady"
+	DatacenterConditionMonitoringReady   = "MonitoringReady"
+	DatacenterConditionBackupReady       = "BackupReady"
+	DatacenterConditionSecurityCompliant = "SecurityCompliant"
+	DatacenterConditionQuotaAvailable    = "QuotaAvailable"
 )
 
 // +genclient
