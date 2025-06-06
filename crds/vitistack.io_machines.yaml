@@ -11,12 +11,15 @@ spec:
     kind: Machine
     listKind: MachineList
     plural: machines
+    shortNames:
+    - m
     singular: machine
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
+        description: Machine is the Schema for the Machines API
         properties:
           apiVersion:
             description: |-
@@ -164,3 +167,5 @@ spec:
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}

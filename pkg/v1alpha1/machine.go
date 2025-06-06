@@ -4,6 +4,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// Machine is the Schema for the Machines API
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:path=machines,scope=Namespaced,shortName=m
 type Machine struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -90,4 +97,16 @@ type MachineDisk struct {
 	// The disk's label
 	Label string `json:"label"`
 	// The disk's serial number
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// MachineList contains a list of Machine
+type MachineList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Machine `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&Machine{}, &MachineList{})
 }
