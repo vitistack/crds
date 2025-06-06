@@ -92,8 +92,6 @@ type MachineCPU struct {
 
 type MachineSpecDisk struct {
 	// Name of the disk
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
 	Name string `json:"name"`
 	// Size of the disk in GB
 	// +kubebuilder:validation:Minimum=1
@@ -145,16 +143,10 @@ type NetworkInterface struct {
 
 type MachineOS struct {
 	// Operating system family (linux, windows)
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=linux;windows
 	Family string `json:"family"`
 	// Distribution (ubuntu, centos, rhel, windows-server, debian, alpine)
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
 	Distribution string `json:"distribution"`
 	// Version of the OS
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
 	Version string `json:"version"`
 	// Architecture (amd64, arm64)
 	// +kubebuilder:validation:Enum=amd64;arm64;x86_64
@@ -167,12 +159,8 @@ type MachineOS struct {
 
 type CloudProviderConfig struct {
 	// Provider name (aws, azure, gcp, vsphere, openstack)
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=aws;azure;gcp;vsphere;openstack;libvirt;proxmox
 	Name string `json:"name"`
 	// Region where the machine should be created
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
 	Region string `json:"region"`
 	// Availability zone
 	Zone string `json:"zone,omitempty"`
