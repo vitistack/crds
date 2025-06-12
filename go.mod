@@ -1,6 +1,6 @@
 module github.com/vitistack/crds
 
-go 1.24.3
+go 1.24.4
 
 require (
 	github.com/NorskHelsenett/ror v1.2.0-rc11

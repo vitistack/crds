@@ -36,6 +36,11 @@ gen-manifests: controller-gen ## Generate manifests
 gen-deepcopy: controller-gen ## Generate code
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
+##@ Build
+.PHONY: build
+build: ## Build the manager binary.
+	go build ./...
+
 ##@ Code sanity
 
 .PHONY: fmt
