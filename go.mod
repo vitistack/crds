@@ -3,7 +3,7 @@ module github.com/vitistack/crds
 go 1.24.4
 
 require (
-	github.com/NorskHelsenett/ror v1.2.0-rc13
+	github.com/NorskHelsenett/ror v1.2.0-rc14
 	k8s.io/apimachinery v0.33.1
 	sigs.k8s.io/controller-runtime v0.21.0
 )
@@ -55,6 +55,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
+	go.uber.org/automaxprocs v1.6.0 // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
