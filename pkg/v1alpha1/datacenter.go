@@ -70,8 +70,7 @@ type DatacenterSpec struct {
 	Location DatacenterLocation `json:"location,omitempty"`
 
 	// MachineProviders lists the machine providers available in this datacenter
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinItems=0
+	// +kubebuilder:validation:Optional
 	MachineProviders []DatacenterProviderReference `json:"machineProviders"`
 
 	// KubernetesProviders lists the Kubernetes providers available in this datacenter

@@ -247,7 +247,6 @@ spec:
                   required:
                   - name
                   type: object
-                minItems: 0
                 type: array
               monitoring:
                 description: Monitoring configures monitoring and observability for
@@ -549,7 +548,6 @@ spec:
                 type: string
             required:
             - displayName
-            - machineProviders
             - region
             type: object
           status:
