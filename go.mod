@@ -3,7 +3,7 @@ module github.com/vitistack/crds
 go 1.24.4
 
 require (
-	github.com/NorskHelsenett/ror v1.2.0-rc11
+	github.com/NorskHelsenett/ror v1.2.0-rc13
 	k8s.io/apimachinery v0.33.1
 	sigs.k8s.io/controller-runtime v0.21.0
 )
