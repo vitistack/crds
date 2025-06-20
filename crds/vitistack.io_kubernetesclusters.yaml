@@ -110,12 +110,15 @@ spec:
                           - size
                           type: object
                         type: array
+                      version:
+                        type: string
                     required:
                     - machineClass
                     - metadata
                     - provider
                     - replicas
                     - storage
+                    - version
                     type: object
                   version:
                     type: string
@@ -164,6 +167,23 @@ spec:
                               type: string
                             replicas:
                               type: integer
+                            taint:
+                              items:
+                                properties:
+                                  effect:
+                                    type: string
+                                  key:
+                                    type: string
+                                  value:
+                                    type: string
+                                required:
+                                - effect
+                                - key
+                                - value
+                                type: object
+                              type: array
+                            version:
+                              type: string
                           required:
                           - autoscaling
                           - machineClass
@@ -171,6 +191,8 @@ spec:
                           - name
                           - provider
                           - replicas
+                          - taint
+                          - version
                           type: object
                         type: array
                     required:
@@ -181,6 +203,9 @@ spec:
                 - version
                 - workers
                 type: object
+            required:
+            - data
+            - topology
             type: object
           status:
             description: |-
@@ -562,13 +587,23 @@ spec:
                     - price
                     - resources
                     type: object
-                  controlplaneendpoint:
-                    type: string
                   created:
                     format: date-time
                     type: string
                   egressIP:
                     type: string
+                  endpoints:
+                    items:
+                      properties:
+                        address:
+                          type: string
+                        name:
+                          type: string
+                      required:
+                      - address
+                      - name
+                      type: object
+                    type: array
                   lastUpdated:
                     format: date-time
                     type: string
@@ -591,9 +626,9 @@ spec:
                     type: array
                 required:
                 - cluster
-                - controlplaneendpoint
                 - created
                 - egressIP
+                - endpoints
                 - lastUpdated
                 - lastUpdatedBy
                 - versions

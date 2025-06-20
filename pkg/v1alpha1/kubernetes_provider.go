@@ -10,7 +10,7 @@ import (
 // KubernetesProvider is the Schema for the KubernetesProviders API
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=kubernetesproviders,scope=Namespaced,shortName=kp
+// +kubebuilder:resource:path=kubernetesproviders,scope=Cluster,shortName=kp
 // +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.providerType`
 // +kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.version`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.phase`

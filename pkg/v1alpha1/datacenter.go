@@ -31,7 +31,7 @@ const (
 // Datacenter is the Schema for the Datacenters API
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=datacenters,scope=Namespaced,shortName=dc
+// +kubebuilder:resource:path=datacenters,scope=Cluster,shortName=dc
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
 // +kubebuilder:printcolumn:name="Machine Providers",type=integer,JSONPath=`.status.machineProviderCount`

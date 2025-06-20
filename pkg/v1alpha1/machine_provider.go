@@ -10,7 +10,7 @@ import (
 // MachineProvider is the Schema for the MachineProviders API
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=machineproviders,scope=Namespaced,shortName=mp
+// +kubebuilder:resource:path=machineproviders,scope=Cluster,shortName=mp
 // +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.providerType`
 // +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.phase`

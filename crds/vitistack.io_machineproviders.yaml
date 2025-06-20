@@ -14,7 +14,7 @@ spec:
     shortNames:
     - mp
     singular: machineprovider
-  scope: Namespaced
+  scope: Cluster
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.providerType
