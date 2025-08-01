@@ -44,6 +44,8 @@ spec:
                 properties:
                   clusterId:
                     type: string
+                  clusterUid:
+                    type: string
                   datacenter:
                     type: string
                   environment:
@@ -62,6 +64,7 @@ spec:
                     type: string
                 required:
                 - clusterId
+                - clusterUid
                 - datacenter
                 - environment
                 - project
