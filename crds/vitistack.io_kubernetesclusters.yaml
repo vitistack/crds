@@ -248,6 +248,10 @@ spec:
                             type: string
                           message:
                             type: string
+                          nodes:
+                            items:
+                              type: string
+                            type: array
                           resources:
                             properties:
                               cpu:
@@ -347,6 +351,7 @@ spec:
                         required:
                         - machineClass
                         - message
+                        - nodes
                         - resources
                         - scale
                         - status
@@ -375,6 +380,10 @@ spec:
                               type: string
                             name:
                               type: string
+                            nodes:
+                              items:
+                                type: string
+                              type: array
                             resources:
                               properties:
                                 cpu:
@@ -476,6 +485,7 @@ spec:
                           - machineClass
                           - message
                           - name
+                          - nodes
                           - resources
                           - scale
                           - status
