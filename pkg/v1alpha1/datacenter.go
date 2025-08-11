@@ -32,6 +32,7 @@ const (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=datacenters,scope=Cluster,shortName=dc
+// +kubebuilder:printcolumn:name="Display Name",type=string,JSONPath=`.spec.displayName`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
 // +kubebuilder:printcolumn:name="Machine Providers",type=integer,JSONPath=`.status.machineProviderCount`
