@@ -23,25 +23,29 @@ spec:
     - jsonPath: .status.phase
       name: Phase
       type: string
-    - jsonPath: .spec.region
-      name: Region
-      type: string
-    - jsonPath: .status.machineProviderCount
-      name: Machine Providers
-      type: integer
-    - jsonPath: .status.kubernetesProviderCount
-      name: K8s Providers
-      type: integer
     - jsonPath: .status.conditions[?(@.type=="Ready")].status
       name: Ready
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    - jsonPath: .spec.region
+      name: Region
+      type: string
+    - jsonPath: .spec.zone
+      name: Zone
+      type: string
+    - jsonPath: .status.machineProvider.count
+      name: Machine Providers
+      priority: 10
+      type: integer
+    - jsonPath: .status.kubernetesProvider.count
+      name: K8s Providers
+      priority: 10
+      type: integer
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Datacenter is the Schema for the Datacenters API
         properties:
           apiVersion:
             description: |-
@@ -552,6 +556,7 @@ spec:
             required:
             - displayName
             - region
+            - zone
             type: object
           status:
             description: DatacenterStatus defines the observed state of Datacenter

@@ -34,11 +34,13 @@ const (
 // +kubebuilder:resource:path=datacenters,scope=Cluster,shortName=dc
 // +kubebuilder:printcolumn:name="Display Name",type=string,JSONPath=`.spec.displayName`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-// +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
-// +kubebuilder:printcolumn:name="Machine Providers",type=integer,JSONPath=`.status.machineProviderCount`
-// +kubebuilder:printcolumn:name="K8s Providers",type=integer,JSONPath=`.status.kubernetesProviderCount`
 // +kubebuilder:printcolumn:name="Ready",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.region`
+// +kubebuilder:printcolumn:name="Zone",type=string,JSONPath=`.spec.zone`
+
+// +kubebuilder:printcolumn:name="Machine Providers",type=integer,JSONPath=`.status.machineProvider.count`,priority=10
+// +kubebuilder:printcolumn:name="K8s Providers",type=integer,JSONPath=`.status.kubernetesProvider.count`,priority=10
 type Datacenter struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -53,6 +55,10 @@ type DatacenterSpec struct {
 	// +kubebuilder:validation:Required
 	DisplayName string `json:"displayName"`
 
+	// Zone specifies the availability zone within the region (optional)
+	// +kubebuilder:validation:Required
+	Zone string `json:"zone,omitempty"`
+
 	// Description provides additional context about the datacenter
 	// +kubebuilder:validation:Optional
 	Description string `json:"description,omitempty"`
@@ -62,17 +68,13 @@ type DatacenterSpec struct {
 	// +kubebuilder:validation:MinLength=0
 	Region string `json:"region"`
 
-	// Zone specifies the availability zone within the region (optional)
-	// +kubebuilder:validation:Optional
-	Zone string `json:"zone,omitempty"`
-
 	// Location provides detailed location information
 	// +kubebuilder:validation:Optional
 	Location DatacenterLocation `json:"location,omitempty"`
 
 	// MachineProviders lists the machine providers available in this datacenter
 	// +kubebuilder:validation:Optional
-	MachineProviders []DatacenterProviderReference `json:"machineProviders"`
+	MachineProviders []DatacenterProviderReference `json:"machineProviders,omitempty"`
 
 	// KubernetesProviders lists the Kubernetes providers available in this datacenter
 	// +kubebuilder:validation:Optional
