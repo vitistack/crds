@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/NorskHelsenett/ror v1.2.2
-	k8s.io/apimachinery v0.33.3
+	k8s.io/apimachinery v0.33.4
 	sigs.k8s.io/controller-runtime v0.21.0
 )
 
