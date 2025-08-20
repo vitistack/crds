@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Datacenter CRD Validation Test Script
-# This script validates the Datacenter CRD with various configurations
+# Vitistack CRD Validation Test Script
+# This script validates the Vitistack CRD with various configurations
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CRD_DIR="${SCRIPT_DIR}/crds"
 EXAMPLES_DIR="${SCRIPT_DIR}/examples"
-TEMP_DIR="/tmp/datacenter-test"
+TEMP_DIR="/tmp/vitistack-test"
 
 # Colors for output
 RED='\033[0;31m'
@@ -17,7 +17,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}=== Datacenter CRD Validation Test ===${NC}"
+echo -e "${BLUE}=== Vitistack CRD Validation Test ===${NC}"
 
 # Create temp directory
 mkdir -p "$TEMP_DIR"
@@ -38,30 +38,30 @@ print_test() {
 }
 
 # Test 1: Check if CRD file exists
-print_test "INFO" "Testing Datacenter CRD existence and structure"
-if [ -f "$CRD_DIR/vitistack.io_datacenters.yaml" ]; then
-    print_test "PASS" "Datacenter CRD file exists"
+print_test "INFO" "Testing Vitistack CRD existence and structure"
+if [ -f "$CRD_DIR/vitistack.io_vitistacks.yaml" ]; then
+    print_test "PASS" "Vitistack CRD file exists"
 else
-    print_test "FAIL" "Datacenter CRD file not found"
+    print_test "FAIL" "Vitistack CRD file not found"
     exit 1
 fi
 
 # Test 2: Validate CRD YAML structure
 print_test "INFO" "Validating CRD YAML structure"
-if kubectl apply --dry-run=client -f "$CRD_DIR/vitistack.io_datacenters.yaml" > /dev/null 2>&1; then
+if kubectl apply --dry-run=client -f "$CRD_DIR/vitistack.io_vitistacks.yaml" > /dev/null 2>&1; then
     print_test "PASS" "CRD YAML structure is valid"
 else
     print_test "FAIL" "CRD YAML structure is invalid"
-    kubectl apply --dry-run=client -f "$CRD_DIR/vitistack.io_datacenters.yaml"
+    kubectl apply --dry-run=client -f "$CRD_DIR/vitistack.io_vitistacks.yaml"
     exit 1
 fi
 
 # Test 3: Apply CRD to cluster
-print_test "INFO" "Applying Datacenter CRD to cluster"
-if kubectl apply -f "$CRD_DIR/vitistack.io_datacenters.yaml" > /dev/null 2>&1; then
-    print_test "PASS" "Successfully applied Datacenter CRD"
+print_test "INFO" "Applying Vitistack CRD to cluster"
+if kubectl apply -f "$CRD_DIR/vitistack.io_vitistacks.yaml" > /dev/null 2>&1; then
+    print_test "PASS" "Successfully applied Vitistack CRD"
 else
-    print_test "FAIL" "Failed to apply Datacenter CRD"
+    print_test "FAIL" "Failed to apply Vitistack CRD"
     exit 1
 fi
 
@@ -70,26 +70,26 @@ print_test "INFO" "Waiting for CRD to be established"
 sleep 2
 
 # Test 4: Verify CRD is established
-if kubectl get crd datacenters.vitistack.io > /dev/null 2>&1; then
-    print_test "PASS" "Datacenter CRD is established"
+if kubectl get crd vitistacks.vitistack.io > /dev/null 2>&1; then
+    print_test "PASS" "Vitistack CRD is established"
 else
-    print_test "FAIL" "Datacenter CRD is not established"
+    print_test "FAIL" "Vitistack CRD is not established"
     exit 1
 fi
 
 # Test 5: Create test configurations
-print_test "INFO" "Creating test Datacenter configurations"
+print_test "INFO" "Creating test Vitistack configurations"
 
-# Test Multi-Cloud Enterprise Datacenter
-cat > "$TEMP_DIR/enterprise-datacenter.yaml" << 'EOF'
+# Test Multi-Cloud Enterprise Vitistack
+cat > "$TEMP_DIR/enterprise-vitistack.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: test-enterprise-dc
   namespace: default
 spec:
-  name: "Test Enterprise Datacenter"
-  description: "Multi-cloud enterprise datacenter for testing"
+  name: "Test Enterprise Vitistack"
+  description: "Multi-cloud enterprise vitistack for testing"
   location:
     region: us-west-2
     availabilityZones:
@@ -309,16 +309,16 @@ spec:
       alertThreshold: "80.0"
 EOF
 
-# Test Edge Datacenter
-cat > "$TEMP_DIR/edge-datacenter.yaml" << 'EOF'
+# Test Edge Vitistack
+cat > "$TEMP_DIR/edge-vitistack.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: test-edge-dc
   namespace: default
 spec:
-  name: "Test Edge Datacenter"
-  description: "Edge computing datacenter for low-latency applications"
+  name: "Test Edge Vitistack"
+  description: "Edge computing vitistack for low-latency applications"
   location:
     region: edge-location-1
     coordinates:
@@ -416,18 +416,18 @@ spec:
       alertThreshold: "90.0"
 EOF
 
-# Test On-Premises Datacenter
-cat > "$TEMP_DIR/onprem-datacenter.yaml" << 'EOF'
+# Test On-Premises Vitistack
+cat > "$TEMP_DIR/onprem-vitistack.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: test-onprem-dc
   namespace: default
 spec:
-  name: "Test On-Premises Datacenter"
-  description: "Traditional on-premises datacenter"
+  name: "Test On-Premises Vitistack"
+  description: "Traditional on-premises vitistack"
   location:
-    region: datacenter-1
+    region: vitistack-1
     coordinates:
       latitude: "33.4484"
       longitude: "-112.0740"
@@ -444,7 +444,7 @@ spec:
       priority: 1
       config:
         type: vsphere
-        datacenter: "Datacenter1"
+        vitistack: "Vitistack1"
         cluster: "Cluster1"
     kubernetesProviders:
     - name: rke2-primary
@@ -558,7 +558,7 @@ spec:
     destinations:
     - type: nfs
       server: backup.corp.example.com
-      path: /backup/datacenter1
+      path: /backup/vitistack1
       encryption: true
     - type: tape
       library: IBM-TS3500
@@ -569,7 +569,7 @@ spec:
       rto: 24h
       rpo: 4h
       replicationSites:
-      - region: datacenter-2
+      - region: vitistack-2
         provider: onprem
         location: "Remote Site"
   
@@ -589,39 +589,39 @@ EOF
 # Test 6: Validate test configurations
 print_test "INFO" "Validating test configurations"
 
-for datacenter_file in enterprise-datacenter.yaml edge-datacenter.yaml onprem-datacenter.yaml; do
-    datacenter_name=$(echo "$datacenter_file" | cut -d'-' -f1)
+for vitistack_file in enterprise-vitistack.yaml edge-vitistack.yaml onprem-vitistack.yaml; do
+    vitistack_name=$(echo "$vitistack_file" | cut -d'-' -f1)
     
-    if kubectl apply --dry-run=client -f "$TEMP_DIR/$datacenter_file" > /dev/null 2>&1; then
-        print_test "PASS" "Valid $datacenter_name datacenter configuration"
+    if kubectl apply --dry-run=client -f "$TEMP_DIR/$vitistack_file" > /dev/null 2>&1; then
+        print_test "PASS" "Valid $vitistack_name vitistack configuration"
     else
-        print_test "FAIL" "Invalid $datacenter_name datacenter configuration"
+        print_test "FAIL" "Invalid $vitistack_name vitistack configuration"
         echo "Error details:"
-        kubectl apply --dry-run=client -f "$TEMP_DIR/$datacenter_file"
+        kubectl apply --dry-run=client -f "$TEMP_DIR/$vitistack_file"
     fi
 done
 
 # Test 7: Apply and verify resources
-print_test "INFO" "Applying test Datacenter resources"
+print_test "INFO" "Applying test Vitistack resources"
 
-for datacenter_file in enterprise-datacenter.yaml edge-datacenter.yaml onprem-datacenter.yaml; do
-    datacenter_name=$(echo "$datacenter_file" | cut -d'-' -f1)
-    resource_name="test-${datacenter_name}-dc"
+for vitistack_file in enterprise-vitistack.yaml edge-vitistack.yaml onprem-vitistack.yaml; do
+    vitistack_name=$(echo "$vitistack_file" | cut -d'-' -f1)
+    resource_name="test-${vitistack_name}-dc"
     
-    if kubectl apply -f "$TEMP_DIR/$datacenter_file" > /dev/null 2>&1; then
-        print_test "PASS" "Successfully applied $datacenter_name datacenter"
+    if kubectl apply -f "$TEMP_DIR/$vitistack_file" > /dev/null 2>&1; then
+        print_test "PASS" "Successfully applied $vitistack_name vitistack"
         
         # Wait a moment for resource to be created
         sleep 1
         
         # Verify resource exists
-        if kubectl get datacenter "$resource_name" > /dev/null 2>&1; then
-            print_test "PASS" "$datacenter_name datacenter resource exists"
+        if kubectl get vitistack "$resource_name" > /dev/null 2>&1; then
+            print_test "PASS" "$vitistack_name vitistack resource exists"
         else
-            print_test "FAIL" "$datacenter_name datacenter resource not found"
+            print_test "FAIL" "$vitistack_name vitistack resource not found"
         fi
     else
-        print_test "FAIL" "Failed to apply $datacenter_name datacenter"
+        print_test "FAIL" "Failed to apply $vitistack_name vitistack"
     fi
 done
 
@@ -631,12 +631,12 @@ print_test "INFO" "Testing invalid configuration rejection"
 # Invalid CIDR
 cat > "$TEMP_DIR/invalid-cidr.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: invalid-cidr-dc
   namespace: default
 spec:
-  name: "Invalid CIDR Datacenter"
+  name: "Invalid CIDR Vitistack"
   location:
     region: test-region
   networking:
@@ -657,12 +657,12 @@ EOF
 # Invalid coordinates
 cat > "$TEMP_DIR/invalid-coordinates.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: invalid-coordinates-dc
   namespace: default
 spec:
-  name: "Invalid Coordinates Datacenter"
+  name: "Invalid Coordinates Vitistack"
   location:
     region: test-region
     coordinates:
@@ -677,12 +677,12 @@ EOF
 # Invalid quota values
 cat > "$TEMP_DIR/invalid-quota.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: invalid-quota-dc
   namespace: default
 spec:
-  name: "Invalid Quota Datacenter"
+  name: "Invalid Quota Vitistack"
   location:
     region: test-region
   resourceQuotas:
@@ -694,12 +694,12 @@ EOF
 # Invalid schedule
 cat > "$TEMP_DIR/invalid-schedule.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: invalid-schedule-dc
   namespace: default
 spec:
-  name: "Invalid Schedule Datacenter"
+  name: "Invalid Schedule Vitistack"
   location:
     region: test-region
   backup:
@@ -728,14 +728,14 @@ done
 # Test 9: Test minimal configuration
 print_test "INFO" "Testing minimal valid configuration"
 
-cat > "$TEMP_DIR/minimal-datacenter.yaml" << 'EOF'
+cat > "$TEMP_DIR/minimal-vitistack.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: minimal-dc
   namespace: default
 spec:
-  name: "Minimal Datacenter"
+  name: "Minimal Vitistack"
   location:
     region: minimal-region
   resourceQuotas:
@@ -744,12 +744,12 @@ spec:
       totalMemoryGB: "2"
 EOF
 
-if kubectl apply --dry-run=client -f "$TEMP_DIR/minimal-datacenter.yaml" > /dev/null 2>&1; then
+if kubectl apply --dry-run=client -f "$TEMP_DIR/minimal-vitistack.yaml" > /dev/null 2>&1; then
     print_test "PASS" "Minimal configuration is valid"
 else
     print_test "FAIL" "Minimal configuration is invalid"
     echo "Error details:"
-    kubectl apply --dry-run=client -f "$TEMP_DIR/minimal-datacenter.yaml"
+    kubectl apply --dry-run=client -f "$TEMP_DIR/minimal-vitistack.yaml"
 fi
 
 # Test 10: Test complex networking configuration
@@ -757,12 +757,12 @@ print_test "INFO" "Testing complex networking configuration"
 
 cat > "$TEMP_DIR/complex-network.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: complex-network-dc
   namespace: default
 spec:
-  name: "Complex Network Datacenter"
+  name: "Complex Network Vitistack"
   location:
     region: complex-region
   
@@ -907,27 +907,27 @@ fi
 print_test "INFO" "Cleaning up test resources"
 
 # Delete test resources
-for datacenter_file in enterprise-datacenter.yaml edge-datacenter.yaml onprem-datacenter.yaml; do
-    datacenter_name=$(echo "$datacenter_file" | cut -d'-' -f1)
-    resource_name="test-${datacenter_name}-dc"
+for vitistack_file in enterprise-vitistack.yaml edge-vitistack.yaml onprem-vitistack.yaml; do
+    vitistack_name=$(echo "$vitistack_file" | cut -d'-' -f1)
+    resource_name="test-${vitistack_name}-dc"
     
-    if kubectl delete datacenter "$resource_name" > /dev/null 2>&1; then
-        print_test "PASS" "Cleaned up $datacenter_name datacenter"
+    if kubectl delete vitistack "$resource_name" > /dev/null 2>&1; then
+        print_test "PASS" "Cleaned up $vitistack_name vitistack"
     else
-        print_test "WARN" "Failed to cleanup $datacenter_name datacenter (may not exist)"
+        print_test "WARN" "Failed to cleanup $vitistack_name vitistack (may not exist)"
     fi
 done
 
 # Test 12: Test example files if they exist
-if [ -f "$EXAMPLES_DIR/datacenter-example.yaml" ]; then
+if [ -f "$EXAMPLES_DIR/vitistack-example.yaml" ]; then
     print_test "INFO" "Testing example files"
     
-    if kubectl apply --dry-run=client -f "$EXAMPLES_DIR/datacenter-example.yaml" > /dev/null 2>&1; then
+    if kubectl apply --dry-run=client -f "$EXAMPLES_DIR/vitistack-example.yaml" > /dev/null 2>&1; then
         print_test "PASS" "Example file validation successful"
     else
         print_test "FAIL" "Example file validation failed"
         echo "Error details:"
-        kubectl apply --dry-run=client -f "$EXAMPLES_DIR/datacenter-example.yaml"
+        kubectl apply --dry-run=client -f "$EXAMPLES_DIR/vitistack-example.yaml"
     fi
 else
     print_test "WARN" "Example file not found, skipping example validation"
@@ -937,8 +937,8 @@ fi
 print_test "INFO" "Checking CRD schema completeness"
 
 # Extract schema from CRD
-if kubectl get crd datacenters.vitistack.io -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}' > /dev/null 2>&1; then
-    schema=$(kubectl get crd datacenters.vitistack.io -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}')
+if kubectl get crd vitistacks.vitistack.io -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}' > /dev/null 2>&1; then
+    schema=$(kubectl get crd vitistacks.vitistack.io -o jsonpath='{.spec.versions[0].schema.openAPIV3Schema}')
     
     # Check for required schema elements
     required_fields=("spec" "status" "metadata" "location" "resourceQuotas" "networking" "security" "monitoring" "backup")
@@ -978,7 +978,7 @@ fi
 # Cleanup temp directory
 rm -rf "$TEMP_DIR"
 
-print_test "INFO" "Datacenter CRD validation test completed"
+print_test "INFO" "Vitistack CRD validation test completed"
 
 echo -e "\n${BLUE}=== Test Summary ===${NC}"
 echo "- CRD structure and syntax validation"

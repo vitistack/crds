@@ -29,9 +29,9 @@ Global Infrastructure:
 ### Global Datacenter Configuration
 
 ```yaml
-# Global management datacenter
+# Global management vitistack
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: global-ecommerce
   namespace: global-infrastructure
@@ -75,7 +75,7 @@ spec:
     globalMaxMemory: "40Ti"
     globalMaxStorage: "1Pi"
   
-  # Child datacenters
+  # Child vitistacks
   childDatacenters:
     - name: us-primary
       namespace: us-region
@@ -148,15 +148,15 @@ spec:
         capabilities: ["cdn", "compute", "ml-training"]
 
 ---
-# US Primary Datacenter
+# US Primary Vitistack
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: us-primary
   namespace: us-region
 spec:
   region: us-west-2
-  description: "Primary US datacenter for e-commerce platform"
+  description: "Primary US vitistack for e-commerce platform"
   
   # Reference to global parent
   parentDatacenter:
@@ -289,15 +289,15 @@ spec:
       priority: 1
 
 ---
-# EU Compliance Datacenter
+# EU Compliance Vitistack
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: eu-compliance
   namespace: eu-region
 spec:
   region: eu-central-1
-  description: "GDPR-compliant EU datacenter"
+  description: "GDPR-compliant EU vitistack"
   
   # GDPR-specific configuration
   compliance:
@@ -342,9 +342,9 @@ spec:
       priority: 1
 
 ---
-# APAC Growth Datacenter
+# APAC Growth Vitistack
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: apac-growth
   namespace: apac-region
@@ -1194,11 +1194,11 @@ The configuration shows how VitiStack CRDs can orchestrate complex, enterprise-g
 
 This example demonstrates a financial services platform with strict compliance, high availability, and security requirements.
 
-### Compliance-First Datacenter
+### Compliance-First Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: financial-services-primary
   namespace: fintech-production

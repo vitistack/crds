@@ -232,10 +232,10 @@ cpu:
 memory: 8589934592
 providerConfig:
   name: vsphere
-  region: datacenter-west
+  region: vitistack-west
   config:
     vcenter: vcenter.example.com
-    datacenter: DC-West
+    vitistack: DC-West
     cluster: Cluster-Prod
     datastore: datastore-ssd
 ```

@@ -20,7 +20,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}=== Complete CRD System Validation Test ===${NC}"
-echo -e "${BLUE}Testing Machine, MachineProvider, KubernetesProvider, and Datacenter CRDs${NC}"
+echo -e "${BLUE}Testing Machine, MachineProvider, KubernetesProvider, and Vitistack CRDs${NC}"
 
 # Create temp directory
 mkdir -p "$TEMP_DIR"
@@ -65,7 +65,7 @@ crd_files=(
     "vitistack.io_machines.yaml"
     "vitistack.io_machineproviders.yaml"
     "vitistack.io_kubernetesproviders.yaml"
-    "vitistack.io_datacenters.yaml"
+    "vitistack.io_vitistacks.yaml"
 )
 
 for crd_file in "${crd_files[@]}"; do
@@ -113,7 +113,7 @@ crd_names=(
     "machines.vitistack.io"
     "machineproviders.vitistack.io"
     "kubernetesproviders.vitistack.io"
-    "datacenters.vitistack.io"
+    "vitistacks.vitistack.io"
 )
 
 for crd_name in "${crd_names[@]}"; do
@@ -128,10 +128,10 @@ done
 # Test 5: Create integrated test scenario
 print_test "STEP" "Creating integrated test scenario"
 
-# Create a complete datacenter with providers and machines
-cat > "$TEMP_DIR/integrated-datacenter.yaml" << 'EOF'
+# Create a complete vitistack with providers and machines
+cat > "$TEMP_DIR/integrated-vitistack.yaml" << 'EOF'
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: integrated-test-dc
   namespace: default
@@ -139,8 +139,8 @@ metadata:
     environment: test
     purpose: integration
 spec:
-  name: "Integrated Test Datacenter"
-  description: "Complete test datacenter with all components"
+  name: "Integrated Test Vitistack"
+  description: "Complete test vitistack with all components"
   location:
     region: us-west-2
     availabilityZones:
@@ -279,7 +279,7 @@ metadata:
   name: aws-test-provider
   namespace: default
   labels:
-    datacenter: integrated-test-dc
+    vitistack: integrated-test-dc
     provider: aws
 spec:
   type: aws
@@ -347,7 +347,7 @@ metadata:
   name: eks-test-provider
   namespace: default
   labels:
-    datacenter: integrated-test-dc
+    vitistack: integrated-test-dc
     provider: eks
 spec:
   type: eks
@@ -441,7 +441,7 @@ metadata:
   name: web-server-1
   namespace: default
   labels:
-    datacenter: integrated-test-dc
+    vitistack: integrated-test-dc
     role: web-server
     environment: test
 spec:
@@ -491,7 +491,7 @@ metadata:
   name: app-server-1
   namespace: default
   labels:
-    datacenter: integrated-test-dc
+    vitistack: integrated-test-dc
     role: app-server
     environment: test
 spec:
@@ -539,7 +539,7 @@ EOF
 print_test "STEP" "Validating integrated configurations"
 
 configs=(
-    "integrated-datacenter.yaml:Datacenter"
+    "integrated-vitistack.yaml:Vitistack"
     "integrated-machine-provider.yaml:MachineProvider"
     "integrated-k8s-provider.yaml:KubernetesProvider"
     "integrated-machines.yaml:Machines"
@@ -563,7 +563,7 @@ print_test "STEP" "Applying integrated resources"
 
 # Apply in dependency order
 apply_order=(
-    "integrated-datacenter.yaml"
+    "integrated-vitistack.yaml"
     "integrated-machine-provider.yaml"
     "integrated-k8s-provider.yaml"
     "integrated-machines.yaml"
@@ -592,7 +592,7 @@ fi
 
 # Check if resources exist and have proper labels
 resources=(
-    "datacenter:integrated-test-dc"
+    "vitistack:integrated-test-dc"
     "machineprovider:aws-test-provider"
     "kubernetesprovider:eks-test-provider"
     "machine:web-server-1"
@@ -607,11 +607,11 @@ for resource in "${resources[@]}"; do
         print_test "PASS" "Resource exists: $type/$name"
         
         # Check for proper labeling where applicable
-        if [ "$type" != "datacenter" ]; then
-            if kubectl get "$type" "$name" -o jsonpath='{.metadata.labels.datacenter}' 2>/dev/null | grep -q "integrated-test-dc"; then
-                print_test "PASS" "Resource properly labeled with datacenter: $type/$name"
+        if [ "$type" != "vitistack" ]; then
+            if kubectl get "$type" "$name" -o jsonpath='{.metadata.labels.vitistack}' 2>/dev/null | grep -q "integrated-test-dc"; then
+                print_test "PASS" "Resource properly labeled with vitistack: $type/$name"
             else
-                print_test "WARN" "Resource missing datacenter label: $type/$name"
+                print_test "WARN" "Resource missing vitistack label: $type/$name"
             fi
         fi
     else
@@ -623,10 +623,10 @@ done
 print_test "STEP" "Testing resource queries and selectors"
 
 # Test label selectors
-if kubectl get machines -l datacenter=integrated-test-dc --no-headers 2>/dev/null | wc -l | grep -q "2"; then
-    print_test "PASS" "Label selector works for machines by datacenter"
+if kubectl get machines -l vitistack=integrated-test-dc --no-headers 2>/dev/null | wc -l | grep -q "2"; then
+    print_test "PASS" "Label selector works for machines by vitistack"
 else
-    print_test "FAIL" "Label selector failed for machines by datacenter"
+    print_test "FAIL" "Label selector failed for machines by vitistack"
 fi
 
 if kubectl get machines -l role=web-server --no-headers 2>/dev/null | wc -l | grep -q "1"; then
@@ -679,7 +679,7 @@ delete_order=(
     "machine:app-server-1"
     "kubernetesprovider:eks-test-provider"
     "machineprovider:aws-test-provider"
-    "datacenter:integrated-test-dc"
+    "vitistack:integrated-test-dc"
 )
 
 for resource in "${delete_order[@]}"; do
@@ -700,7 +700,7 @@ example_files=(
     "machine-example.yaml"
     "machine-provider-example.yaml"
     "kubernetes-provider-example.yaml"
-    "datacenter-example.yaml"
+    "vitistack-example.yaml"
 )
 
 for example_file in "${example_files[@]}"; do
@@ -787,7 +787,7 @@ echo -e "${BLUE}Tested Components:${NC}"
 echo "- Machine CRD: VM and instance management"
 echo "- MachineProvider CRD: Cloud and virtualization provider configuration"
 echo "- KubernetesProvider CRD: Kubernetes cluster management"
-echo "- Datacenter CRD: Infrastructure orchestration and governance"
+echo "- Vitistack CRD: Infrastructure orchestration and governance"
 echo ""
 echo -e "${BLUE}Test Categories:${NC}"
 echo "- CRD structure and syntax validation"
@@ -799,7 +799,7 @@ echo "- Performance and scale characteristics"
 echo "- Schema completeness verification"
 echo ""
 echo -e "${BLUE}Integration Scenarios:${NC}"
-echo "- Complete datacenter with providers and machines"
+echo "- Complete vitistack with providers and machines"
 echo "- Cross-resource labeling and relationships"
 echo "- Resource dependency management"
 echo "- Update and deletion workflows"

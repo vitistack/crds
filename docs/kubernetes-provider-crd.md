@@ -31,7 +31,7 @@ Standard Kubernetes metadata with additional printer columns:
 spec:
   type: string # Provider type (eks, aks, gke, rke2, k3s, kubeadm, openshift)
   version: string # Kubernetes version (e.g., "1.28.0")
-  region: string # Cloud region or datacenter
+  region: string # Cloud region or vitistack
 
   # Cluster basic settings
   clusterConfig:
@@ -642,7 +642,7 @@ metadata:
 spec:
   type: rke2
   version: "1.28.2+rke2r1"
-  region: datacenter1
+  region: vitistack1
 
   clusterConfig:
     name: onprem-cluster

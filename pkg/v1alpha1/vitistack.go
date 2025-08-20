@@ -4,34 +4,34 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Datacenter phase constants
+// Vitistack phase constants
 const (
-	DatacenterPhaseInitializing = "Initializing"
-	DatacenterPhaseProvisioning = "Provisioning"
-	DatacenterPhaseReady        = "Ready"
-	DatacenterPhaseDegraded     = "Degraded"
-	DatacenterPhaseDeleting     = "Deleting"
-	DatacenterPhaseFailed       = "Failed"
+	VitistackPhaseInitializing = "Initializing"
+	VitistackPhaseProvisioning = "Provisioning"
+	VitistackPhaseReady        = "Ready"
+	VitistackPhaseDegraded     = "Degraded"
+	VitistackPhaseDeleting     = "Deleting"
+	VitistackPhaseFailed       = "Failed"
 )
 
-// Datacenter condition types
+// Vitistack condition types
 const (
-	DatacenterConditionReady             = "Ready"
-	DatacenterConditionProvidersHealthy  = "ProvidersHealthy"
-	DatacenterConditionNetworkingReady   = "NetworkingReady"
-	DatacenterConditionMonitoringReady   = "MonitoringReady"
-	DatacenterConditionBackupReady       = "BackupReady"
-	DatacenterConditionSecurityCompliant = "SecurityCompliant"
-	DatacenterConditionQuotaAvailable    = "QuotaAvailable"
+	VitistackConditionReady             = "Ready"
+	VitistackConditionProvidersHealthy  = "ProvidersHealthy"
+	VitistackConditionNetworkingReady   = "NetworkingReady"
+	VitistackConditionMonitoringReady   = "MonitoringReady"
+	VitistackConditionBackupReady       = "BackupReady"
+	VitistackConditionSecurityCompliant = "SecurityCompliant"
+	VitistackConditionQuotaAvailable    = "QuotaAvailable"
 )
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Datacenter is the Schema for the Datacenters API
+// Vitistack is the Schema for the Vitistacks API
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=datacenters,scope=Cluster,shortName=dc
+// +kubebuilder:resource:path=vitistacks,scope=Cluster,shortName=vs
 // +kubebuilder:printcolumn:name="Display Name",type=string,JSONPath=`.spec.displayName`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Ready",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].status`
@@ -41,17 +41,17 @@ const (
 
 // +kubebuilder:printcolumn:name="Machine Providers",type=integer,JSONPath=`.status.machineProvider.count`,priority=10
 // +kubebuilder:printcolumn:name="K8s Providers",type=integer,JSONPath=`.status.kubernetesProvider.count`,priority=10
-type Datacenter struct {
+type Vitistack struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   DatacenterSpec   `json:"spec,omitempty"`
-	Status DatacenterStatus `json:"status,omitempty"`
+	Spec   VitistackSpec   `json:"spec,omitempty"`
+	Status VitistackStatus `json:"status,omitempty"`
 }
 
-// DatacenterSpec defines the desired state of Datacenter
-type DatacenterSpec struct {
-	// DisplayName is the human-readable name for the datacenter
+// VitistackSpec defines the desired state of Vitistack
+type VitistackSpec struct {
+	// DisplayName is the human-readable name for the vitistack
 	// +kubebuilder:validation:Required
 	DisplayName string `json:"displayName"`
 
@@ -59,73 +59,73 @@ type DatacenterSpec struct {
 	// +kubebuilder:validation:Required
 	Zone string `json:"zone,omitempty"`
 
-	// Description provides additional context about the datacenter
+	// Description provides additional context about the vitistack
 	// +kubebuilder:validation:Optional
 	Description string `json:"description,omitempty"`
 
-	// Region specifies the geographical region where the datacenter is located
+	// Region specifies the geographical region where the vitistack is located
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=0
 	Region string `json:"region"`
 
 	// Location provides detailed location information
 	// +kubebuilder:validation:Optional
-	Location DatacenterLocation `json:"location,omitempty"`
+	Location VitistackLocation `json:"location,omitempty"`
 
-	// MachineProviders lists the machine providers available in this datacenter
+	// MachineProviders lists the machine providers available in this vitistack
 	// +kubebuilder:validation:Optional
-	MachineProviders []DatacenterProviderReference `json:"machineProviders,omitempty"`
+	MachineProviders []VitistackProviderReference `json:"machineProviders,omitempty"`
 
-	// KubernetesProviders lists the Kubernetes providers available in this datacenter
+	// KubernetesProviders lists the Kubernetes providers available in this vitistack
 	// +kubebuilder:validation:Optional
-	KubernetesProviders []DatacenterProviderReference `json:"kubernetesProviders,omitempty"`
+	KubernetesProviders []VitistackProviderReference `json:"kubernetesProviders,omitempty"`
 
-	// Networking defines the network configuration for the datacenter
+	// Networking defines the network configuration for the vitistack
 	// +kubebuilder:validation:Optional
-	Networking DatacenterNetworking `json:"networking,omitempty"`
+	Networking VitistackNetworking `json:"networking,omitempty"`
 
 	// Security defines security policies and compliance requirements
 	// +kubebuilder:validation:Optional
-	Security DatacenterSecurity `json:"security,omitempty"`
+	Security VitistackSecurity `json:"security,omitempty"`
 
-	// Monitoring configures monitoring and observability for the datacenter
+	// Monitoring configures monitoring and observability for the vitistack
 	// +kubebuilder:validation:Optional
-	Monitoring DatacenterMonitoring `json:"monitoring,omitempty"`
+	Monitoring VitistackMonitoring `json:"monitoring,omitempty"`
 
 	// Backup configures backup and disaster recovery policies
 	// +kubebuilder:validation:Optional
-	Backup DatacenterBackup `json:"backup,omitempty"`
+	Backup VitistackBackup `json:"backup,omitempty"`
 
-	// ResourceQuotas define resource limits for the datacenter
+	// ResourceQuotas define resource limits for the vitistack
 	// +kubebuilder:validation:Optional
-	ResourceQuotas DatacenterResourceQuotas `json:"resourceQuotas,omitempty"`
+	ResourceQuotas VitistackResourceQuotas `json:"resourceQuotas,omitempty"`
 
-	// Tags for organizing and categorizing datacenters
+	// Tags for organizing and categorizing vitistacks
 	// +kubebuilder:validation:Optional
 	Tags map[string]string `json:"tags,omitempty"`
 }
 
-// DatacenterLocation provides detailed location information
-type DatacenterLocation struct {
-	// Country where the datacenter is located
+// VitistackLocation provides detailed location information
+type VitistackLocation struct {
+	// Country where the vitistack is located
 	// +kubebuilder:validation:Optional
 	Country string `json:"country,omitempty"`
 
-	// City where the datacenter is located
+	// City where the vitistack is located
 	// +kubebuilder:validation:Optional
 	City string `json:"city,omitempty"`
 
-	// Address of the datacenter
+	// Address of the vitistack
 	// +kubebuilder:validation:Optional
 	Address string `json:"address,omitempty"`
 
-	// Coordinates for the datacenter location
+	// Coordinates for the vitistack location
 	// +kubebuilder:validation:Optional
-	Coordinates DatacenterCoordinates `json:"coordinates,omitempty"`
+	Coordinates VitistackCoordinates `json:"coordinates,omitempty"`
 }
 
-// DatacenterCoordinates defines geographical coordinates
-type DatacenterCoordinates struct {
+// VitistackCoordinates defines geographical coordinates
+type VitistackCoordinates struct {
 	// Latitude coordinate (-90 to 90)
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Pattern=`^-?([0-8]?[0-9](\.[0-9]+)?|90(\.0+)?)$`
@@ -137,8 +137,8 @@ type DatacenterCoordinates struct {
 	Longitude string `json:"longitude,omitempty"`
 }
 
-// DatacenterProviderReference references a provider available in this datacenter
-type DatacenterProviderReference struct {
+// VitistackProviderReference references a provider available in this vitistack
+type VitistackProviderReference struct {
 	// Name of the provider resource
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
@@ -158,32 +158,32 @@ type DatacenterProviderReference struct {
 	// +kubebuilder:default=true
 	Enabled bool `json:"enabled,omitempty"`
 
-	// Configuration provides provider-specific settings for this datacenter
+	// Configuration provides provider-specific settings for this vitistack
 	// +kubebuilder:validation:Optional
 	Configuration map[string]string `json:"configuration,omitempty"`
 }
 
-// DatacenterNetworking defines network configuration
-type DatacenterNetworking struct {
+// VitistackNetworking defines network configuration
+type VitistackNetworking struct {
 	// VPCs define the virtual private clouds available
 	// +kubebuilder:validation:Optional
-	VPCs []DatacenterVPC `json:"vpcs,omitempty"`
+	VPCs []VitistackVPC `json:"vpcs,omitempty"`
 
 	// LoadBalancers define available load balancer configurations
 	// +kubebuilder:validation:Optional
-	LoadBalancers []DatacenterLoadBalancer `json:"loadBalancers,omitempty"`
+	LoadBalancers []VitistackLoadBalancer `json:"loadBalancers,omitempty"`
 
-	// DNS configuration for the datacenter
+	// DNS configuration for the vitistack
 	// +kubebuilder:validation:Optional
-	DNS DatacenterDNS `json:"dns,omitempty"`
+	DNS VitistackDNS `json:"dns,omitempty"`
 
 	// Firewall rules and security groups
 	// +kubebuilder:validation:Optional
-	Firewall DatacenterFirewall `json:"firewall,omitempty"`
+	Firewall VitistackFirewall `json:"firewall,omitempty"`
 }
 
-// DatacenterVPC defines a virtual private cloud
-type DatacenterVPC struct {
+// VitistackVPC defines a virtual private cloud
+type VitistackVPC struct {
 	// Name of the VPC
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -195,15 +195,15 @@ type DatacenterVPC struct {
 
 	// Subnets within the VPC
 	// +kubebuilder:validation:Optional
-	Subnets []DatacenterSubnet `json:"subnets,omitempty"`
+	Subnets []VitistackSubnet `json:"subnets,omitempty"`
 
 	// Default indicates if this is the default VPC
 	// +kubebuilder:validation:Optional
 	Default bool `json:"default,omitempty"`
 }
 
-// DatacenterSubnet defines a subnet within a VPC
-type DatacenterSubnet struct {
+// VitistackSubnet defines a subnet within a VPC
+type VitistackSubnet struct {
 	// Name of the subnet
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -222,8 +222,8 @@ type DatacenterSubnet struct {
 	Public bool `json:"public,omitempty"`
 }
 
-// DatacenterLoadBalancer defines load balancer configuration
-type DatacenterLoadBalancer struct {
+// VitistackLoadBalancer defines load balancer configuration
+type VitistackLoadBalancer struct {
 	// Name of the load balancer
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -240,13 +240,13 @@ type DatacenterLoadBalancer struct {
 	Scheme string `json:"scheme,omitempty"`
 }
 
-// DatacenterDNS defines DNS configuration
-type DatacenterDNS struct {
+// VitistackDNS defines DNS configuration
+type VitistackDNS struct {
 	// Servers list DNS server addresses
 	// +kubebuilder:validation:Optional
 	Servers []string `json:"servers,omitempty"`
 
-	// Domain is the default domain for the datacenter
+	// Domain is the default domain for the vitistack
 	// +kubebuilder:validation:Optional
 	Domain string `json:"domain,omitempty"`
 
@@ -255,8 +255,8 @@ type DatacenterDNS struct {
 	SearchDomains []string `json:"searchDomains,omitempty"`
 }
 
-// DatacenterFirewall defines firewall configuration
-type DatacenterFirewall struct {
+// VitistackFirewall defines firewall configuration
+type VitistackFirewall struct {
 	// DefaultPolicy for traffic (allow, deny)
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Enum=allow;deny
@@ -265,11 +265,11 @@ type DatacenterFirewall struct {
 
 	// Rules define specific firewall rules
 	// +kubebuilder:validation:Optional
-	Rules []DatacenterFirewallRule `json:"rules,omitempty"`
+	Rules []VitistackFirewallRule `json:"rules,omitempty"`
 }
 
-// DatacenterFirewallRule defines a firewall rule
-type DatacenterFirewallRule struct {
+// VitistackFirewallRule defines a firewall rule
+type VitistackFirewallRule struct {
 	// Name of the rule
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -298,27 +298,27 @@ type DatacenterFirewallRule struct {
 	Destination string `json:"destination,omitempty"`
 }
 
-// DatacenterSecurity defines security policies
-type DatacenterSecurity struct {
+// VitistackSecurity defines security policies
+type VitistackSecurity struct {
 	// ComplianceFrameworks that must be adhered to
 	// +kubebuilder:validation:Optional
 	ComplianceFrameworks []string `json:"complianceFrameworks,omitempty"`
 
 	// Encryption requirements
 	// +kubebuilder:validation:Optional
-	Encryption DatacenterEncryption `json:"encryption,omitempty"`
+	Encryption VitistackEncryption `json:"encryption,omitempty"`
 
 	// AccessControl policies
 	// +kubebuilder:validation:Optional
-	AccessControl DatacenterAccessControl `json:"accessControl,omitempty"`
+	AccessControl VitistackAccessControl `json:"accessControl,omitempty"`
 
 	// AuditLogging configuration
 	// +kubebuilder:validation:Optional
-	AuditLogging DatacenterAuditLogging `json:"auditLogging,omitempty"`
+	AuditLogging VitistackAuditLogging `json:"auditLogging,omitempty"`
 }
 
-// DatacenterEncryption defines encryption requirements
-type DatacenterEncryption struct {
+// VitistackEncryption defines encryption requirements
+type VitistackEncryption struct {
 	// AtRest indicates if data at rest must be encrypted
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=true
@@ -334,8 +334,8 @@ type DatacenterEncryption struct {
 	KeyManagement string `json:"keyManagement,omitempty"`
 }
 
-// DatacenterAccessControl defines access control policies
-type DatacenterAccessControl struct {
+// VitistackAccessControl defines access control policies
+type VitistackAccessControl struct {
 	// RBAC indicates if role-based access control is required
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=true
@@ -346,17 +346,17 @@ type DatacenterAccessControl struct {
 	// +kubebuilder:default=false
 	MFA bool `json:"mfa,omitempty"`
 
-	// AllowedUsers list users who can access resources in this datacenter
+	// AllowedUsers list users who can access resources in this vitistack
 	// +kubebuilder:validation:Optional
 	AllowedUsers []string `json:"allowedUsers,omitempty"`
 
-	// AllowedGroups list groups who can access resources in this datacenter
+	// AllowedGroups list groups who can access resources in this vitistack
 	// +kubebuilder:validation:Optional
 	AllowedGroups []string `json:"allowedGroups,omitempty"`
 }
 
-// DatacenterAuditLogging defines audit logging configuration
-type DatacenterAuditLogging struct {
+// VitistackAuditLogging defines audit logging configuration
+type VitistackAuditLogging struct {
 	// Enabled indicates if audit logging is enabled
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=true
@@ -375,8 +375,8 @@ type DatacenterAuditLogging struct {
 	Destination string `json:"destination,omitempty"`
 }
 
-// DatacenterMonitoring defines monitoring configuration
-type DatacenterMonitoring struct {
+// VitistackMonitoring defines monitoring configuration
+type VitistackMonitoring struct {
 	// Enabled indicates if monitoring is enabled
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=true
@@ -403,8 +403,8 @@ type DatacenterMonitoring struct {
 	CustomDashboards []string `json:"customDashboards,omitempty"`
 }
 
-// DatacenterBackup defines backup and disaster recovery
-type DatacenterBackup struct {
+// VitistackBackup defines backup and disaster recovery
+type VitistackBackup struct {
 	// Enabled indicates if backup is enabled
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=true
@@ -417,19 +417,19 @@ type DatacenterBackup struct {
 
 	// RetentionPolicy for backups
 	// +kubebuilder:validation:Optional
-	RetentionPolicy DatacenterBackupRetention `json:"retentionPolicy,omitempty"`
+	RetentionPolicy VitistackBackupRetention `json:"retentionPolicy,omitempty"`
 
 	// Destinations where backups are stored
 	// +kubebuilder:validation:Optional
-	Destinations []DatacenterBackupDestination `json:"destinations,omitempty"`
+	Destinations []VitistackBackupDestination `json:"destinations,omitempty"`
 
 	// DisasterRecovery configuration
 	// +kubebuilder:validation:Optional
-	DisasterRecovery DatacenterDisasterRecovery `json:"disasterRecovery,omitempty"`
+	DisasterRecovery VitistackDisasterRecovery `json:"disasterRecovery,omitempty"`
 }
 
-// DatacenterBackupRetention defines backup retention policies
-type DatacenterBackupRetention struct {
+// VitistackBackupRetention defines backup retention policies
+type VitistackBackupRetention struct {
 	// Daily backups to keep
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Minimum=1
@@ -449,8 +449,8 @@ type DatacenterBackupRetention struct {
 	Monthly int32 `json:"monthly,omitempty"`
 }
 
-// DatacenterBackupDestination defines backup storage destination
-type DatacenterBackupDestination struct {
+// VitistackBackupDestination defines backup storage destination
+type VitistackBackupDestination struct {
 	// Name of the backup destination
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -469,16 +469,16 @@ type DatacenterBackupDestination struct {
 	Encryption bool `json:"encryption,omitempty"`
 }
 
-// DatacenterDisasterRecovery defines disaster recovery configuration
-type DatacenterDisasterRecovery struct {
+// VitistackDisasterRecovery defines disaster recovery configuration
+type VitistackDisasterRecovery struct {
 	// Enabled indicates if disaster recovery is configured
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=false
 	Enabled bool `json:"enabled,omitempty"`
 
-	// TargetDatacenter for disaster recovery
+	// TargetVitistack for disaster recovery
 	// +kubebuilder:validation:Optional
-	TargetDatacenter string `json:"targetDatacenter,omitempty"`
+	TargetVitistack string `json:"targetVitistack,omitempty"`
 
 	// RPO (Recovery Point Objective) in minutes
 	// +kubebuilder:validation:Optional
@@ -491,8 +491,8 @@ type DatacenterDisasterRecovery struct {
 	RTOMinutes int32 `json:"rtoMinutes,omitempty"`
 }
 
-// DatacenterResourceQuotas defines resource limits
-type DatacenterResourceQuotas struct {
+// VitistackResourceQuotas defines resource limits
+type VitistackResourceQuotas struct {
 	// MaxMachines limits the number of machines
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:Minimum=1
@@ -524,13 +524,13 @@ type DatacenterResourceQuotas struct {
 	MaxNetworkInterfaces int32 `json:"maxNetworkInterfaces,omitempty"`
 }
 
-// DatacenterStatus defines the observed state of Datacenter
-type DatacenterStatus struct {
-	// Phase represents the current phase of the datacenter
+// VitistackStatus defines the observed state of Vitistack
+type VitistackStatus struct {
+	// Phase represents the current phase of the vitistack
 	// +kubebuilder:validation:Optional
 	Phase string `json:"phase,omitempty"`
 
-	// Conditions represent the latest available observations of datacenter state
+	// Conditions represent the latest available observations of vitistack state
 	// +kubebuilder:validation:Optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
@@ -542,7 +542,7 @@ type DatacenterStatus struct {
 	// +kubebuilder:validation:Optional
 	KubernetesProviderCount int32 `json:"kubernetesProviderCount,omitempty"`
 
-	// ActiveMachines is the number of active machines in the datacenter
+	// ActiveMachines is the number of active machines in the vitistack
 	// +kubebuilder:validation:Optional
 	ActiveMachines int32 `json:"activeMachines,omitempty"`
 
@@ -552,23 +552,23 @@ type DatacenterStatus struct {
 
 	// ResourceUsage shows current resource utilization
 	// +kubebuilder:validation:Optional
-	ResourceUsage DatacenterResourceUsage `json:"resourceUsage,omitempty"`
+	ResourceUsage VitistackResourceUsage `json:"resourceUsage,omitempty"`
 
 	// ProviderStatuses shows the status of each provider
 	// +kubebuilder:validation:Optional
-	ProviderStatuses []DatacenterProviderStatus `json:"providerStatuses,omitempty"`
+	ProviderStatuses []VitistackProviderStatus `json:"providerStatuses,omitempty"`
 
-	// LastReconcileTime is when the datacenter was last reconciled
+	// LastReconcileTime is when the vitistack was last reconciled
 	// +kubebuilder:validation:Optional
 	LastReconcileTime *metav1.Time `json:"lastReconcileTime,omitempty"`
 
-	// ObservedGeneration reflects the generation of the most recently observed Datacenter
+	// ObservedGeneration reflects the generation of the most recently observed Vitistack
 	// +kubebuilder:validation:Optional
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 }
 
-// DatacenterResourceUsage shows current resource utilization
-type DatacenterResourceUsage struct {
+// VitistackResourceUsage shows current resource utilization
+type VitistackResourceUsage struct {
 	// CPUCoresUsed shows used CPU cores
 	// +kubebuilder:validation:Optional
 	CPUCoresUsed int32 `json:"cpuCoresUsed,omitempty"`
@@ -602,8 +602,8 @@ type DatacenterResourceUsage struct {
 	NetworkInterfacesTotal int32 `json:"networkInterfacesTotal,omitempty"`
 }
 
-// DatacenterProviderStatus shows the status of a provider in the datacenter
-type DatacenterProviderStatus struct {
+// VitistackProviderStatus shows the status of a provider in the vitistack
+type VitistackProviderStatus struct {
 	// Name of the provider
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -635,13 +635,13 @@ type DatacenterProviderStatus struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// DatacenterList contains a list of Datacenter
-type DatacenterList struct {
+// VitistackList contains a list of Vitistack
+type VitistackList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Datacenter `json:"items"`
+	Items           []Vitistack `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Datacenter{}, &DatacenterList{})
+	SchemeBuilder.Register(&Vitistack{}, &VitistackList{})
 }

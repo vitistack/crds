@@ -21,17 +21,17 @@ This guide provides comprehensive operational procedures, troubleshooting workfl
 
 ### Key Metrics to Monitor
 
-#### Datacenter Metrics
+#### Vitistack Metrics
 
 ```bash
-# Check datacenter health status
-kubectl get datacenters -o custom-columns=NAME:.metadata.name,PHASE:.status.phase,READY:.status.conditions[?(@.type=="Ready")].status
+# Check vitistack health status
+kubectl get vitistacks -o custom-columns=NAME:.metadata.name,PHASE:.status.phase,READY:.status.conditions[?(@.type=="Ready")].status
 
 # Monitor resource utilization
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.resourceUsage.cpuCoresUsed}/{.status.resourceUsage.cpuCoresTotal}{"\t"}{.status.resourceUsage.memoryGBUsed}/{.status.resourceUsage.memoryGBTotal}{"\n"}{end}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.resourceUsage.cpuCoresUsed}/{.status.resourceUsage.cpuCoresTotal}{"\t"}{.status.resourceUsage.memoryGBUsed}/{.status.resourceUsage.memoryGBTotal}{"\n"}{end}'
 
 # Check provider health
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{range .status.providerStatuses[*]}{"\t"}{.name}{"\t"}{.healthy}{"\t"}{.message}{"\n"}{end}{end}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{range .status.providerStatuses[*]}{"\t"}{.name}{"\t"}{.healthy}{"\t"}{.message}{"\n"}{end}{end}'
 ```
 
 #### Machine Provider Metrics
@@ -83,32 +83,32 @@ metadata:
   namespace: vitistack-system
 spec:
   groups:
-    - name: vitistack.datacenter
+    - name: vitistack.vitistack
       rules:
-        - alert: DatacenterNotReady
-          expr: vitistack_datacenter_ready != 1
+        - alert: VitistackNotReady
+          expr: vitistack_vitistack_ready != 1
           for: 5m
           labels:
             severity: critical
           annotations:
-            summary: "Datacenter {{ $labels.datacenter }} is not ready"
-            description: "Datacenter {{ $labels.datacenter }} has been not ready for more than 5 minutes"
+            summary: "Vitistack {{ $labels.vitistack }} is not ready"
+            description: "Vitistack {{ $labels.vitistack }} has been not ready for more than 5 minutes"
 
-        - alert: DatacenterResourceUsageHigh
-          expr: (vitistack_datacenter_cpu_used / vitistack_datacenter_cpu_total) > 0.85
+        - alert: VitistackResourceUsageHigh
+          expr: (vitistack_vitistack_cpu_used / vitistack_vitistack_cpu_total) > 0.85
           for: 10m
           labels:
             severity: warning
           annotations:
-            summary: "High CPU usage in datacenter {{ $labels.datacenter }}"
+            summary: "High CPU usage in vitistack {{ $labels.vitistack }}"
 
-        - alert: DatacenterProviderDown
-          expr: vitistack_datacenter_provider_healthy == 0
+        - alert: VitistackProviderDown
+          expr: vitistack_vitistack_provider_healthy == 0
           for: 2m
           labels:
             severity: critical
           annotations:
-            summary: "Provider {{ $labels.provider }} in datacenter {{ $labels.datacenter }} is down"
+            summary: "Provider {{ $labels.provider }} in vitistack {{ $labels.vitistack }} is down"
 
     - name: vitistack.machines
       rules:
@@ -144,30 +144,30 @@ spec:
     "title": "VitiStack Operations Dashboard",
     "panels": [
       {
-        "title": "Datacenter Health Overview",
+        "title": "Vitistack Health Overview",
         "type": "stat",
         "targets": [
           {
-            "expr": "count(vitistack_datacenter_ready == 1)",
-            "legendFormat": "Ready Datacenters"
+            "expr": "count(vitistack_vitistack_ready == 1)",
+            "legendFormat": "Ready Vitistacks"
           },
           {
-            "expr": "count(vitistack_datacenter_ready == 0)",
-            "legendFormat": "Failed Datacenters"
+            "expr": "count(vitistack_vitistack_ready == 0)",
+            "legendFormat": "Failed Vitistacks"
           }
         ]
       },
       {
-        "title": "Resource Utilization by Datacenter",
+        "title": "Resource Utilization by Vitistack",
         "type": "bargauge",
         "targets": [
           {
-            "expr": "vitistack_datacenter_cpu_used / vitistack_datacenter_cpu_total * 100",
-            "legendFormat": "CPU % - {{ datacenter }}"
+            "expr": "vitistack_vitistack_cpu_used / vitistack_vitistack_cpu_total * 100",
+            "legendFormat": "CPU % - {{ vitistack }}"
           },
           {
-            "expr": "vitistack_datacenter_memory_used / vitistack_datacenter_memory_total * 100",
-            "legendFormat": "Memory % - {{ datacenter }}"
+            "expr": "vitistack_vitistack_memory_used / vitistack_vitistack_memory_total * 100",
+            "legendFormat": "Memory % - {{ vitistack }}"
           }
         ]
       },
@@ -194,22 +194,22 @@ spec:
 
 ### Common Issues and Resolution
 
-#### 1. Datacenter Not Ready
+#### 1. Vitistack Not Ready
 
 **Symptoms:**
 
-- Datacenter phase stuck in "Initializing" or "Provisioning"
+- Vitistack phase stuck in "Initializing" or "Provisioning"
 - Ready condition false
 - Machines cannot be provisioned
 
 **Diagnosis Steps:**
 
 ```bash
-# Check datacenter status
-kubectl describe datacenter <datacenter-name>
+# Check vitistack status
+kubectl describe vitistack <vitistack-name>
 
 # Check events
-kubectl get events --field-selector involvedObject.name=<datacenter-name>
+kubectl get events --field-selector involvedObject.name=<vitistack-name>
 
 # Verify provider references
 kubectl get machineproviders,kubernetesproviders -n <namespace>
@@ -234,16 +234,16 @@ kubectl logs -n vitistack-system deployment/vitistack-controller
 
    ```bash
    # Validate CIDR blocks don't overlap
-   kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.networking.vpcs[*].cidr}{"\n"}{end}'
+   kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.networking.vpcs[*].cidr}{"\n"}{end}'
 
    # Check subnet configurations
-   kubectl describe datacenter <name> | grep -A 10 networking
+   kubectl describe vitistack <name> | grep -A 10 networking
    ```
 
 3. **Resource Quota Conflicts**
    ```bash
    # Check current usage vs limits
-   kubectl get datacenter <name> -o jsonpath='{.status.resourceUsage}'
+   kubectl get vitistack <name> -o jsonpath='{.status.resourceUsage}'
    ```
 
 #### 2. Machine Provisioning Failures
@@ -343,8 +343,8 @@ kubectl annotate machineprovider <name> vitistack.io/force-sync="$(date)"
 
 echo "=== VitiStack System Status ==="
 
-echo "Datacenters:"
-kubectl get datacenters -o wide
+echo "Vitistacks:"
+kubectl get vitistacks -o wide
 
 echo -e "\nMachine Providers:"
 kubectl get machineproviders -o wide
@@ -394,7 +394,7 @@ check_component() {
 
 echo "=== VitiStack Health Check ==="
 
-check_component "datacenters"
+check_component "vitistacks"
 check_component "machineproviders"
 check_component "kubernetesproviders"
 check_component "machines"
@@ -489,9 +489,9 @@ done
 ```yaml
 # Configure multiple providers with priorities
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: optimized-datacenter
+  name: optimized-vitistack
 spec:
   machineProviders:
     - name: primary-provider
@@ -524,14 +524,14 @@ kubectl top pods -n vitistack-system
 curl -s http://controller-metrics:8080/metrics | grep vitistack_controller
 
 # Resource usage trends
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.resourceUsage}{"\n"}{end}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.resourceUsage}{"\n"}{end}'
 ```
 
 ## Backup and Recovery
 
 ### Automated Backup Procedures
 
-#### Datacenter Configuration Backup
+#### Vitistack Configuration Backup
 
 ```bash
 #!/bin/bash
@@ -543,7 +543,7 @@ mkdir -p "$BACKUP_DIR"
 echo "Backing up VitiStack configuration to $BACKUP_DIR"
 
 # Backup all CRDs
-kubectl get datacenters -o yaml > "$BACKUP_DIR/datacenters.yaml"
+kubectl get vitistacks -o yaml > "$BACKUP_DIR/vitistacks.yaml"
 kubectl get machineproviders -o yaml > "$BACKUP_DIR/machineproviders.yaml"
 kubectl get kubernetesproviders -o yaml > "$BACKUP_DIR/kubernetesproviders.yaml"
 kubectl get machines --all-namespaces -o yaml > "$BACKUP_DIR/machines.yaml"
@@ -559,7 +559,7 @@ cat > "$BACKUP_DIR/manifest.txt" << EOF
 Backup created: $(date)
 Kubernetes version: $(kubectl version --short)
 VitiStack version: $(kubectl get deployment vitistack-controller -n vitistack-system -o jsonpath='{.spec.template.spec.containers[0].image}')
-Datacenters: $(kubectl get datacenters --no-headers | wc -l)
+Vitistacks: $(kubectl get vitistacks --no-headers | wc -l)
 Machine Providers: $(kubectl get machineproviders --no-headers | wc -l)
 Kubernetes Providers: $(kubectl get kubernetesproviders --no-headers | wc -l)
 Machines: $(kubectl get machines --all-namespaces --no-headers | wc -l)
@@ -603,8 +603,8 @@ echo "Waiting for providers to be ready..."
 kubectl wait --for=condition=Ready machineproviders --all --timeout=300s
 kubectl wait --for=condition=Ready kubernetesproviders --all --timeout=300s
 
-echo "Restoring datacenters..."
-kubectl apply -f "$BACKUP_DIR/datacenters.yaml"
+echo "Restoring vitistacks..."
+kubectl apply -f "$BACKUP_DIR/vitistacks.yaml"
 
 echo "Restoring machines..."
 kubectl apply -f "$BACKUP_DIR/machines.yaml"
@@ -617,9 +617,9 @@ echo "Restoration completed"
 ```yaml
 # backup-policy.yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: primary-datacenter
+  name: primary-vitistack
 spec:
   backup:
     enabled: true
@@ -643,7 +643,7 @@ spec:
       monthly: 12
     disasterRecovery:
       enabled: true
-      targetDatacenter: disaster-recovery-datacenter
+      targetVitistack: disaster-recovery-vitistack
       rpoMinutes: 60
       rtoMinutes: 240
 ```
@@ -670,13 +670,13 @@ echo -e "\nSecret Usage:"
 kubectl get secrets -A -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{.type}{"\n"}{end}' | grep vitistack
 
 echo -e "\nEncryption Status:"
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.encryption}{"\n"}{end}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.encryption}{"\n"}{end}'
 
 echo -e "\nCompliance Frameworks:"
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.complianceFrameworks}{"\n"}{end}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.complianceFrameworks}{"\n"}{end}'
 
 echo -e "\nAudit Logging:"
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.auditLogging.enabled}{"\n"}{end}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.auditLogging.enabled}{"\n"}{end}'
 ```
 
 #### Security Hardening Checklist
@@ -737,7 +737,7 @@ case $INCIDENT_TYPE in
         echo "Responding to unauthorized access attempt"
 
         # Enable enhanced audit logging
-        kubectl patch datacenters --type='merge' -p='{"spec":{"security":{"auditLogging":{"retentionDays":90}}}}'
+        kubectl patch vitistacks --type='merge' -p='{"spec":{"security":{"auditLogging":{"retentionDays":90}}}}'
 
         # Review recent activities
         kubectl get events --sort-by=.metadata.creationTimestamp | grep -i "$AFFECTED_RESOURCE"
@@ -758,14 +758,14 @@ esac
 echo "=== Capacity Analysis Report ==="
 
 echo "Current Resource Usage:"
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.resourceUsage.cpuCoresUsed}/{.status.resourceUsage.cpuCoresTotal}{"\t"}{.status.resourceUsage.memoryGBUsed}/{.status.resourceUsage.memoryGBTotal}{"\n"}{end}' | column -t
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.resourceUsage.cpuCoresUsed}/{.status.resourceUsage.cpuCoresTotal}{"\t"}{.status.resourceUsage.memoryGBUsed}/{.status.resourceUsage.memoryGBTotal}{"\n"}{end}' | column -t
 
 echo -e "\nGrowth Trends (30-day):"
 # This would typically integrate with your metrics system
-curl -s "http://prometheus:9090/api/v1/query_range?query=vitistack_datacenter_cpu_used&start=$(date -d '30 days ago' +%s)&end=$(date +%s)&step=86400" | jq '.data.result'
+curl -s "http://prometheus:9090/api/v1/query_range?query=vitistack_vitistack_cpu_used&start=$(date -d '30 days ago' +%s)&end=$(date +%s)&step=86400" | jq '.data.result'
 
 echo -e "\nCapacity Recommendations:"
-kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{(.status.resourceUsage.cpuCoresUsed / .status.resourceUsage.cpuCoresTotal * 100)}{"%\t"}{(.status.resourceUsage.memoryGBUsed / .status.resourceUsage.memoryGBTotal * 100)}{"%\n"}{end}' | awk '$2 > 80 || $3 > 80 {print "RECOMMEND EXPANSION: " $1 " (CPU: " $2 ", Memory: " $3 ")"}'
+kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{(.status.resourceUsage.cpuCoresUsed / .status.resourceUsage.cpuCoresTotal * 100)}{"%\t"}{(.status.resourceUsage.memoryGBUsed / .status.resourceUsage.memoryGBTotal * 100)}{"%\n"}{end}' | awk '$2 > 80 || $3 > 80 {print "RECOMMEND EXPANSION: " $1 " (CPU: " $2 ", Memory: " $3 ")"}'
 ```
 
 #### Scaling Recommendations
@@ -821,16 +821,16 @@ spec:
   groups:
     - name: vitistack.critical
       rules:
-        - alert: DatacenterDown
-          expr: vitistack_datacenter_ready == 0
+        - alert: VitistackDown
+          expr: vitistack_vitistack_ready == 0
           for: 1m
           labels:
             severity: critical
             team: platform
           annotations:
-            summary: "Datacenter {{ $labels.datacenter }} is down"
-            description: "Critical infrastructure failure in datacenter {{ $labels.datacenter }}"
-            runbook_url: "https://wiki.company.com/vitistack/runbooks/datacenter-down"
+            summary: "Vitistack {{ $labels.vitistack }} is down"
+            description: "Critical infrastructure failure in vitistack {{ $labels.vitistack }}"
+            runbook_url: "https://wiki.company.com/vitistack/runbooks/vitistack-down"
 
         - alert: MassProvisioningFailure
           expr: rate(vitistack_machine_provisioning_failures_total[5m]) > 0.5
@@ -972,7 +972,7 @@ sleep 30
 ./vitistack-healthcheck.sh
 
 # 5. Test basic functionality
-kubectl get datacenters
+kubectl get vitistacks
 kubectl get machineproviders
 
 echo "Controller update completed successfully"
@@ -997,7 +997,7 @@ fi
 echo "Migrating VitiStack from $SOURCE_CLUSTER to $TARGET_CLUSTER"
 
 # 1. Backup from source
-kubectl --context=$SOURCE_CLUSTER get datacenters,machineproviders,kubernetesproviders -o yaml > migration-backup.yaml
+kubectl --context=$SOURCE_CLUSTER get vitistacks,machineproviders,kubernetesproviders -o yaml > migration-backup.yaml
 
 # 2. Switch to target cluster
 kubectl config use-context $TARGET_CLUSTER
@@ -1019,7 +1019,7 @@ kubectl wait --for=condition=Available deployment/vitistack-controller -n vitist
 kubectl apply -f migration-backup.yaml
 
 # 8. Verify migration
-kubectl get datacenters,machineproviders,kubernetesproviders
+kubectl get vitistacks,machineproviders,kubernetesproviders
 
 echo "Migration completed"
 ```
@@ -1061,13 +1061,13 @@ echo "=== VitiStack Comprehensive Health Check ==="
 check_and_score "Controller Pod Running" "kubectl get pods -n vitistack-system -l app=vitistack-controller --field-selector=status.phase=Running" 5
 
 # CRD Availability
-check_and_score "Datacenter CRD" "kubectl get crd datacenters.vitistack.io" 2
+check_and_score "Vitistack CRD" "kubectl get crd vitistacks.vitistack.io" 2
 check_and_score "Machine CRD" "kubectl get crd machines.vitistack.io" 2
 check_and_score "MachineProvider CRD" "kubectl get crd machineproviders.vitistack.io" 2
 check_and_score "KubernetesProvider CRD" "kubectl get crd kubernetesproviders.vitistack.io" 2
 
 # Resource Health
-check_and_score "Datacenters Ready" "kubectl get datacenters -o jsonpath='{.items[*].status.conditions[?(@.type==\"Ready\")].status}' | grep -q True" 5
+check_and_score "Vitistacks Ready" "kubectl get vitistacks -o jsonpath='{.items[*].status.conditions[?(@.type==\"Ready\")].status}' | grep -q True" 5
 check_and_score "Providers Authenticated" "kubectl get machineproviders -o jsonpath='{.items[*].status.conditions[?(@.type==\"AuthenticationValid\")].status}' | grep -qv False" 3
 
 # Metrics and Monitoring

@@ -610,10 +610,10 @@ resource "helm_release" "vitistack" {
   ]
 }
 
-# Create initial datacenter
-resource "kubectl_manifest" "datacenter" {
-  yaml_body = templatefile("${path.module}/datacenter.yaml.tpl", {
-    name              = var.datacenter_name
+# Create initial vitistack
+resource "kubectl_manifest" "vitistack" {
+  yaml_body = templatefile("${path.module}/vitistack.yaml.tpl", {
+    name              = var.vitistack_name
     region            = var.aws_region
     vpc_cidr          = var.vpc_cidr
     availability_zones = var.availability_zones
@@ -677,19 +677,19 @@ const vitistackController = new k8s.helm.v3.Release("vitistack-controller", {
   },
 });
 
-// Create datacenter
-const datacenter = new k8s.apiextensions.CustomResource(
-  "aws-datacenter",
+// Create vitistack
+const vitistack = new k8s.apiextensions.CustomResource(
+  "aws-vitistack",
   {
     apiVersion: "vitistack.io/v1alpha1",
-    kind: "Datacenter",
+    kind: "Vitistack",
     metadata: {
       name: "aws-production",
       namespace: vitistackNamespace.metadata.name,
     },
     spec: {
       region: "us-west-2",
-      description: "Production datacenter in AWS US West 2",
+      description: "Production vitistack in AWS US West 2",
       machineProviders: [
         {
           name: "aws-ec2-provider",
@@ -794,7 +794,7 @@ deploy_crds() {
 
     # Wait for CRDs to be established
     log "Waiting for CRDs to be established..."
-    kubectl wait --for condition=established --timeout=60s crd/datacenters.vitistack.io
+    kubectl wait --for condition=established --timeout=60s crd/vitistacks.vitistack.io
     kubectl wait --for condition=established --timeout=60s crd/machineproviders.vitistack.io
     kubectl wait --for condition=established --timeout=60s crd/kubernetesproviders.vitistack.io
     kubectl wait --for condition=established --timeout=60s crd/machines.vitistack.io
@@ -925,7 +925,7 @@ smoke_test() {
 
     # Test 2: CRD availability
     log "Test 2: Checking CRD availability..."
-    kubectl get crd datacenters.vitistack.io >/dev/null 2>&1 || error "Datacenter CRD not available"
+    kubectl get crd vitistacks.vitistack.io >/dev/null 2>&1 || error "Vitistack CRD not available"
     kubectl get crd machineproviders.vitistack.io >/dev/null 2>&1 || error "MachineProvider CRD not available"
     kubectl get crd kubernetesproviders.vitistack.io >/dev/null 2>&1 || error "KubernetesProvider CRD not available"
     kubectl get crd machines.vitistack.io >/dev/null 2>&1 || error "Machine CRD not available"
@@ -934,13 +934,13 @@ smoke_test() {
     log "Test 3: Testing webhook functionality..."
     cat <<EOF | kubectl apply -f - || error "Webhook validation failed"
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: smoke-test-datacenter
+  name: smoke-test-vitistack
   namespace: $TEST_NAMESPACE
 spec:
   region: us-west-2
-  description: "Smoke test datacenter"
+  description: "Smoke test vitistack"
   machineProviders: []
   kubernetesProviders: []
 EOF
@@ -948,7 +948,7 @@ EOF
     # Test 4: Controller reconciliation
     log "Test 4: Testing controller reconciliation..."
     sleep 5
-    kubectl get datacenter smoke-test-datacenter -n $TEST_NAMESPACE -o jsonpath='{.status.phase}' | grep -q "Ready\|Pending" || error "Controller not reconciling"
+    kubectl get vitistack smoke-test-vitistack -n $TEST_NAMESPACE -o jsonpath='{.status.phase}' | grep -q "Ready\|Pending" || error "Controller not reconciling"
 
     # Test 5: Metrics endpoint
     log "Test 5: Checking metrics endpoint..."
@@ -1037,7 +1037,7 @@ charts/vitistack-controller/
 │   ├── servicemonitor.yaml
 │   └── networkpolicy.yaml
 └── crds/
-    ├── datacenters.yaml
+    ├── vitistacks.yaml
     ├── machineproviders.yaml
     ├── kubernetesproviders.yaml
     └── machines.yaml

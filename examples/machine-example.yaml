@@ -236,10 +236,10 @@ spec:
 
   providerConfig:
     name: vsphere
-    region: datacenter-west
+    region: vitistack-west
     config:
       vcenter: vcenter.example.com
-      datacenter: DC-West
+      vitistack: DC-West
       cluster: Cluster-Test
       datastore: datastore-ssd
       folder: /VMs/Testing

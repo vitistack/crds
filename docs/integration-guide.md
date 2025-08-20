@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide demonstrates how the four VitiStack CRDs work together to create a complete infrastructure management solution. We'll walk through real-world scenarios showing the relationships between Datacenter, MachineProvider, KubernetesProvider, and Machine resources.
+This guide demonstrates how the four VitiStack CRDs work together to create a complete infrastructure management solution. We'll walk through real-world scenarios showing the relationships between Vitistack, MachineProvider, KubernetesProvider, and Machine resources.
 
 ## Integration Scenarios
 
@@ -10,17 +10,17 @@ This guide demonstrates how the four VitiStack CRDs work together to create a co
 
 This scenario shows how to deploy a complete Kubernetes cluster on AWS using all four CRDs.
 
-#### Step 1: Create the Datacenter
+#### Step 1: Create the Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: aws-production
   namespace: production
 spec:
   region: us-west-2
-  description: "Production datacenter in AWS US West 2"
+  description: "Production vitistack in AWS US West 2"
 
   # Network Configuration
   networking:
@@ -159,7 +159,7 @@ spec:
 
     # Networking
     networking:
-      vpcId: "vpc-12345678" # Reference to VPC created by Datacenter
+      vpcId: "vpc-12345678" # Reference to VPC created by Vitistack
       subnets:
         - subnet-12345678 # private-subnet-1
         - subnet-87654321 # private-subnet-2
@@ -449,7 +449,7 @@ kubectl create secret generic aws-credentials \
   --namespace=production
 
 # 3. Apply resources in dependency order
-kubectl apply -f datacenter.yaml
+kubectl apply -f vitistack.yaml
 kubectl apply -f machine-provider.yaml
 kubectl apply -f kubernetes-provider.yaml
 kubectl apply -f machine.yaml
@@ -457,25 +457,25 @@ kubectl apply -f machine.yaml
 
 ### Scenario 2: Multi-Cloud Disaster Recovery
 
-This scenario demonstrates a multi-cloud setup with primary and secondary datacenters.
+This scenario demonstrates a multi-cloud setup with primary and secondary vitistacks.
 
-#### Primary Datacenter (AWS)
+#### Primary Vitistack (AWS)
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: primary-datacenter
+  name: primary-vitistack
   namespace: production
 spec:
   region: us-west-2
-  description: "Primary production datacenter"
+  description: "Primary production vitistack"
 
   # Disaster Recovery Configuration
   disasterRecovery:
     enabled: true
     replicationTargets:
-      - name: secondary-datacenter
+      - name: secondary-vitistack
         namespace: production
         region: us-east-1
         provider: aws
@@ -493,24 +493,24 @@ spec:
       priority: 1
 ```
 
-#### Secondary Datacenter (Azure)
+#### Secondary Vitistack (Azure)
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: secondary-datacenter
+  name: secondary-vitistack
   namespace: production
 spec:
   region: east-us
-  description: "Secondary datacenter for disaster recovery"
+  description: "Secondary vitistack for disaster recovery"
 
-  # Mark as DR datacenter
+  # Mark as DR vitistack
   role: disaster-recovery
 
   # Reference to primary
-  primaryDatacenter:
-    name: primary-datacenter
+  primaryVitistack:
+    name: primary-vitistack
     namespace: production
 
   # Secondary providers
@@ -527,11 +527,11 @@ spec:
 
 This scenario shows how to deploy edge computing resources with central management.
 
-#### Central Management Datacenter
+#### Central Management Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: central-management
   namespace: edge-system
@@ -562,11 +562,11 @@ spec:
     aggregateEdgeLogs: true
 ```
 
-#### Edge Location Datacenter
+#### Edge Location Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: edge-west
   namespace: edge-west
@@ -574,11 +574,11 @@ spec:
   region: us-west
   description: "Edge location in US West"
 
-  # Mark as edge datacenter
+  # Mark as edge vitistack
   role: edge
 
   # Reference to central management
-  managementDatacenter:
+  managementVitistack:
     name: central-management
     namespace: edge-system
 
@@ -646,9 +646,9 @@ spec:
   # ... configuration
 ```
 
-### 2. Cross-Datacenter Resource Sharing
+### 2. Cross-Vitistack Resource Sharing
 
-Share resources across datacenters:
+Share resources across vitistacks:
 
 ```yaml
 # Shared storage provider
@@ -660,11 +660,11 @@ spec:
   type: aws
   # ... configuration
 
-  # Make available to multiple datacenters
+  # Make available to multiple vitistacks
   shareWith:
-    - datacenter: primary-datacenter
+    - vitistack: primary-vitistack
       namespace: production
-    - datacenter: secondary-datacenter
+    - vitistack: secondary-vitistack
       namespace: production
 
   # Shared storage configuration
@@ -683,22 +683,22 @@ spec:
 Implement hierarchical resource management:
 
 ```yaml
-# Parent datacenter
+# Parent vitistack
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: global-datacenter
+  name: global-vitistack
 spec:
   region: global
-  description: "Global datacenter for centralized management"
+  description: "Global vitistack for centralized management"
 
-  # Child datacenters
-  childDatacenters:
-    - name: us-datacenter
+  # Child vitistacks
+  childVitistacks:
+    - name: us-vitistack
       namespace: us-region
-    - name: eu-datacenter
+    - name: eu-vitistack
       namespace: eu-region
-    - name: asia-datacenter
+    - name: asia-vitistack
       namespace: asia-region
 
   # Global policies
@@ -718,19 +718,19 @@ spec:
       globalMaxClusters: 50
 
 ---
-# Child datacenter
+# Child vitistack
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: us-datacenter
+  name: us-vitistack
   namespace: us-region
 spec:
   region: us
-  description: "US regional datacenter"
+  description: "US regional vitistack"
 
   # Reference to parent
-  parentDatacenter:
-    name: global-datacenter
+  parentVitistack:
+    name: global-vitistack
     namespace: default
 
   # Inherit policies from parent
@@ -769,16 +769,16 @@ metadata:
   name: vitistack-alerts
 spec:
   groups:
-    - name: datacenter.rules
+    - name: vitistack.rules
       rules:
-        - alert: DatacenterProviderDown
-          expr: vitistack_datacenter_provider_status{status="ready"} == 0
+        - alert: VitistackProviderDown
+          expr: vitistack_vitistack_provider_status{status="ready"} == 0
           for: 5m
           labels:
             severity: critical
           annotations:
-            summary: "Datacenter provider is down"
-            description: "Provider {{ $labels.provider }} in datacenter {{ $labels.datacenter }} has been down for more than 5 minutes"
+            summary: "Vitistack provider is down"
+            description: "Provider {{ $labels.provider }} in vitistack {{ $labels.vitistack }} has been down for more than 5 minutes"
 
     - name: machine.rules
       rules:
@@ -810,7 +810,7 @@ spec:
 
    ```bash
    # Check provider references
-   kubectl get datacenter datacenter-name -o yaml | grep -A 10 machineProviders
+   kubectl get vitistack vitistack-name -o yaml | grep -A 10 machineProviders
    kubectl get machineprovider provider-name -o yaml
    ```
 
@@ -848,18 +848,18 @@ spec:
 
 ```bash
 # Get status of all CRDs
-kubectl get datacenters,machineproviders,kubernetesproviders,machines -A
+kubectl get vitistacks,machineproviders,kubernetesproviders,machines -A
 
 # Detailed resource inspection
-kubectl describe datacenter datacenter-name
-kubectl get datacenter datacenter-name -o yaml
+kubectl describe vitistack vitistack-name
+kubectl get vitistack vitistack-name -o yaml
 
 # Check controller logs
-kubectl logs -n vitistack-system deployment/datacenter-controller -f
+kubectl logs -n vitistack-system deployment/vitistack-controller -f
 kubectl logs -n vitistack-system deployment/machine-controller -f
 
 # Validate resource relationships
-kubectl get datacenter datacenter-name -o jsonpath='{.spec.machineProviders[*].name}'
+kubectl get vitistack vitistack-name -o jsonpath='{.spec.machineProviders[*].name}'
 kubectl get machineprovider provider-name -o jsonpath='{.status.conditions[*].type}'
 
 # Check events
@@ -873,8 +873,8 @@ kubectl get events --sort-by='.lastTimestamp' -A | grep -i vitistack
 Use consistent naming conventions across all resources:
 
 ```yaml
-# Datacenter: {environment}-{region}-datacenter
-name: production-us-west-datacenter
+# Vitistack: {environment}-{region}-vitistack
+name: production-us-west-vitistack
 
 # Provider: {provider-type}-{region}-provider
 name: aws-us-west-provider
@@ -890,13 +890,13 @@ Organize resources using namespaces:
 ```bash
 # Environment-based namespaces
 production/
-├── datacenter
+├── vitistack
 ├── machine-providers
 ├── kubernetes-providers
 └── machines
 
 staging/
-├── datacenter
+├── vitistack
 ├── machine-providers
 ├── kubernetes-providers
 └── machines
@@ -925,11 +925,11 @@ Store configurations in Git repositories:
 
 ```bash
 infrastructure/
-├── datacenters/
+├── vitistacks/
 │   ├── production/
-│   │   └── datacenter.yaml
+│   │   └── vitistack.yaml
 │   └── staging/
-│       └── datacenter.yaml
+│       └── vitistack.yaml
 ├── providers/
 │   ├── machine-providers/
 │   └── kubernetes-providers/
@@ -944,7 +944,7 @@ Test integrations thoroughly:
 
 ```bash
 # Dry-run configurations
-kubectl apply --dry-run=client -f datacenter.yaml
+kubectl apply --dry-run=client -f vitistack.yaml
 
 # Validate before applying
 kubectl apply --validate=true -f provider.yaml

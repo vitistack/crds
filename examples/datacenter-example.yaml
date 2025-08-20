@@ -1,18 +1,18 @@
-# Comprehensive Datacenter examples showcasing different configurations
+# Comprehensive Vitistack examples showcasing different configurations
 ---
-# Multi-cloud enterprise datacenter with comprehensive configuration
+# Multi-cloud enterprise vitistack with comprehensive configuration
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: enterprise-datacenter-east
+  name: enterprise-vitistack-east
   namespace: production
   labels:
     environment: production
     tier: enterprise
     region: us-east-1
 spec:
-  displayName: "Enterprise Datacenter East"
-  description: "Primary production datacenter in US East region with multi-cloud support"
+  displayName: "Enterprise Vitistack East"
+  description: "Primary production vitistack in US East region with multi-cloud support"
   region: us-east-1
   zone: us-east-1a
   location:
@@ -23,7 +23,7 @@ spec:
       latitude: "39.0458"
       longitude: "-77.4883"
 
-  # Machine providers available in this datacenter
+  # Machine providers available in this vitistack
   machineProviders:
     - name: aws-us-east-1
       namespace: providers
@@ -44,7 +44,7 @@ spec:
       priority: 3
       enabled: true
       configuration:
-        datacenter: "DC1"
+        vitistack: "DC1"
         cluster: "Prod-Cluster"
 
   # Kubernetes providers available
@@ -153,10 +153,10 @@ spec:
         encryption: true
         configuration:
           storageAccount: "companybackups"
-          container: "datacenter-backups"
+          container: "vitistack-backups"
     disasterRecovery:
       enabled: true
-      targetDatacenter: "enterprise-datacenter-west"
+      targetVitistack: "enterprise-vitistack-west"
       rpoMinutes: 15
       rtoMinutes: 60
 
@@ -177,19 +177,19 @@ spec:
     backup-policy: "enterprise"
 
 ---
-# Simple edge datacenter with minimal configuration
+# Simple edge vitistack with minimal configuration
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: edge-datacenter-west
+  name: edge-vitistack-west
   namespace: edge
   labels:
     environment: edge
     tier: basic
     region: us-west-2
 spec:
-  displayName: "Edge Datacenter West"
-  description: "Edge computing datacenter for low-latency workloads"
+  displayName: "Edge Vitistack West"
+  description: "Edge computing vitistack for low-latency workloads"
   region: us-west-2
   zone: us-west-2a
 
@@ -262,19 +262,19 @@ spec:
     tier: "basic"
 
 ---
-# On-premises datacenter with VMware and local storage
+# On-premises vitistack with VMware and local storage
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: onprem-datacenter-hq
+  name: onprem-vitistack-hq
   namespace: onprem
   labels:
     environment: production
     location: on-premises
     tier: enterprise
 spec:
-  displayName: "Headquarters Datacenter"
-  description: "On-premises datacenter with VMware vSphere and local Kubernetes"
+  displayName: "Headquarters Vitistack"
+  description: "On-premises vitistack with VMware vSphere and local Kubernetes"
   region: on-premises
   zone: rack-1
   location:
@@ -293,7 +293,7 @@ spec:
       enabled: true
       configuration:
         vcenter: "vcenter.company.com"
-        datacenter: "HQ-DC"
+        vitistack: "HQ-DC"
         cluster: "Production-Cluster-A"
     - name: vsphere-cluster-b
       namespace: providers
@@ -301,7 +301,7 @@ spec:
       enabled: true
       configuration:
         vcenter: "vcenter.company.com"
-        datacenter: "HQ-DC"
+        vitistack: "HQ-DC"
         cluster: "Production-Cluster-B"
 
   kubernetesProviders:
@@ -394,7 +394,7 @@ spec:
         encryption: true
         configuration:
           server: "nas01.company.local"
-          path: "/backups/datacenter"
+          path: "/backups/vitistack"
       - name: offsite-backup
         type: s3
         encryption: true
@@ -403,7 +403,7 @@ spec:
           region: "us-west-1"
     disasterRecovery:
       enabled: true
-      targetDatacenter: "colo-datacenter-backup"
+      targetVitistack: "colo-vitistack-backup"
       rpoMinutes: 30
       rtoMinutes: 120
 

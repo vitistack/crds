@@ -408,7 +408,7 @@ spec:
 apiVersion: vitistack.io/v1alpha1
 kind: MachineProvider
 metadata:
-  name: vsphere-datacenter-1
+  name: vsphere-vitistack-1
   namespace: providers
   labels:
     provider: vsphere
@@ -436,7 +436,7 @@ spec:
       name: vsphere-credentials
       namespace: providers
     parameters:
-      datacenter: "Datacenter-1"
+      vitistack: "Datacenter-1"
       cluster: "Production-Cluster"
 
   capabilities:
@@ -541,7 +541,7 @@ spec:
     "Datacenter": "DC1"
 
   config:
-    "datacenter": "Datacenter-1"
+    "vitistack": "Datacenter-1"
     "cluster": "Production-Cluster"
     "datastore": "shared-storage-01"
     "network": "production-portgroup"

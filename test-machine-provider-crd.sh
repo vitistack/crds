@@ -179,7 +179,7 @@ metadata:
   namespace: default
 spec:
   type: vsphere
-  region: datacenter1
+  region: TestRegion
   availabilityZones:
   - cluster1
   - cluster2

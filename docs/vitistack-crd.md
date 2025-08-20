@@ -1,12 +1,12 @@
-# Datacenter CRD Documentation
+# Vitistack CRD Documentation
 
 ## Overview
 
-The Datacenter Custom Resource Definition (CRD) represents a logical datacenter that ties together machine providers and Kubernetes providers within a specific geographical region or zone. It provides comprehensive configuration for networking, security, monitoring, backup, and resource management across multi-cloud and on-premises environments.
+The Vitistack Custom Resource Definition (CRD) represents a logical vitistack that ties together machine providers and Kubernetes providers within a specific geographical region or zone. It provides comprehensive configuration for networking, security, monitoring, backup, and resource management across multi-cloud and on-premises environments.
 
 ## Purpose
 
-- **Provider Orchestration**: Coordinate multiple machine and Kubernetes providers within a datacenter
+- **Provider Orchestration**: Coordinate multiple machine and Kubernetes providers within a vitistack
 - **Resource Management**: Define quotas and limits for compute, storage, and network resources
 - **Security Governance**: Enforce compliance frameworks, encryption, and access controls
 - **Operational Excellence**: Configure monitoring, backup, and disaster recovery policies
@@ -17,12 +17,12 @@ The Datacenter Custom Resource Definition (CRD) represents a logical datacenter 
 
 - **Group**: `vitistack.io`
 - **Version**: `v1alpha1`
-- **Kind**: `Datacenter`
+- **Kind**: `Vitistack`
 
 ## Resource Scope
 
 - **Scope**: Namespaced
-- **Short Name**: `dc`
+- **Short Name**: `vs`
 
 ## Spec Fields
 
@@ -30,9 +30,9 @@ The Datacenter Custom Resource Definition (CRD) represents a logical datacenter 
 
 | Field         | Type   | Required | Description                                         |
 | ------------- | ------ | -------- | --------------------------------------------------- |
-| `displayName` | string | ✅       | Human-readable name for the datacenter              |
-| `description` | string | ❌       | Additional context about the datacenter             |
-| `region`      | string | ✅       | Geographical region where the datacenter is located |
+| `displayName` | string | ✅       | Human-readable name for the vitistack              |
+| `description` | string | ❌       | Additional context about the vitistack             |
+| `region`      | string | ✅       | Geographical region where the vitistack is located |
 | `zone`        | string | ❌       | Availability zone within the region                 |
 | `location`    | object | ❌       | Detailed location information including coordinates |
 
@@ -40,8 +40,8 @@ The Datacenter Custom Resource Definition (CRD) represents a logical datacenter 
 
 | Field                 | Type  | Required | Description                                               |
 | --------------------- | ----- | -------- | --------------------------------------------------------- |
-| `machineProviders`    | array | ✅       | List of machine providers available in this datacenter    |
-| `kubernetesProviders` | array | ❌       | List of Kubernetes providers available in this datacenter |
+| `machineProviders`    | array | ✅       | List of machine providers available in this vitistack    |
+| `kubernetesProviders` | array | ❌       | List of Kubernetes providers available in this vitistack |
 
 #### Provider Reference Structure
 
@@ -190,7 +190,7 @@ destinations:
 ```yaml
 disasterRecovery:
   enabled: bool # Enable disaster recovery
-  targetDatacenter: string # Target datacenter for DR
+  targetVitistack: string # Target vitistack for DR
   rpoMinutes: int32 # Recovery Point Objective (minutes)
   rtoMinutes: int32 # Recovery Time Objective (minutes)
 ```
@@ -210,24 +210,24 @@ disasterRecovery:
 
 | Field  | Type | Required | Description                                                 |
 | ------ | ---- | -------- | ----------------------------------------------------------- |
-| `tags` | map  | ❌       | Key-value pairs for organizing and categorizing datacenters |
+| `tags` | map  | ❌       | Key-value pairs for organizing and categorizing vitistacks |
 
 ## Status Fields
 
-The status section provides real-time information about the datacenter's operational state.
+The status section provides real-time information about the vitistack's operational state.
 
 ### Core Status
 
 | Field                     | Type   | Description                                         |
 | ------------------------- | ------ | --------------------------------------------------- |
-| `phase`                   | string | Current datacenter phase                            |
-| `conditions`              | array  | Latest observations of datacenter state             |
+| `phase`                   | string | Current vitistack phase                            |
+| `conditions`              | array  | Latest observations of vitistack state             |
 | `machineProviderCount`    | int32  | Number of active machine providers                  |
 | `kubernetesProviderCount` | int32  | Number of active Kubernetes providers               |
 | `activeMachines`          | int32  | Number of active machines                           |
 | `activeClusters`          | int32  | Number of active Kubernetes clusters                |
-| `lastReconcileTime`       | time   | When the datacenter was last reconciled             |
-| `observedGeneration`      | int64  | Generation of the most recently observed Datacenter |
+| `lastReconcileTime`       | time   | When the vitistack was last reconciled             |
+| `observedGeneration`      | int64  | Generation of the most recently observed Vitistack |
 
 ### Resource Usage
 
@@ -260,18 +260,18 @@ providerStatuses:
 
 | Phase          | Description                     |
 | -------------- | ------------------------------- |
-| `Initializing` | Datacenter is being initialized |
+| `Initializing` | Vitistack is being initialized |
 | `Provisioning` | Resources are being provisioned |
-| `Ready`        | Datacenter is operational       |
+| `Ready`        | Vitistack is operational       |
 | `Degraded`     | Some components are unhealthy   |
-| `Deleting`     | Datacenter is being deleted     |
-| `Failed`       | Datacenter setup failed         |
+| `Deleting`     | Vitistack is being deleted     |
+| `Failed`       | Vitistack setup failed         |
 
 ## Conditions
 
 | Type                | Description                    |
 | ------------------- | ------------------------------ |
-| `Ready`             | Datacenter is ready for use    |
+| `Ready`             | Vitistack is ready for use    |
 | `ProvidersHealthy`  | All providers are healthy      |
 | `NetworkingReady`   | Network configuration is ready |
 | `MonitoringReady`   | Monitoring is configured       |
@@ -310,30 +310,30 @@ providerStatuses:
 
 ## Printer Columns
 
-When listing datacenters with `kubectl get datacenters`, the following columns are displayed:
+When listing vitistacks with `kubectl get vitistacks`, the following columns are displayed:
 
 | Column            | Description                    |
 | ----------------- | ------------------------------ |
-| NAME              | Datacenter name                |
+| NAME              | Vitistack name                |
 | PHASE             | Current phase                  |
 | REGION            | Geographical region            |
 | MACHINE PROVIDERS | Number of machine providers    |
 | K8S PROVIDERS     | Number of Kubernetes providers |
 | READY             | Ready condition status         |
-| AGE               | Age of the datacenter          |
+| AGE               | Age of the vitistack          |
 
 ## Examples
 
-### Multi-Cloud Enterprise Datacenter
+### Multi-Cloud Enterprise Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: enterprise-datacenter-east
+  name: enterprise-vitistack-east
   namespace: production
 spec:
-  displayName: "Enterprise Datacenter East"
+  displayName: "Enterprise Vitistack East"
   region: us-east-1
   zone: us-east-1a
 
@@ -377,16 +377,16 @@ spec:
     maxMemoryGB: 50000
 ```
 
-### Edge Datacenter
+### Edge Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: edge-datacenter-west
+  name: edge-vitistack-west
   namespace: edge
 spec:
-  displayName: "Edge Datacenter West"
+  displayName: "Edge Vitistack West"
   region: us-west-2
 
   machineProviders:
@@ -401,16 +401,16 @@ spec:
     maxMemoryGB: 2000
 ```
 
-### On-Premises Datacenter
+### On-Premises Vitistack
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: onprem-datacenter-hq
+  name: onprem-vitistack-hq
   namespace: onprem
 spec:
-  displayName: "Headquarters Datacenter"
+  displayName: "Headquarters Vitistack"
   region: on-premises
   location:
     country: "United States"
@@ -422,7 +422,7 @@ spec:
       enabled: true
       configuration:
         vcenter: "vcenter.company.com"
-        datacenter: "HQ-DC"
+        vitistack: "HQ-DC"
 
   kubernetesProviders:
     - name: rancher-provider
@@ -441,7 +441,7 @@ spec:
         type: nfs
         configuration:
           server: "nas01.company.local"
-          path: "/backups/datacenter"
+          path: "/backups/vitistack"
 ```
 
 ## Best Practices
@@ -455,7 +455,7 @@ spec:
 
 ### Networking
 
-1. **CIDR Planning**: Plan CIDR blocks to avoid conflicts between datacenters
+1. **CIDR Planning**: Plan CIDR blocks to avoid conflicts between vitistacks
 2. **Subnet Design**: Use separate subnets for different workload types
 3. **Firewall Rules**: Follow principle of least privilege for firewall rules
 4. **Load Balancers**: Configure appropriate load balancer types for workloads
@@ -493,20 +493,20 @@ spec:
 ### Debugging Commands
 
 ```bash
-# List all datacenters
-kubectl get datacenters
+# List all vitistacks
+kubectl get vitistacks
 
-# Get detailed datacenter information
-kubectl describe datacenter <name>
+# Get detailed vitistack information
+kubectl describe vitistack <name>
 
-# Check datacenter status
-kubectl get datacenter <name> -o jsonpath='{.status.phase}'
+# Check vitistack status
+kubectl get vitistack <name> -o jsonpath='{.status.phase}'
 
 # View provider statuses
-kubectl get datacenter <name> -o jsonpath='{.status.providerStatuses}'
+kubectl get vitistack <name> -o jsonpath='{.status.providerStatuses}'
 
 # Check resource usage
-kubectl get datacenter <name> -o jsonpath='{.status.resourceUsage}'
+kubectl get vitistack <name> -o jsonpath='{.status.resourceUsage}'
 ```
 
 ## Related Resources
@@ -518,4 +518,4 @@ kubectl get datacenter <name> -o jsonpath='{.status.resourceUsage}'
 
 ## API Reference
 
-For complete API reference including all fields, validations, and examples, see the generated OpenAPI schema in the CRD definition file: `crds/vitistack.io_datacenters.yaml`.
+For complete API reference including all fields, validations, and examples, see the generated OpenAPI schema in the CRD definition file: `crds/vitistack.io_vitistacks.yaml`.

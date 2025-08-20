@@ -16,7 +16,7 @@ VitiStack provides a comprehensive set of Kubernetes Custom Resource Definitions
 
 | Resource            | Kind               | Scope      | Description                                 |
 | ------------------- | ------------------ | ---------- | ------------------------------------------- |
-| datacenters         | Datacenter         | Namespaced | Logical datacenter or infrastructure region |
+| vitistacks         | Vitistack         | Namespaced | Logical vitistack or infrastructure region |
 | machineproviders    | MachineProvider    | Namespaced | Compute instance provisioning configuration |
 | kubernetesproviders | KubernetesProvider | Namespaced | Kubernetes cluster management configuration |
 | machines            | Machine            | Namespaced | Individual compute instance specification   |
@@ -53,17 +53,17 @@ status:
 
 ## Resource Specifications
 
-### Datacenter
+### Vitistack
 
-Represents a logical datacenter or infrastructure region that coordinates multiple providers and resources.
+Represents a logical vitistack or infrastructure region that coordinates multiple providers and resources.
 
 #### Full API Specification
 
 ```yaml
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: string                    # Required: Datacenter name
+  name: string                    # Required: Vitistack name
   namespace: string               # Required: Kubernetes namespace
 spec:
   # Basic Configuration
@@ -190,7 +190,7 @@ spec:
   disasterRecovery:
     enabled: boolean             # Enable DR configuration
     replicationTargets:          # DR replication targets
-      - name: string             # Target datacenter name
+      - name: string             # Target vitistack name
         namespace: string        # Target namespace
         region: string           # Target region
         provider: string         # Target provider
@@ -266,13 +266,13 @@ status:
   # Standard Status Fields
   phase: string                  # Pending, Initializing, Ready, Failed, Deleting
   conditions:
-    - type: string               # DatacenterReady, ProvidersReady, NetworkingReady, etc.
+    - type: string               # VitistackReady, ProvidersReady, NetworkingReady, etc.
       status: string             # True, False, Unknown
       reason: string             # Machine-readable reason
       message: string            # Human-readable message
       lastTransitionTime: timestamp
 
-  # Datacenter-Specific Status
+  # Vitistack-Specific Status
   providers:                     # Provider status summary
     machines:                    # Machine provider status
       total: integer             # Total number of machine providers
@@ -409,7 +409,7 @@ spec:
 
     # Networking
     networking:
-      vpcId: vpc-12345678 # VPC ID (optional, can be managed by Datacenter)
+      vpcId: vpc-12345678 # VPC ID (optional, can be managed by Vitistack)
       subnets: # Subnet IDs
         - subnet-12345678
         - subnet-87654321
@@ -1434,8 +1434,8 @@ All resources use standard Kubernetes condition types:
 
 | Resource           | Condition Type      | Description                          |
 | ------------------ | ------------------- | ------------------------------------ |
-| Datacenter         | `ProvidersReady`    | All referenced providers are ready   |
-| Datacenter         | `NetworkingReady`   | Networking configuration is complete |
+| Vitistack         | `ProvidersReady`    | All referenced providers are ready   |
+| Vitistack         | `NetworkingReady`   | Networking configuration is complete |
 | MachineProvider    | `CredentialsValid`  | Provider credentials are valid       |
 | MachineProvider    | `CapacityAvailable` | Provider has available capacity      |
 | KubernetesProvider | `ClusterReady`      | Kubernetes cluster is ready          |
@@ -1473,7 +1473,7 @@ API calls are subject to rate limiting to prevent abuse:
 
 | Resource Type      | Requests per Minute | Burst |
 | ------------------ | ------------------- | ----- |
-| Datacenter         | 30                  | 50    |
+| Vitistack         | 30                  | 50    |
 | MachineProvider    | 60                  | 100   |
 | KubernetesProvider | 30                  | 50    |
 | Machine            | 120                 | 200   |

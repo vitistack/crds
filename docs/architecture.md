@@ -2,13 +2,13 @@
 
 ## Overview
 
-VitiStack is a comprehensive Kubernetes-native infrastructure management platform that provides unified orchestration of compute resources, Kubernetes clusters, and datacenter operations across multi-cloud and on-premises environments. The system is built around four core Custom Resource Definitions (CRDs) that work together to provide a complete infrastructure-as-code solution.
+VitiStack is a comprehensive Kubernetes-native infrastructure management platform that provides unified orchestration of compute resources, Kubernetes clusters, and vitistack operations across multi-cloud and on-premises environments. The system is built around four core Custom Resource Definitions (CRDs) that work together to provide a complete infrastructure-as-code solution.
 
 ## Core Components
 
-### 1. Datacenter CRD
+### 1. Vitistack CRD
 
-The foundational component that represents a logical datacenter or infrastructure region.
+The foundational component that represents a logical vitistack or infrastructure region.
 
 **Responsibilities:**
 
@@ -89,14 +89,14 @@ Represents individual compute instances that make up Kubernetes clusters or stan
 │                     Kubernetes API Server                       │
 ├─────────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐ ┌──────────────┐ ┌─────────────┐ ┌──────────┐  │
-│  │ Datacenter  │ │ Machine      │ │ Kubernetes  │ │ Machine  │  │
+│  │ Vitistack  │ │ Machine      │ │ Kubernetes  │ │ Machine  │  │
 │  │ Controller  │ │ Provider     │ │ Provider    │ │          │  │
 │  │             │ │ Controller   │ │ Controller  │ │ Controller│  │
 │  └─────────────┘ └──────────────┘ └─────────────┘ └──────────┘  │
 ├─────────────────────────────────────────────────────────────────┤
 │                     Custom Resources                            │
 │  ┌─────────────┐ ┌──────────────┐ ┌─────────────┐ ┌──────────┐  │
-│  │ Datacenter  │ │ Machine      │ │ Kubernetes  │ │ Machine  │  │
+│  │ Vitistack  │ │ Machine      │ │ Kubernetes  │ │ Machine  │  │
 │  │ CRD         │ │ Provider     │ │ Provider    │ │ CRD      │  │
 │  │             │ │ CRD          │ │ CRD         │ │          │  │
 │  └─────────────┘ └──────────────┘ └─────────────┘ └──────────┘  │
@@ -114,7 +114,7 @@ Represents individual compute instances that make up Kubernetes clusters or stan
 ### Hierarchical Structure
 
 ```
-Datacenter (namespace-scoped)
+Vitistack (namespace-scoped)
 ├── MachineProvider (namespace-scoped)
 │   └── Machine (namespace-scoped)
 └── KubernetesProvider (namespace-scoped)
@@ -124,18 +124,18 @@ Datacenter (namespace-scoped)
 
 ### Reference Patterns
 
-1. **Datacenter → Providers**: Datacenters reference MachineProviders and KubernetesProviders
+1. **Vitistack → Providers**: Vitistacks reference MachineProviders and KubernetesProviders
 2. **Machine → MachineProvider**: Machines reference their MachineProvider for provisioning
 3. **KubernetesProvider → MachineProvider**: K8s providers can reference machine providers for worker nodes
 4. **Cross-Namespace References**: Providers and resources can be referenced across namespaces
 
 ## Data Flow
 
-### 1. Datacenter Initialization
+### 1. Vitistack Initialization
 
 ```
-1. User creates Datacenter resource
-2. Datacenter controller validates configuration
+1. User creates Vitistack resource
+2. Vitistack controller validates configuration
 3. Controller initializes networking (VPCs, subnets)
 4. Security policies are applied
 5. Provider references are validated
@@ -258,7 +258,7 @@ Datacenter (namespace-scoped)
 ```yaml
 # Simple single-cloud deployment
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: aws-production
 spec:
@@ -276,7 +276,7 @@ spec:
 ```yaml
 # Multi-cloud deployment with failover
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: multi-cloud-production
 spec:
@@ -295,9 +295,9 @@ spec:
 ```yaml
 # Hybrid cloud with on-premises integration
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: hybrid-datacenter
+  name: hybrid-vitistack
 spec:
   region: headquarters
   machineProviders:
@@ -312,7 +312,7 @@ spec:
 ```yaml
 # Edge computing deployment
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
   name: edge-location-west
 spec:
@@ -386,18 +386,18 @@ spec:
 
 ```bash
 # Check CRD status
-kubectl get datacenters,machineproviders,kubernetesproviders,machines
+kubectl get vitistacks,machineproviders,kubernetesproviders,machines
 
 # Describe resources for detailed information
-kubectl describe datacenter <name>
+kubectl describe vitistack <name>
 kubectl describe machineprovider <name>
 
 # Check controller logs
-kubectl logs -n vitistack-system deployment/datacenter-controller
+kubectl logs -n vitistack-system deployment/vitistack-controller
 kubectl logs -n vitistack-system deployment/machine-controller
 
 # Validate resource configurations
-kubectl validate -f datacenter.yaml
+kubectl validate -f vitistack.yaml
 kubectl dry-run=client -f machine.yaml
 ```
 
@@ -414,7 +414,7 @@ kubectl dry-run=client -f machine.yaml
 
 1. **AI/ML Integration**: Predictive scaling and anomaly detection
 2. **Advanced Security**: Zero-trust security model
-3. **Global Load Balancing**: Cross-datacenter load balancing
+3. **Global Load Balancing**: Cross-vitistack load balancing
 4. **Compliance Automation**: Automated compliance checking and reporting
 
 ### Long Term (12+ months)

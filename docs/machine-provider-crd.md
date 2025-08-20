@@ -18,7 +18,7 @@ Standard Kubernetes metadata with additional printer columns:
 
 - **Name**: Provider name
 - **Type**: Provider type (aws, azure, gcp, vsphere, etc.)
-- **Region**: Primary region/datacenter
+- **Region**: Primary region/vitistack
 - **Ready**: Provider readiness status
 - **Age**: Resource age
 
@@ -29,7 +29,7 @@ Standard Kubernetes metadata with additional printer columns:
 ```yaml
 spec:
   type: string                    # Provider type (aws, azure, gcp, vsphere, openstack, libvirt, proxmox)
-  region: string                  # Primary region or datacenter location
+  region: string                  # Primary region or vitistack location
   availabilityZones: []string     # Available zones within the region
 
   # Provider-specific configuration
@@ -316,7 +316,7 @@ status:
 - **AWS**: Requires valid region format (e.g., "us-west-2")
 - **Azure**: Requires valid resource group and subscription ID
 - **GCP**: Requires valid project ID and zone format
-- **vSphere**: Requires valid datacenter and cluster names
+- **vSphere**: Requires valid vitistack and cluster names
 - **OpenStack**: Requires valid tenant and domain configuration
 
 ## Examples
@@ -405,11 +405,11 @@ spec:
 apiVersion: vitistack.io/v1alpha1
 kind: MachineProvider
 metadata:
-  name: vsphere-datacenter1
+  name: vsphere-vitistack1
   namespace: default
 spec:
   type: vsphere
-  region: datacenter1
+  region: vitistack1
   availabilityZones:
     - cluster1
     - cluster2
@@ -419,7 +419,7 @@ spec:
     version: "7.0"
     timeout: 60s
     customSettings:
-      datacenter: "Datacenter1"
+      vitistack: "Vitistack1"
       datastore: "datastore1"
       resourcePool: "pool1"
 

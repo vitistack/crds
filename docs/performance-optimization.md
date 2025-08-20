@@ -609,8 +609,8 @@ func (p *CPUOptimizedProcessor) processItem(item WorkItem) {
 
     // CPU-intensive processing logic
     switch data := item.Data.(type) {
-    case *DatacenterSpec:
-        p.processDatacenter(item.Ctx, data)
+    case *VitistackSpec:
+        p.processVitistack(item.Ctx, data)
     case *MachineSpec:
         p.processMachine(item.Ctx, data)
     }
@@ -1392,7 +1392,7 @@ var (
             Name: "vitistack_resource_utilization_percent",
             Help: "Resource utilization percentage",
         },
-        []string{"resource_type", "datacenter"},
+        []string{"resource_type", "vitistack"},
     )
 )
 
@@ -1407,7 +1407,7 @@ func NewMetricsRecorder() *MetricsRecorder {
 }
 
 func (m *MetricsRecorder) RecordReconcileTime(duration time.Duration) {
-    reconcileTime.WithLabelValues("datacenter", "default").Observe(duration.Seconds())
+    reconcileTime.WithLabelValues("vitistack", "default").Observe(duration.Seconds())
 }
 
 func (m *MetricsRecorder) RecordQueueDepth(controller string, queueType string, depth int) {
@@ -1510,7 +1510,7 @@ data:
             "targets": [
               {
                 "expr": "vitistack_resource_utilization_percent",
-                "legendFormat": "{{ resource_type }} in {{ datacenter }}"
+                "legendFormat": "{{ resource_type }} in {{ vitistack }}"
               }
             ]
           }
@@ -1571,7 +1571,7 @@ echo "Starting VitiStack performance test suite..."
 # Test 1: Reconciliation Performance
 echo "Test 1: Reconciliation Performance"
 kubectl apply -f test/performance/high-load-scenario.yaml
-time kubectl wait --for=condition=Ready datacenters --all --timeout=600s
+time kubectl wait --for=condition=Ready vitistacks --all --timeout=600s
 
 # Test 2: Scaling Performance
 echo "Test 2: Scaling Performance"

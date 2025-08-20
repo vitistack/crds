@@ -80,7 +80,7 @@ This guide provides comprehensive testing strategies, test cases, integration sc
 #### Test Structure
 
 ```go
-// pkg/controller/datacenter_controller_test.go
+// pkg/controller/vitistack_controller_test.go
 package controller
 
 import (
@@ -101,24 +101,24 @@ import (
     vitistackv1alpha1 "github.com/vitistack/crds/pkg/apis/v1alpha1"
 )
 
-func TestDatacenterController_Reconcile(t *testing.T) {
+func TestVitistackController_Reconcile(t *testing.T) {
     tests := []struct {
         name           string
-        datacenter     *vitistackv1alpha1.Datacenter
+        vitistack     *vitistackv1alpha1.Vitistack
         existingObjs   []client.Object
-        expectedPhase  vitistackv1alpha1.DatacenterPhase
+        expectedPhase  vitistackv1alpha1.VitistackPhase
         expectedError  bool
         expectedEvents int
     }{
         {
-            name: "successful datacenter creation",
-            datacenter: &vitistackv1alpha1.Datacenter{
+            name: "successful vitistack creation",
+            vitistack: &vitistackv1alpha1.Vitistack{
                 ObjectMeta: metav1.ObjectMeta{
-                    Name:      "test-datacenter",
+                    Name:      "test-vitistack",
                     Namespace: "default",
                 },
-                Spec: vitistackv1alpha1.DatacenterSpec{
-                    Location: vitistackv1alpha1.DatacenterLocation{
+                Spec: vitistackv1alpha1.VitistackSpec{
+                    Location: vitistackv1alpha1.VitistackLocation{
                         Region: "us-east-1",
                         Zone:   "us-east-1a",
                     },
@@ -146,18 +146,18 @@ func TestDatacenterController_Reconcile(t *testing.T) {
                     },
                 },
             },
-            expectedPhase: vitistackv1alpha1.DatacenterPhaseReady,
+            expectedPhase: vitistackv1alpha1.VitistackPhaseReady,
             expectedError: false,
         },
         {
-            name: "datacenter with missing provider",
-            datacenter: &vitistackv1alpha1.Datacenter{
+            name: "vitistack with missing provider",
+            vitistack: &vitistackv1alpha1.Vitistack{
                 ObjectMeta: metav1.ObjectMeta{
-                    Name:      "test-datacenter",
+                    Name:      "test-vitistack",
                     Namespace: "default",
                 },
-                Spec: vitistackv1alpha1.DatacenterSpec{
-                    Location: vitistackv1alpha1.DatacenterLocation{
+                Spec: vitistackv1alpha1.VitistackSpec{
+                    Location: vitistackv1alpha1.VitistackLocation{
                         Region: "us-east-1",
                         Zone:   "us-east-1a",
                     },
@@ -168,7 +168,7 @@ func TestDatacenterController_Reconcile(t *testing.T) {
                     },
                 },
             },
-            expectedPhase: vitistackv1alpha1.DatacenterPhaseFailed,
+            expectedPhase: vitistackv1alpha1.VitistackPhaseFailed,
             expectedError: true,
         },
     }
@@ -179,15 +179,15 @@ func TestDatacenterController_Reconcile(t *testing.T) {
             scheme := runtime.NewScheme()
             require.NoError(t, vitistackv1alpha1.AddToScheme(scheme))
 
-            objs := append(tt.existingObjs, tt.datacenter)
+            objs := append(tt.existingObjs, tt.vitistack)
             fakeClient := fake.NewClientBuilder().
                 WithScheme(scheme).
                 WithObjects(objs...).
-                WithStatusSubresource(&vitistackv1alpha1.Datacenter{}).
+                WithStatusSubresource(&vitistackv1alpha1.Vitistack{}).
                 Build()
 
             // Create controller
-            reconciler := &DatacenterReconciler{
+            reconciler := &VitistackReconciler{
                 Client: fakeClient,
                 Scheme: scheme,
             }
@@ -195,8 +195,8 @@ func TestDatacenterController_Reconcile(t *testing.T) {
             // Execute reconciliation
             req := reconcile.Request{
                 NamespacedName: types.NamespacedName{
-                    Name:      tt.datacenter.Name,
-                    Namespace: tt.datacenter.Namespace,
+                    Name:      tt.vitistack.Name,
+                    Namespace: tt.vitistack.Namespace,
                 },
             }
 
@@ -211,26 +211,26 @@ func TestDatacenterController_Reconcile(t *testing.T) {
             }
 
             // Check updated status
-            var updatedDatacenter vitistackv1alpha1.Datacenter
-            err = fakeClient.Get(context.TODO(), req.NamespacedName, &updatedDatacenter)
+            var updatedVitistack vitistackv1alpha1.Vitistack
+            err = fakeClient.Get(context.TODO(), req.NamespacedName, &updatedVitistack)
             require.NoError(t, err)
-            assert.Equal(t, tt.expectedPhase, updatedDatacenter.Status.Phase)
+            assert.Equal(t, tt.expectedPhase, updatedVitistack.Status.Phase)
         })
     }
 }
 
-func TestDatacenterValidation(t *testing.T) {
+func TestVitistackValidation(t *testing.T) {
     tests := []struct {
         name        string
-        datacenter  *vitistackv1alpha1.Datacenter
+        vitistack  *vitistackv1alpha1.Vitistack
         expectError bool
         errorField  string
     }{
         {
-            name: "valid datacenter",
-            datacenter: &vitistackv1alpha1.Datacenter{
-                Spec: vitistackv1alpha1.DatacenterSpec{
-                    Location: vitistackv1alpha1.DatacenterLocation{
+            name: "valid vitistack",
+            vitistack: &vitistackv1alpha1.Vitistack{
+                Spec: vitistackv1alpha1.VitistackSpec{
+                    Location: vitistackv1alpha1.VitistackLocation{
                         Region: "us-east-1",
                         Zone:   "us-east-1a",
                     },
@@ -248,9 +248,9 @@ func TestDatacenterValidation(t *testing.T) {
         },
         {
             name: "invalid CIDR",
-            datacenter: &vitistackv1alpha1.Datacenter{
-                Spec: vitistackv1alpha1.DatacenterSpec{
-                    Location: vitistackv1alpha1.DatacenterLocation{
+            vitistack: &vitistackv1alpha1.Vitistack{
+                Spec: vitistackv1alpha1.VitistackSpec{
+                    Location: vitistackv1alpha1.VitistackLocation{
                         Region: "us-east-1",
                         Zone:   "us-east-1a",
                     },
@@ -271,7 +271,7 @@ func TestDatacenterValidation(t *testing.T) {
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            err := validateDatacenter(tt.datacenter)
+            err := validateVitistack(tt.vitistack)
             if tt.expectError {
                 assert.Error(t, err)
                 if tt.errorField != "" {
@@ -348,7 +348,7 @@ echo "Integration test environment ready"
 #### Integration Test Suite
 
 ```go
-// test/integration/datacenter_integration_test.go
+// test/integration/vitistack_integration_test.go
 package integration
 
 import (
@@ -364,16 +364,16 @@ import (
     vitistackv1alpha1 "github.com/vitistack/crds/pkg/apis/v1alpha1"
 )
 
-type DatacenterIntegrationTestSuite struct {
+type VitistackIntegrationTestSuite struct {
     suite.Suite
     testNamespace string
 }
 
-func (suite *DatacenterIntegrationTestSuite) SetupSuite() {
+func (suite *VitistackIntegrationTestSuite) SetupSuite() {
     suite.testNamespace = "vitistack-integration-test"
 }
 
-func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
+func (suite *VitistackIntegrationTestSuite) TestVitistackLifecycle() {
     ctx := context.Background()
 
     // Create machine provider
@@ -410,14 +410,14 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
     })
     suite.Require().NoError(err)
 
-    // Create datacenter
-    datacenter := &vitistackv1alpha1.Datacenter{
+    // Create vitistack
+    vitistack := &vitistackv1alpha1.Vitistack{
         ObjectMeta: metav1.ObjectMeta{
-            Name:      "test-datacenter",
+            Name:      "test-vitistack",
             Namespace: suite.testNamespace,
         },
-        Spec: vitistackv1alpha1.DatacenterSpec{
-            Location: vitistackv1alpha1.DatacenterLocation{
+        Spec: vitistackv1alpha1.VitistackSpec{
+            Location: vitistackv1alpha1.VitistackLocation{
                 Region: "us-east-1",
                 Zone:   "us-east-1a",
             },
@@ -427,20 +427,20 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
         },
     }
 
-    err = suite.k8sClient.Create(ctx, datacenter)
+    err = suite.k8sClient.Create(ctx, vitistack)
     suite.Require().NoError(err)
 
-    // Wait for datacenter to be ready
+    // Wait for vitistack to be ready
     err = wait.PollImmediate(10*time.Second, 5*time.Minute, func() (bool, error) {
-        var dc vitistackv1alpha1.Datacenter
+        var dc vitistackv1alpha1.Vitistack
         err := suite.k8sClient.Get(ctx, types.NamespacedName{
-            Name:      "test-datacenter",
+            Name:      "test-vitistack",
             Namespace: suite.testNamespace,
         }, &dc)
         if err != nil {
             return false, err
         }
-        return dc.Status.Phase == vitistackv1alpha1.DatacenterPhaseReady, nil
+        return dc.Status.Phase == vitistackv1alpha1.VitistackPhaseReady, nil
     })
     suite.Require().NoError(err)
 
@@ -451,8 +451,8 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
             Namespace: suite.testNamespace,
         },
         Spec: vitistackv1alpha1.MachineSpec{
-            DatacenterRef: vitistackv1alpha1.DatacenterRef{
-                Name: "test-datacenter",
+            VitistackRef: vitistackv1alpha1.VitistackRef{
+                Name: "test-vitistack",
             },
             MachineType: "t3.medium",
             Image: vitistackv1alpha1.ImageSpec{
@@ -483,29 +483,29 @@ func (suite *DatacenterIntegrationTestSuite) TestDatacenterLifecycle() {
     suite.cleanup()
 }
 
-func (suite *DatacenterIntegrationTestSuite) TestMultiProviderDatacenter() {
-    // Test datacenter with multiple providers
+func (suite *VitistackIntegrationTestSuite) TestMultiProviderVitistack() {
+    // Test vitistack with multiple providers
     // Implementation similar to above but with multiple providers
 }
 
-func (suite *DatacenterIntegrationTestSuite) TestCrossDatacenterMachine() {
-    // Test machine creation across different datacenters
+func (suite *VitistackIntegrationTestSuite) TestCrossVitistackMachine() {
+    // Test machine creation across different vitistacks
 }
 
-func (suite *DatacenterIntegrationTestSuite) cleanup() {
+func (suite *VitistackIntegrationTestSuite) cleanup() {
     ctx := context.Background()
 
     // Delete all test resources
     suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Machine{},
         client.InNamespace(suite.testNamespace))
-    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Datacenter{},
+    suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.Vitistack{},
         client.InNamespace(suite.testNamespace))
     suite.k8sClient.DeleteAllOf(ctx, &vitistackv1alpha1.MachineProvider{},
         client.InNamespace(suite.testNamespace))
 }
 
-func TestDatacenterIntegrationSuite(t *testing.T) {
-    suite.Run(t, new(DatacenterIntegrationTestSuite))
+func TestVitistackIntegrationSuite(t *testing.T) {
+    suite.Run(t, new(VitistackIntegrationTestSuite))
 }
 ```
 
@@ -522,11 +522,11 @@ echo "Testing AWS + Azure multi-cloud scenario..."
 kubectl apply -f test/integration/scenarios/aws-azure-multicloud.yaml
 
 # Wait for resources to be ready
-kubectl wait --for=condition=Ready datacenter/multi-cloud-datacenter --timeout=600s
+kubectl wait --for=condition=Ready vitistack/multi-cloud-vitistack --timeout=600s
 
 # Verify cross-cloud functionality
 kubectl get machines -o wide
-kubectl describe datacenter multi-cloud-datacenter
+kubectl describe vitistack multi-cloud-vitistack
 
 # Test GCP + AWS integration
 echo "Testing GCP + AWS multi-cloud scenario..."
@@ -539,11 +539,11 @@ kubectl get machineproviders -o jsonpath='{range .items[*]}{.metadata.name}{"\t"
 echo "Testing disaster recovery scenario..."
 kubectl apply -f test/integration/scenarios/disaster-recovery.yaml
 
-# Simulate primary datacenter failure
-kubectl patch datacenter primary-datacenter -p='{"spec":{"enabled":false}}'
+# Simulate primary vitistack failure
+kubectl patch vitistack primary-vitistack -p='{"spec":{"enabled":false}}'
 
-# Verify failover to secondary datacenter
-kubectl wait --for=condition=Ready datacenter/secondary-datacenter --timeout=300s
+# Verify failover to secondary vitistack
+kubectl wait --for=condition=Ready vitistack/secondary-vitistack --timeout=300s
 
 echo "Multi-cloud integration tests completed"
 ```
@@ -569,7 +569,7 @@ data:
           - action: "create-provider"
             provider: "aws"
             region: "us-east-1"
-          - action: "create-datacenter"
+          - action: "create-vitistack"
             providers: ["aws-provider"]
           - action: "create-machines"
             count: 3
@@ -586,7 +586,7 @@ data:
           - action: "create-provider"
             provider: "azure"
             region: "eastus"
-          - action: "create-datacenter"
+          - action: "create-vitistack"
             providers: ["aws-provider", "azure-provider"]
           - action: "create-machines"
             distribution: "balanced"
@@ -598,16 +598,16 @@ data:
       - name: "disaster-recovery"
         description: "Test disaster recovery capabilities"
         steps:
-          - action: "create-primary-datacenter"
+          - action: "create-primary-vitistack"
             provider: "aws"
             region: "us-east-1"
-          - action: "create-secondary-datacenter"
+          - action: "create-secondary-vitistack"
             provider: "aws"
             region: "us-west-2"
           - action: "deploy-application"
             replicas: 3
           - action: "simulate-disaster"
-            target: "primary-datacenter"
+            target: "primary-vitistack"
           - action: "verify-failover"
           - action: "verify-data-consistency"
           - action: "cleanup"
@@ -694,8 +694,8 @@ run_single_cloud_test() {
     # Apply single cloud configuration
     envsubst < test/e2e/scenarios/single-cloud.yaml | kubectl apply -f - -n $TEST_NAMESPACE
 
-    # Wait for datacenter to be ready
-    kubectl wait --for=condition=Ready datacenter/single-cloud-dc -n $TEST_NAMESPACE --timeout=600s
+    # Wait for vitistack to be ready
+    kubectl wait --for=condition=Ready vitistack/single-cloud-dc -n $TEST_NAMESPACE --timeout=600s
 
     # Create test machines
     for i in {1..3}; do
@@ -722,8 +722,8 @@ run_multi_cloud_test() {
     # Apply multi-cloud configuration
     envsubst < test/e2e/scenarios/multi-cloud.yaml | kubectl apply -f - -n $TEST_NAMESPACE
 
-    # Wait for all datacenters to be ready
-    kubectl wait --for=condition=Ready datacenters --all -n $TEST_NAMESPACE --timeout=900s
+    # Wait for all vitistacks to be ready
+    kubectl wait --for=condition=Ready vitistacks --all -n $TEST_NAMESPACE --timeout=900s
 
     # Create machines across clouds
     create_distributed_machines $TEST_NAMESPACE
@@ -740,11 +740,11 @@ run_multi_cloud_test() {
 run_disaster_recovery_test() {
     echo "Executing disaster recovery test..."
 
-    # Deploy primary and secondary datacenters
+    # Deploy primary and secondary vitistacks
     envsubst < test/e2e/scenarios/disaster-recovery.yaml | kubectl apply -f - -n $TEST_NAMESPACE
 
-    # Wait for primary datacenter
-    kubectl wait --for=condition=Ready datacenter/primary-dc -n $TEST_NAMESPACE --timeout=600s
+    # Wait for primary vitistack
+    kubectl wait --for=condition=Ready vitistack/primary-dc -n $TEST_NAMESPACE --timeout=600s
 
     # Deploy application to primary
     kubectl apply -f test/e2e/apps/sample-app.yaml -n $TEST_NAMESPACE
@@ -753,10 +753,10 @@ run_disaster_recovery_test() {
     kubectl wait --for=condition=Available deployment/sample-app -n $TEST_NAMESPACE --timeout=300s
 
     # Simulate disaster
-    simulate_datacenter_failure "primary-dc" $TEST_NAMESPACE
+    simulate_vitistack_failure "primary-dc" $TEST_NAMESPACE
 
     # Verify failover to secondary
-    kubectl wait --for=condition=Ready datacenter/secondary-dc -n $TEST_NAMESPACE --timeout=600s
+    kubectl wait --for=condition=Ready vitistack/secondary-dc -n $TEST_NAMESPACE --timeout=600s
 
     # Verify application recovery
     verify_application_recovery $TEST_NAMESPACE
@@ -796,16 +796,16 @@ verify_cross_cloud_networking() {
     fi
 }
 
-simulate_datacenter_failure() {
-    local datacenter_name=$1
+simulate_vitistack_failure() {
+    local vitistack_name=$1
     local namespace=$2
-    echo "Simulating failure of datacenter: $datacenter_name"
+    echo "Simulating failure of vitistack: $vitistack_name"
 
-    # Disable datacenter
-    kubectl patch datacenter $datacenter_name -n $namespace -p='{"spec":{"enabled":false}}'
+    # Disable vitistack
+    kubectl patch vitistack $vitistack_name -n $namespace -p='{"spec":{"enabled":false}}'
 
     # Wait for machines to be drained
-    kubectl wait --for=delete machines -l datacenter=$datacenter_name -n $namespace --timeout=600s
+    kubectl wait --for=delete machines -l vitistack=$vitistack_name -n $namespace --timeout=600s
 }
 
 cleanup_test_environment() {
@@ -881,8 +881,8 @@ metadata:
   name: load-test-machine-$i
   namespace: $TEST_NAMESPACE
 spec:
-  datacenterRef:
-    name: load-test-datacenter
+  vitistackRef:
+    name: load-test-vitistack
   machineType: t3.micro
   image:
     name: ubuntu-20.04
@@ -954,20 +954,20 @@ import (
     vitistackv1alpha1 "github.com/vitistack/crds/pkg/apis/v1alpha1"
 )
 
-func BenchmarkDatacenterReconciliation(b *testing.B) {
+func BenchmarkVitistackReconciliation(b *testing.B) {
     // Setup test environment
     ctx := context.Background()
 
     b.ResetTimer()
 
     for i := 0; i < b.N; i++ {
-        datacenter := &vitistackv1alpha1.Datacenter{
+        vitistack := &vitistackv1alpha1.Vitistack{
             ObjectMeta: metav1.ObjectMeta{
                 Name:      fmt.Sprintf("benchmark-dc-%d", i),
                 Namespace: "default",
             },
-            Spec: vitistackv1alpha1.DatacenterSpec{
-                Location: vitistackv1alpha1.DatacenterLocation{
+            Spec: vitistackv1alpha1.VitistackSpec{
+                Location: vitistackv1alpha1.VitistackLocation{
                     Region: "us-east-1",
                     Zone:   "us-east-1a",
                 },
@@ -975,31 +975,31 @@ func BenchmarkDatacenterReconciliation(b *testing.B) {
         }
 
         start := time.Now()
-        err := k8sClient.Create(ctx, datacenter)
+        err := k8sClient.Create(ctx, vitistack)
         if err != nil {
-            b.Fatalf("Failed to create datacenter: %v", err)
+            b.Fatalf("Failed to create vitistack: %v", err)
         }
 
         // Wait for reconciliation
-        err = waitForDatacenterReady(ctx, datacenter.Name, 5*time.Minute)
+        err = waitForVitistackReady(ctx, vitistack.Name, 5*time.Minute)
         if err != nil {
-            b.Fatalf("Datacenter not ready: %v", err)
+            b.Fatalf("Vitistack not ready: %v", err)
         }
 
         elapsed := time.Since(start)
-        b.Logf("Datacenter %d reconciled in %v", i, elapsed)
+        b.Logf("Vitistack %d reconciled in %v", i, elapsed)
 
         // Cleanup
-        k8sClient.Delete(ctx, datacenter)
+        k8sClient.Delete(ctx, vitistack)
     }
 }
 
 func BenchmarkMachineProvisioning(b *testing.B) {
     ctx := context.Background()
 
-    // Pre-create datacenter
-    datacenter := createTestDatacenter(ctx, "benchmark-datacenter")
-    defer k8sClient.Delete(ctx, datacenter)
+    // Pre-create vitistack
+    vitistack := createTestVitistack(ctx, "benchmark-vitistack")
+    defer k8sClient.Delete(ctx, vitistack)
 
     b.ResetTimer()
 
@@ -1010,8 +1010,8 @@ func BenchmarkMachineProvisioning(b *testing.B) {
                 Namespace: "default",
             },
             Spec: vitistackv1alpha1.MachineSpec{
-                DatacenterRef: vitistackv1alpha1.DatacenterRef{
-                    Name: datacenter.Name,
+                VitistackRef: vitistackv1alpha1.VitistackRef{
+                    Name: vitistack.Name,
                 },
                 MachineType: "t3.micro",
             },
@@ -1052,10 +1052,10 @@ func BenchmarkConcurrentReconciliation(b *testing.B) {
             go func(index int) {
                 defer wg.Done()
 
-                datacenter := createTestDatacenter(ctx, fmt.Sprintf("concurrent-dc-%d-%d", i, index))
-                defer k8sClient.Delete(ctx, datacenter)
+                vitistack := createTestVitistack(ctx, fmt.Sprintf("concurrent-dc-%d-%d", i, index))
+                defer k8sClient.Delete(ctx, vitistack)
 
-                err := waitForDatacenterReady(ctx, datacenter.Name, 5*time.Minute)
+                err := waitForVitistackReady(ctx, vitistack.Name, 5*time.Minute)
                 if err != nil {
                     errors <- err
                 }
@@ -1094,7 +1094,7 @@ kubectl delete pod -n vitistack-system -l app=vitistack-controller
 kubectl wait --for=condition=Ready pod -n vitistack-system -l app=vitistack-controller --timeout=300s
 
 # Verify system recovery
-kubectl get datacenters
+kubectl get vitistacks
 kubectl get machines --all-namespaces
 
 # Test 2: Network Partitioning
@@ -1146,7 +1146,7 @@ data:
           - action: "wait-for-recovery"
             timeout: "300s"
           - action: "verify-functionality"
-            tests: ["datacenter-creation", "machine-provisioning"]
+            tests: ["vitistack-creation", "machine-provisioning"]
       
       - name: "etcd-network-partition"
         description: "Simulate etcd network partition"
@@ -1190,31 +1190,31 @@ echo "Starting resilience testing..."
 
 # Function to check system health
 check_system_health() {
-    local expected_datacenters=$1
+    local expected_vitistacks=$1
     local expected_machines=$2
 
-    local actual_datacenters=$(kubectl get datacenters --no-headers | wc -l)
+    local actual_vitistacks=$(kubectl get vitistacks --no-headers | wc -l)
     local actual_machines=$(kubectl get machines --all-namespaces --no-headers | wc -l)
 
-    if [ "$actual_datacenters" -eq "$expected_datacenters" ] && [ "$actual_machines" -eq "$expected_machines" ]; then
+    if [ "$actual_vitistacks" -eq "$expected_vitistacks" ] && [ "$actual_machines" -eq "$expected_machines" ]; then
         echo "✅ System health check passed"
         return 0
     else
         echo "❌ System health check failed"
-        echo "Expected: $expected_datacenters datacenters, $expected_machines machines"
-        echo "Actual: $actual_datacenters datacenters, $actual_machines machines"
+        echo "Expected: $expected_vitistacks vitistacks, $expected_machines machines"
+        echo "Actual: $actual_vitistacks vitistacks, $actual_machines machines"
         return 1
     fi
 }
 
 # Initial setup
 kubectl apply -f test/resilience/initial-setup.yaml
-kubectl wait --for=condition=Ready datacenters --all --timeout=600s
+kubectl wait --for=condition=Ready vitistacks --all --timeout=600s
 
-initial_datacenters=$(kubectl get datacenters --no-headers | wc -l)
+initial_vitistacks=$(kubectl get vitistacks --no-headers | wc -l)
 initial_machines=$(kubectl get machines --all-namespaces --no-headers | wc -l)
 
-echo "Initial state: $initial_datacenters datacenters, $initial_machines machines"
+echo "Initial state: $initial_vitistacks vitistacks, $initial_machines machines"
 
 # Test scenarios
 test_scenarios=(
@@ -1235,7 +1235,7 @@ for scenario in "${test_scenarios[@]}"; do
     sleep 30
 
     # Check system health
-    if check_system_health $initial_datacenters $initial_machines; then
+    if check_system_health $initial_vitistacks $initial_machines; then
         echo "✅ Resilience test $scenario passed"
     else
         echo "❌ Resilience test $scenario failed"
@@ -1296,12 +1296,12 @@ kubectl create clusterrolebinding test-user-binding \
     --clusterrole=view \
     --serviceaccount=default:test-user
 
-# Try to create datacenter with limited permissions
+# Try to create vitistack with limited permissions
 kubectl --as=system:serviceaccount:default:test-user apply -f - <<EOF
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: rbac-test-datacenter
+  name: rbac-test-vitistack
 spec:
   location:
     region: us-east-1
@@ -1335,9 +1335,9 @@ echo "Running encryption and data protection tests..."
 echo "Test 1: Testing encryption at rest"
 cat <<EOF | kubectl apply -f -
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: encryption-test-datacenter
+  name: encryption-test-vitistack
 spec:
   location:
     region: us-east-1
@@ -1348,10 +1348,10 @@ spec:
       algorithm: "AES-256"
 EOF
 
-kubectl wait --for=condition=Ready datacenter/encryption-test-datacenter --timeout=600s
+kubectl wait --for=condition=Ready vitistack/encryption-test-vitistack --timeout=600s
 
 # Verify encryption is enabled
-encryption_status=$(kubectl get datacenter encryption-test-datacenter -o jsonpath='{.status.security.encryption.status}')
+encryption_status=$(kubectl get vitistack encryption-test-vitistack -o jsonpath='{.status.security.encryption.status}')
 if [ "$encryption_status" = "enabled" ]; then
     echo "✅ Encryption at rest verified"
 else
@@ -1371,9 +1371,9 @@ echo "✅ Secret encryption test (manual verification required)"
 echo "Test 3: Testing network encryption"
 cat <<EOF | kubectl apply -f -
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: network-encryption-datacenter
+  name: network-encryption-vitistack
 spec:
   location:
     region: us-east-1
@@ -1389,12 +1389,12 @@ spec:
       encryption: true
 EOF
 
-kubectl wait --for=condition=Ready datacenter/network-encryption-datacenter --timeout=600s
+kubectl wait --for=condition=Ready vitistack/network-encryption-vitistack --timeout=600s
 echo "✅ Network encryption configured"
 
 # Cleanup
-kubectl delete datacenter encryption-test-datacenter
-kubectl delete datacenter network-encryption-datacenter
+kubectl delete vitistack encryption-test-vitistack
+kubectl delete vitistack network-encryption-vitistack
 kubectl delete secret test-secret
 ```
 
@@ -1414,9 +1414,9 @@ echo "Running compliance validation tests..."
 echo "Test 1: SOC 2 Type II compliance validation"
 cat <<EOF | kubectl apply -f -
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: soc2-compliant-datacenter
+  name: soc2-compliant-vitistack
 spec:
   location:
     region: us-east-1
@@ -1435,10 +1435,10 @@ spec:
       inTransit: true
 EOF
 
-kubectl wait --for=condition=Ready datacenter/soc2-compliant-datacenter --timeout=600s
+kubectl wait --for=condition=Ready vitistack/soc2-compliant-vitistack --timeout=600s
 
 # Verify compliance settings
-compliance_status=$(kubectl get datacenter soc2-compliant-datacenter -o jsonpath='{.status.compliance.SOC2-TypeII.status}')
+compliance_status=$(kubectl get vitistack soc2-compliant-vitistack -o jsonpath='{.status.compliance.SOC2-TypeII.status}')
 if [ "$compliance_status" = "compliant" ]; then
     echo "✅ SOC 2 compliance verified"
 else
@@ -1449,9 +1449,9 @@ fi
 echo "Test 2: GDPR compliance validation"
 cat <<EOF | kubectl apply -f -
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: gdpr-compliant-datacenter
+  name: gdpr-compliant-vitistack
 spec:
   location:
     region: eu-west-1
@@ -1468,16 +1468,16 @@ spec:
     rightToBeErasure: true
 EOF
 
-kubectl wait --for=condition=Ready datacenter/gdpr-compliant-datacenter --timeout=600s
+kubectl wait --for=condition=Ready vitistack/gdpr-compliant-vitistack --timeout=600s
 echo "✅ GDPR compliance configured"
 
 # Test 3: HIPAA Compliance
 echo "Test 3: HIPAA compliance validation"
 cat <<EOF | kubectl apply -f -
 apiVersion: vitistack.io/v1alpha1
-kind: Datacenter
+kind: Vitistack
 metadata:
-  name: hipaa-compliant-datacenter
+  name: hipaa-compliant-vitistack
 spec:
   location:
     region: us-east-1
@@ -1497,7 +1497,7 @@ spec:
       sessionTimeout: 15  # minutes
 EOF
 
-kubectl wait --for=condition=Ready datacenter/hipaa-compliant-datacenter --timeout=600s
+kubectl wait --for=condition=Ready vitistack/hipaa-compliant-vitistack --timeout=600s
 echo "✅ HIPAA compliance configured"
 
 # Generate compliance report
@@ -1506,7 +1506,7 @@ generate_compliance_report() {
     echo "Generated: $(date)" >> compliance-report.txt
     echo "" >> compliance-report.txt
 
-    kubectl get datacenters -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.complianceFrameworks}{"\t"}{.status.compliance}{"\n"}{end}' >> compliance-report.txt
+    kubectl get vitistacks -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.security.complianceFrameworks}{"\t"}{.status.compliance}{"\n"}{end}' >> compliance-report.txt
 
     echo "Compliance report generated: compliance-report.txt"
 }
@@ -1514,9 +1514,9 @@ generate_compliance_report() {
 generate_compliance_report
 
 # Cleanup
-kubectl delete datacenter soc2-compliant-datacenter
-kubectl delete datacenter gdpr-compliant-datacenter
-kubectl delete datacenter hipaa-compliant-datacenter
+kubectl delete vitistack soc2-compliant-vitistack
+kubectl delete vitistack gdpr-compliant-vitistack
+kubectl delete vitistack hipaa-compliant-vitistack
 ```
 
 ## Test Automation

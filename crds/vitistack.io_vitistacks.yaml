@@ -4,16 +4,16 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.18.0
-  name: datacenters.vitistack.io
+  name: vitistacks.vitistack.io
 spec:
   group: vitistack.io
   names:
-    kind: Datacenter
-    listKind: DatacenterList
-    plural: datacenters
+    kind: Vitistack
+    listKind: VitistackList
+    plural: vitistacks
     shortNames:
-    - dc
-    singular: datacenter
+    - vs
+    singular: vitistack
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -65,7 +65,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: DatacenterSpec defines the desired state of Datacenter
+            description: VitistackSpec defines the desired state of Vitistack
             properties:
               backup:
                 description: Backup configures backup and disaster recovery policies
@@ -73,7 +73,7 @@ spec:
                   destinations:
                     description: Destinations where backups are stored
                     items:
-                      description: DatacenterBackupDestination defines backup storage
+                      description: VitistackBackupDestination defines backup storage
                         destination
                       properties:
                         configuration:
@@ -119,8 +119,8 @@ spec:
                         format: int32
                         minimum: 1
                         type: integer
-                      targetDatacenter:
-                        description: TargetDatacenter for disaster recovery
+                      targetVitistack:
+                        description: TargetVitistack for disaster recovery
                         type: string
                     type: object
                   enabled:
@@ -155,23 +155,23 @@ spec:
                     type: string
                 type: object
               description:
-                description: Description provides additional context about the datacenter
+                description: Description provides additional context about the vitistack
                 type: string
               displayName:
-                description: DisplayName is the human-readable name for the datacenter
+                description: DisplayName is the human-readable name for the vitistack
                 type: string
               kubernetesProviders:
                 description: KubernetesProviders lists the Kubernetes providers available
-                  in this datacenter
+                  in this vitistack
                 items:
-                  description: DatacenterProviderReference references a provider available
-                    in this datacenter
+                  description: VitistackProviderReference references a provider available
+                    in this vitistack
                   properties:
                     configuration:
                       additionalProperties:
                         type: string
                       description: Configuration provides provider-specific settings
-                        for this datacenter
+                        for this vitistack
                       type: object
                     enabled:
                       default: true
@@ -199,13 +199,13 @@ spec:
                 description: Location provides detailed location information
                 properties:
                   address:
-                    description: Address of the datacenter
+                    description: Address of the vitistack
                     type: string
                   city:
-                    description: City where the datacenter is located
+                    description: City where the vitistack is located
                     type: string
                   coordinates:
-                    description: Coordinates for the datacenter location
+                    description: Coordinates for the vitistack location
                     properties:
                       latitude:
                         description: Latitude coordinate (-90 to 90)
@@ -217,21 +217,21 @@ spec:
                         type: string
                     type: object
                   country:
-                    description: Country where the datacenter is located
+                    description: Country where the vitistack is located
                     type: string
                 type: object
               machineProviders:
                 description: MachineProviders lists the machine providers available
-                  in this datacenter
+                  in this vitistack
                 items:
-                  description: DatacenterProviderReference references a provider available
-                    in this datacenter
+                  description: VitistackProviderReference references a provider available
+                    in this vitistack
                   properties:
                     configuration:
                       additionalProperties:
                         type: string
                       description: Configuration provides provider-specific settings
-                        for this datacenter
+                        for this vitistack
                       type: object
                     enabled:
                       default: true
@@ -257,7 +257,7 @@ spec:
                 type: array
               monitoring:
                 description: Monitoring configures monitoring and observability for
-                  the datacenter
+                  the vitistack
                 properties:
                   alertReceivers:
                     description: AlertReceivers list contact points for alerts
@@ -287,13 +287,13 @@ spec:
                 type: object
               networking:
                 description: Networking defines the network configuration for the
-                  datacenter
+                  vitistack
                 properties:
                   dns:
-                    description: DNS configuration for the datacenter
+                    description: DNS configuration for the vitistack
                     properties:
                       domain:
-                        description: Domain is the default domain for the datacenter
+                        description: Domain is the default domain for the vitistack
                         type: string
                       searchDomains:
                         description: SearchDomains for DNS resolution
@@ -319,7 +319,7 @@ spec:
                       rules:
                         description: Rules define specific firewall rules
                         items:
-                          description: DatacenterFirewallRule defines a firewall rule
+                          description: VitistackFirewallRule defines a firewall rule
                           properties:
                             action:
                               description: Action to take (allow, deny)
@@ -357,7 +357,7 @@ spec:
                   loadBalancers:
                     description: LoadBalancers define available load balancer configurations
                     items:
-                      description: DatacenterLoadBalancer defines load balancer configuration
+                      description: VitistackLoadBalancer defines load balancer configuration
                       properties:
                         name:
                           description: Name of the load balancer
@@ -386,7 +386,7 @@ spec:
                   vpcs:
                     description: VPCs define the virtual private clouds available
                     items:
-                      description: DatacenterVPC defines a virtual private cloud
+                      description: VitistackVPC defines a virtual private cloud
                       properties:
                         cidr:
                           description: CIDR block for the VPC
@@ -401,8 +401,8 @@ spec:
                         subnets:
                           description: Subnets within the VPC
                           items:
-                            description: DatacenterSubnet defines a subnet within
-                              a VPC
+                            description: VitistackSubnet defines a subnet within a
+                              VPC
                             properties:
                               cidr:
                                 description: CIDR block for the subnet
@@ -430,12 +430,12 @@ spec:
                     type: array
                 type: object
               region:
-                description: Region specifies the geographical region where the datacenter
+                description: Region specifies the geographical region where the vitistack
                   is located
                 minLength: 0
                 type: string
               resourceQuotas:
-                description: ResourceQuotas define resource limits for the datacenter
+                description: ResourceQuotas define resource limits for the vitistack
                 properties:
                   maxCPUCores:
                     description: MaxCPUCores limits total CPU cores
@@ -476,13 +476,13 @@ spec:
                     properties:
                       allowedGroups:
                         description: AllowedGroups list groups who can access resources
-                          in this datacenter
+                          in this vitistack
                         items:
                           type: string
                         type: array
                       allowedUsers:
                         description: AllowedUsers list users who can access resources
-                          in this datacenter
+                          in this vitistack
                         items:
                           type: string
                         type: array
@@ -547,7 +547,7 @@ spec:
               tags:
                 additionalProperties:
                   type: string
-                description: Tags for organizing and categorizing datacenters
+                description: Tags for organizing and categorizing vitistacks
                 type: object
               zone:
                 description: Zone specifies the availability zone within the region
@@ -559,7 +559,7 @@ spec:
             - zone
             type: object
           status:
-            description: DatacenterStatus defines the observed state of Datacenter
+            description: VitistackStatus defines the observed state of Vitistack
             properties:
               activeClusters:
                 description: ActiveClusters is the number of active Kubernetes clusters
@@ -567,12 +567,12 @@ spec:
                 type: integer
               activeMachines:
                 description: ActiveMachines is the number of active machines in the
-                  datacenter
+                  vitistack
                 format: int32
                 type: integer
               conditions:
                 description: Conditions represent the latest available observations
-                  of datacenter state
+                  of vitistack state
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -634,7 +634,7 @@ spec:
                 format: int32
                 type: integer
               lastReconcileTime:
-                description: LastReconcileTime is when the datacenter was last reconciled
+                description: LastReconcileTime is when the vitistack was last reconciled
                 format: date-time
                 type: string
               machineProviderCount:
@@ -644,17 +644,17 @@ spec:
                 type: integer
               observedGeneration:
                 description: ObservedGeneration reflects the generation of the most
-                  recently observed Datacenter
+                  recently observed Vitistack
                 format: int64
                 type: integer
               phase:
-                description: Phase represents the current phase of the datacenter
+                description: Phase represents the current phase of the vitistack
                 type: string
               providerStatuses:
                 description: ProviderStatuses shows the status of each provider
                 items:
-                  description: DatacenterProviderStatus shows the status of a provider
-                    in the datacenter
+                  description: VitistackProviderStatus shows the status of a provider
+                    in the vitistack
                   properties:
                     healthy:
                       description: Healthy indicates if the provider is healthy
