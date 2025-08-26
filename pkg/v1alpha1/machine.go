@@ -12,6 +12,7 @@ import (
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=machines,scope=Namespaced,shortName=m
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
+// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.state`
 // +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.providerConfig.name`
 // +kubebuilder:printcolumn:name="Instance Type",type=string,JSONPath=`.spec.instanceType`
 // +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.providerConfig.region`
@@ -296,6 +297,12 @@ type MachineStatusDisk struct {
 	Type string `json:"type,omitempty"`
 	// The disk's mount point
 	MountPoint string `json:"mountPoint,omitempty"`
+	// PVC name
+	PVCName string `json:"pvcName,omitempty"`
+	// Volume mode, filesystem or block
+	VolumeMode string `json:"volumeMode,omitempty"`
+	// Access modes, readwriteonce, readwritemany, readonlymany
+	AccessModes []string `json:"accessModes,omitempty"`
 	// The disk's filesystem type (e.g., ext4, xfs)
 	FilesystemType string `json:"filesystemType,omitempty"`
 	// The disk's UUID

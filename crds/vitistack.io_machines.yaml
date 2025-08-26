@@ -20,6 +20,9 @@ spec:
     - jsonPath: .status.phase
       name: Phase
       type: string
+    - jsonPath: .status.state
+      name: Phase
+      type: string
     - jsonPath: .spec.providerConfig.name
       name: Provider
       type: string
@@ -304,6 +307,11 @@ spec:
                 description: Actual disk information
                 items:
                   properties:
+                    accessModes:
+                      description: Access modes, readwriteonce, readwritemany, readonlymany
+                      items:
+                        type: string
+                      type: array
                     availableBytes:
                       description: Available space in bytes
                       format: int64
@@ -322,6 +330,9 @@ spec:
                       type: string
                     name:
                       description: The disk's name
+                      type: string
+                    pvcName:
+                      description: PVC name
                       type: string
                     serialNumber:
                       description: The disk's serial number
@@ -342,6 +353,9 @@ spec:
                       type: integer
                     uuid:
                       description: The disk's UUID
+                      type: string
+                    volumeMode:
+                      description: Volume mode, filesystem or block
                       type: string
                   type: object
                 type: array
