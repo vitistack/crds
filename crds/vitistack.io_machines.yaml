@@ -23,14 +23,11 @@ spec:
     - jsonPath: .status.state
       name: State
       type: string
-    - jsonPath: .spec.providerConfig.name
+    - jsonPath: .status.provider
       name: Provider
       type: string
     - jsonPath: .spec.instanceType
       name: Instance Type
-      type: string
-    - jsonPath: .spec.providerConfig.region
-      name: Region
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
