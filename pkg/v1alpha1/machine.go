@@ -12,7 +12,7 @@ import (
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=machines,scope=Namespaced,shortName=m
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.state`
+// +kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 // +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.providerConfig.name`
 // +kubebuilder:printcolumn:name="Instance Type",type=string,JSONPath=`.spec.instanceType`
 // +kubebuilder:printcolumn:name="Region",type=string,JSONPath=`.spec.providerConfig.region`

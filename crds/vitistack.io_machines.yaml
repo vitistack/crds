@@ -21,7 +21,7 @@ spec:
       name: Phase
       type: string
     - jsonPath: .status.state
-      name: Phase
+      name: State
       type: string
     - jsonPath: .spec.providerConfig.name
       name: Provider

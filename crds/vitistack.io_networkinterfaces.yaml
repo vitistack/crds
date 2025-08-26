@@ -1,0 +1,82 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: networkinterfaces.vitistack.io
+spec:
+  group: vitistack.io
+  names:
+    kind: NetworkInterfaces
+    listKind: NetworkInterfacesList
+    plural: networkinterfaces
+    singular: networkinterfaces
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          dhcpReserved:
+            description: DHCP reserved in dchp server(s)
+            type: boolean
+          dns:
+            description: DNS
+            items:
+              type: string
+            type: array
+          ipv4Addresses:
+            description: IPv4 addresses
+            items:
+              type: string
+            type: array
+          ipv4Gateway:
+            description: Gateway
+            type: string
+          ipv4Subnet:
+            description: Subnet
+            type: string
+          ipv6Addresses:
+            description: IPv6 addresses
+            items:
+              type: string
+            type: array
+          ipv6Gateway:
+            description: Gateway for ipv6
+            type: string
+          ipv6Subnet:
+            description: Subnet for ipv6
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          macAddress:
+            description: Mac address
+            type: string
+          metadata:
+            type: object
+          name:
+            description: Name
+            type: string
+          vipReserved:
+            description: VIP reserved
+            type: boolean
+          vlan:
+            description: Vlan
+            type: string
+        type: object
+    served: true
+    storage: true
