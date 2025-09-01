@@ -3,7 +3,7 @@ module github.com/vitistack/crds
 go 1.25.0
 
 require (
-	github.com/NorskHelsenett/ror v1.4.3
+	github.com/NorskHelsenett/ror v1.4.13
 	k8s.io/apimachinery v0.34.0
 	sigs.k8s.io/controller-runtime v0.22.0
 )
@@ -47,6 +47,7 @@ require (
 )
 
 require (
+	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
