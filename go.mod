@@ -3,7 +3,7 @@ module github.com/vitistack/crds
 go 1.25.0
 
 require (
-	github.com/NorskHelsenett/ror v1.4.13
+	github.com/NorskHelsenett/ror v1.4.14
 	k8s.io/apimachinery v0.34.0
 	sigs.k8s.io/controller-runtime v0.22.0
 )
@@ -54,7 +54,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
-	github.com/spf13/pflag v1.0.8 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
