@@ -14,6 +14,10 @@ $(LOCALBIN):
 GOLANGCI_LINT = $(LOCALBIN)/golangci-lint
 CONTROLLER_GEN = $(LOCALBIN)/controller-gen
 
+# Use the Go toolchain version declared in go.mod when building tools
+GO_VERSION := $(shell awk '/^go /{print $$2}' go.mod)
+GO_TOOLCHAIN := go$(GO_VERSION)
+
 ##@ Help
 .PHONY: help
 help: ## Display this help.
@@ -108,7 +112,7 @@ set -e; \
 package=$(2)@$(3) ;\
 echo "Downloading $${package}" ;\
 rm -f $(1) || true ;\
-GOBIN=$(LOCALBIN) go install $${package} ;\
+GOTOOLCHAIN=$(GO_TOOLCHAIN) GOBIN=$(LOCALBIN) go install $${package} ;\
 mv $(1) $(1)-$(3) ;\
 } ;\
 ln -sf $(1)-$(3) $(1)

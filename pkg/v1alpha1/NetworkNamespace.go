@@ -32,7 +32,7 @@ type NetworkNamespaceStatus struct {
 	Message    string             `json:"message,omitempty"`
 	Created    metav1.Time        `json:"created,omitempty"`
 
-	NamespaceId  string `json:"namespace_id,omitempty"`
+	NamespaceID  string `json:"namespace_id,omitempty"`
 	Name         string `json:"name,omitempty"`
 	IPv4Prefix   string `json:"ipv4_prefix,omitempty"`
 	IPv6Prefix   string `json:"ipv6_prefix,omitempty"`
