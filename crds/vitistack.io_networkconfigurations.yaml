@@ -40,6 +40,9 @@ spec:
           metadata:
             type: object
           spec:
+            properties:
+              name:
+                type: string
             type: object
           status:
             properties:
