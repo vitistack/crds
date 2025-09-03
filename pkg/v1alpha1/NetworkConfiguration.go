@@ -13,11 +13,27 @@ import (
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=networkconfigurations,scope=Namespaced,shortName=nc
 type NetworkConfiguration struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   NetworkConfigurationSpec   `json:"spec,omitempty"`
+	Status NetworkConfigurationStatus `json:"status,omitempty"`
+}
+
+type NetworkConfigurationSpec struct {
+	Name string `json:"name,omitempty"`
+}
+
+type NetworkConfigurationStatus struct {
+	Conditions        []metav1.Condition  `json:"conditions,omitempty"`
+	Phase             string              `json:"phase,omitempty"`
+	Status            string              `json:"status,omitempty"`
+	Message           string              `json:"message,omitempty"`
+	Created           metav1.Time         `json:"created,omitempty"`
+	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`
 }
 
 type NetworkInterfaces struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
 	// Name
 	Name string `json:"name,omitempty"`
 	// Mac address
@@ -40,6 +56,4 @@ type NetworkInterfaces struct {
 	DNS []string `json:"dns,omitempty"`
 	// DHCP reserved in dchp server(s)
 	DHCPReserved bool `json:"dhcpReserved,omitempty"`
-	// VIP reserved
-	VIPReserved bool `json:"vipReserved,omitempty"`
 }
