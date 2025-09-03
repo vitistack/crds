@@ -1530,8 +1530,8 @@ func (in *NetworkNamespaceStatus) DeepCopyInto(out *NetworkNamespaceStatus) {
 		}
 	}
 	in.Created.DeepCopyInto(&out.Created)
-	if in.AssociatedKubernetesClusterIds != nil {
-		in, out := &in.AssociatedKubernetesClusterIds, &out.AssociatedKubernetesClusterIds
+	if in.AssociatedKubernetesClusterIDs != nil {
+		in, out := &in.AssociatedKubernetesClusterIDs, &out.AssociatedKubernetesClusterIDs
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
