@@ -35,6 +35,21 @@ generate: gen-deepcopy gen-manifests   ## Generate code and manifests.
 .PHONY: gen-manifests
 gen-manifests: controller-gen ## Generate manifests
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=crds
+	@hack/sanitize-crds.sh crds
+
+.PHONY: sanitize-crds
+sanitize-crds: ## Sanitize generated CRDs to remove unsupported int32/int64 formats.
+	hack/sanitize-crds.sh crds
+
+.PHONY: verify-crds
+verify-crds: ## Verify CRDs are sanitized (no int32/int64 format lines present).
+	@set -e; \
+	if grep -R --include='*.yaml' -E '^[[:space:]]*format:[[:space:]]*"?int(32|64)"?[[:space:]]*$$' crds >/dev/null; then \
+	  echo "CRDs contain int32/int64 format lines. Run 'make sanitize-crds' or 'make manifests'."; \
+	  exit 1; \
+	else \
+	  echo "CRDs are sanitized."; \
+	fi
 
 .PHONY: gen-deepcopy
 gen-deepcopy: controller-gen ## Generate code

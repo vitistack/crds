@@ -111,7 +111,6 @@ spec:
                       type: string
                     sizeGB:
                       description: Size of the disk in GB
-                      format: int64
                       maximum: 65536
                       minimum: 1
                       type: integer
@@ -135,7 +134,6 @@ spec:
                 type: string
               memory:
                 description: Memory configuration in bytes
-                format: int64
                 minimum: 0
                 type: integer
               monitoring:
@@ -311,7 +309,6 @@ spec:
                       type: array
                     availableBytes:
                       description: Available space in bytes
-                      format: int64
                       type: integer
                     device:
                       description: Device path (e.g., /dev/sda)
@@ -336,7 +333,6 @@ spec:
                       type: string
                     size:
                       description: The disk's size in bytes
-                      format: int64
                       type: integer
                     type:
                       description: The disk's type (e.g., SSD, HDD, gp2, gp3)
@@ -346,7 +342,6 @@ spec:
                       type: string
                     usedBytes:
                       description: Used space in bytes
-                      format: int64
                       type: integer
                     uuid:
                       description: The disk's UUID
@@ -387,7 +382,6 @@ spec:
                 type: string
               memory:
                 description: Actual memory in bytes
-                format: int64
                 type: integer
               message:
                 description: Detailed status message

@@ -111,12 +111,10 @@ spec:
                         type: boolean
                       rpoMinutes:
                         description: RPO (Recovery Point Objective) in minutes
-                        format: int32
                         minimum: 1
                         type: integer
                       rtoMinutes:
                         description: RTO (Recovery Time Objective) in minutes
-                        format: int32
                         minimum: 1
                         type: integer
                       targetVitistack:
@@ -133,19 +131,16 @@ spec:
                       daily:
                         default: 7
                         description: Daily backups to keep
-                        format: int32
                         minimum: 1
                         type: integer
                       monthly:
                         default: 12
                         description: Monthly backups to keep
-                        format: int32
                         minimum: 1
                         type: integer
                       weekly:
                         default: 4
                         description: Weekly backups to keep
-                        format: int32
                         minimum: 1
                         type: integer
                     type: object
@@ -188,7 +183,6 @@ spec:
                     priority:
                       description: Priority defines the preference order for this
                         provider (1 = highest priority)
-                      format: int32
                       minimum: 1
                       type: integer
                   required:
@@ -248,7 +242,6 @@ spec:
                     priority:
                       description: Priority defines the preference order for this
                         provider (1 = highest priority)
-                      format: int32
                       minimum: 1
                       type: integer
                   required:
@@ -280,7 +273,6 @@ spec:
                   metricsRetentionDays:
                     default: 30
                     description: MetricsRetentionDays for storing metrics
-                    format: int32
                     maximum: 365
                     minimum: 1
                     type: integer
@@ -439,32 +431,26 @@ spec:
                 properties:
                   maxCPUCores:
                     description: MaxCPUCores limits total CPU cores
-                    format: int32
                     minimum: 1
                     type: integer
                   maxClusters:
                     description: MaxClusters limits the number of Kubernetes clusters
-                    format: int32
                     minimum: 1
                     type: integer
                   maxMachines:
                     description: MaxMachines limits the number of machines
-                    format: int32
                     minimum: 1
                     type: integer
                   maxMemoryGB:
                     description: MaxMemoryGB limits total memory in GB
-                    format: int32
                     minimum: 1
                     type: integer
                   maxNetworkInterfaces:
                     description: MaxNetworkInterfaces limits network interfaces
-                    format: int32
                     minimum: 1
                     type: integer
                   maxStorageGB:
                     description: MaxStorageGB limits total storage in GB
-                    format: int32
                     minimum: 1
                     type: integer
                 type: object
@@ -517,7 +503,6 @@ spec:
                       retentionDays:
                         default: 90
                         description: RetentionDays for audit logs
-                        format: int32
                         maximum: 2555
                         minimum: 1
                         type: integer
@@ -563,12 +548,10 @@ spec:
             properties:
               activeClusters:
                 description: ActiveClusters is the number of active Kubernetes clusters
-                format: int32
                 type: integer
               activeMachines:
                 description: ActiveMachines is the number of active machines in the
                   vitistack
-                format: int32
                 type: integer
               conditions:
                 description: Conditions represent the latest available observations
@@ -594,7 +577,6 @@ spec:
                         observedGeneration represents the .metadata.generation that the condition was set based upon.
                         For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
                         with respect to the current state of the instance.
-                      format: int64
                       minimum: 0
                       type: integer
                     reason:
@@ -631,7 +613,6 @@ spec:
               kubernetesProviderCount:
                 description: KubernetesProviderCount is the number of active Kubernetes
                   providers
-                format: int32
                 type: integer
               lastReconcileTime:
                 description: LastReconcileTime is when the vitistack was last reconciled
@@ -640,12 +621,10 @@ spec:
               machineProviderCount:
                 description: MachineProviderCount is the number of active machine
                   providers
-                format: int32
                 type: integer
               observedGeneration:
                 description: ObservedGeneration reflects the generation of the most
                   recently observed Vitistack
-                format: int64
                 type: integer
               phase:
                 description: Phase represents the current phase of the vitistack
@@ -676,7 +655,6 @@ spec:
                     resourcesManaged:
                       description: ResourcesManaged shows resources managed by this
                         provider
-                      format: int32
                       type: integer
                     type:
                       description: Type of provider (machine, kubernetes)
@@ -694,36 +672,28 @@ spec:
                 properties:
                   cpuCoresTotal:
                     description: CPUCoresTotal shows total available CPU cores
-                    format: int32
                     type: integer
                   cpuCoresUsed:
                     description: CPUCoresUsed shows used CPU cores
-                    format: int32
                     type: integer
                   memoryGBTotal:
                     description: MemoryGBTotal shows total available memory in GB
-                    format: int32
                     type: integer
                   memoryGBUsed:
                     description: MemoryGBUsed shows used memory in GB
-                    format: int32
                     type: integer
                   networkInterfacesTotal:
                     description: NetworkInterfacesTotal shows total available network
                       interfaces
-                    format: int32
                     type: integer
                   networkInterfacesUsed:
                     description: NetworkInterfacesUsed shows used network interfaces
-                    format: int32
                     type: integer
                   storageGBTotal:
                     description: StorageGBTotal shows total available storage in GB
-                    format: int32
                     type: integer
                   storageGBUsed:
                     description: StorageGBUsed shows used storage in GB
-                    format: int32
                     type: integer
                 type: object
             type: object
