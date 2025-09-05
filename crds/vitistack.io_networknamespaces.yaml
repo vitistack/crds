@@ -127,6 +127,8 @@ spec:
                 type: string
               status:
                 type: string
+              subnet:
+                type: string
               vlan_id:
                 type: integer
             type: object

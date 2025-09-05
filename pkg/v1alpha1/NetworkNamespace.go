@@ -38,6 +38,7 @@ type NetworkNamespaceStatus struct {
 	IPv4EgressIP string `json:"ipv4_egress_ip,omitempty"`
 	IPv6EgressIP string `json:"ipv6_egress_ip,omitempty"`
 	VlanID       int    `json:"vlan_id,omitempty"`
+	Subnet       string `json:"subnet,omitempty"`
 
 	AssociatedKubernetesClusterIDs []string `json:"associated_kubernetes_cluster_ids,omitempty"`
 }
