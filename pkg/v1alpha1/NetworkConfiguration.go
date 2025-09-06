@@ -20,7 +20,8 @@ type NetworkConfiguration struct {
 }
 
 type NetworkConfigurationSpec struct {
-	Name string `json:"name,omitempty"`
+	Name              string              `json:"name,omitempty"`
+	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`
 }
 
 type NetworkConfigurationStatus struct {

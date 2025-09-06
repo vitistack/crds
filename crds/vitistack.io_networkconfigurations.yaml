@@ -43,6 +43,50 @@ spec:
             properties:
               name:
                 type: string
+              networkInterfaces:
+                items:
+                  properties:
+                    dhcpReserved:
+                      description: DHCP reserved in dchp server(s)
+                      type: boolean
+                    dns:
+                      description: DNS
+                      items:
+                        type: string
+                      type: array
+                    ipv4Addresses:
+                      description: IPv4 addresses
+                      items:
+                        type: string
+                      type: array
+                    ipv4Gateway:
+                      description: Gateway
+                      type: string
+                    ipv4Subnet:
+                      description: Subnet
+                      type: string
+                    ipv6Addresses:
+                      description: IPv6 addresses
+                      items:
+                        type: string
+                      type: array
+                    ipv6Gateway:
+                      description: Gateway for ipv6
+                      type: string
+                    ipv6Subnet:
+                      description: Subnet for ipv6
+                      type: string
+                    macAddress:
+                      description: Mac address
+                      type: string
+                    name:
+                      description: Name
+                      type: string
+                    vlan:
+                      description: Vlan
+                      type: string
+                  type: object
+                type: array
             type: object
           status:
             properties:
