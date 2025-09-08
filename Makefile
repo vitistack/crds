@@ -73,8 +73,26 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: lint
-lint: golangci-lint ## Run go vet against code.
-	$(GOLANGCI_LINT) run --timeout 5m ./... --config .golangci.yml
+lint: golangci-lint ## Run golangci-lint (prints a summary when clean).
+	@out="$$( $(GOLANGCI_LINT) run --timeout 5m ./... --config .golangci.yml 2>&1 )"; ec=$$?; \
+	if [ $$ec -ne 0 ]; then \
+	  printf '%s\n' "$$out"; \
+	  exit $$ec; \
+	fi; \
+	if [ -z "$$out" ]; then \
+	  echo 'No lint issues found.'; \
+	else \
+	  printf '%s\n' "$$out"; \
+	  count=$$(printf '%s\n' "$$out" | grep -E ':[0-9]+:[0-9]+: ' | wc -l | tr -d ' '); \
+	  echo "Total issues: $$count"; \
+	fi
+
+.PHONY: lint-json
+lint-json: golangci-lint ## Output lint results in JSON with issue count (requires jq for count display).
+	@json="$$( $(GOLANGCI_LINT) run --timeout 5m --out-format json ./... --config .golangci.yml 2>/dev/null )"; ec=$$?; \
+	if [ $$ec -ne 0 ]; then echo "Lint failed"; exit $$ec; fi; \
+	if command -v jq >/dev/null 2>&1; then echo "Issue count: $$(echo "$$json" | jq '.Issues | length')"; fi; \
+	echo "$$json"
 
 ##@ Tests
 .PHONY: test
