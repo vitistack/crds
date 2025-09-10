@@ -16,7 +16,25 @@ spec:
     singular: networkconfiguration
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.name
+      name: Name
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - description: Creation Timestamp
+      jsonPath: .status.created
+      name: Created
+      type: string
+    - description: Count Network Interfaces
+      jsonPath: .status.networkInterfaces.count()
+      name: Interfaces
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: NetworkConfiguration is the Schema for the NetworkConfiguration

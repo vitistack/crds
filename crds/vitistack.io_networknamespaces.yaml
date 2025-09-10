@@ -16,7 +16,24 @@ spec:
     singular: networknamespace
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.name
+      name: Name
+      type: string
+    - jsonPath: .spec.datacenterName
+      name: DatacenterName
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - description: Creation Timestamp
+      jsonPath: .status.created
+      name: Created
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: NetworkNamespace is the Schema for the NetworkNamespace API
