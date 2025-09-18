@@ -6,7 +6,6 @@ import (
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:deepcopy-gen=false
 
 // LoadBalancer is the Schema for the LoadBalancer API
 // +kubebuilder:object:root=true
@@ -22,7 +21,6 @@ type LoadBalancer struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:deepcopy-gen=false
 // MachineList contains a list of Machine
 type LoadBalancerList struct {
 	metav1.TypeMeta `json:",inline"`

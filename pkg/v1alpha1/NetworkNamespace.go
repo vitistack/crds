@@ -6,7 +6,6 @@ import (
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:deepcopy-gen=false
 
 // NetworkNamespace is the Schema for the NetworkNamespace API
 // +kubebuilder:object:root=true
@@ -26,7 +25,6 @@ type NetworkNamespace struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-// +k8s:deepcopy-gen=false
 // NetworkNamespaceList contains a list of NetworkNamespace
 type NetworkNamespaceList struct {
 	metav1.TypeMeta `json:",inline"`
