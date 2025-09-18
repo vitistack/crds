@@ -132,3 +132,15 @@ func VitistackFromUnstructured(u *metav1unstructured.Unstructured) (*v1alpha1.Vi
 	}
 	return out, nil
 }
+
+func LoadBalancerToUnstructured(in *v1alpha1.LoadBalancer) (*metav1unstructured.Unstructured, error) {
+	return ToUnstructured(in)
+}
+
+func LoadBalancerFromUnstructured(u *metav1unstructured.Unstructured) (*v1alpha1.LoadBalancer, error) {
+	out := new(v1alpha1.LoadBalancer)
+	if err := FromUnstructured(u, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
