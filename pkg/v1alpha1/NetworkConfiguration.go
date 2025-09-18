@@ -24,6 +24,14 @@ type NetworkConfiguration struct {
 	Status NetworkConfigurationStatus `json:"status,omitempty"`
 }
 
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// NetworkConfigurationList contains a list of NetworkConfiguration
+type NetworkConfigurationList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []NetworkConfiguration `json:"items"`
+}
+
 type NetworkConfigurationSpec struct {
 	Name              string              `json:"name,omitempty"`
 	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`

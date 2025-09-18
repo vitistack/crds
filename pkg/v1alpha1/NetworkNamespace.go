@@ -24,6 +24,14 @@ type NetworkNamespace struct {
 	Status NetworkNamespaceStatus `json:"status,omitempty"`
 }
 
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// NetworkNamespaceList contains a list of NetworkNamespace
+type NetworkNamespaceList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []NetworkNamespace `json:"items"`
+}
+
 type NetworkNamespaceSpec struct {
 	DatacenterName string `json:"datacenterName,omitempty"` // <country>-<region>-<availability zone> ex: no-west-az1
 	Name           string `json:"name,omitempty"`           // <unique name per availability zone> ex: my-name
