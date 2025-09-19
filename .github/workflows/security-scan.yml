@@ -3,6 +3,14 @@ name: Security Scan
 on:
   schedule:
     - cron: "0 0 * * 1" # Run weekly on Mondays
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   security-scan:
@@ -10,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup Go
         uses: actions/setup-go@v6
