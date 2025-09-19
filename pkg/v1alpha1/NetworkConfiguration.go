@@ -34,10 +34,27 @@ type NetworkConfigurationList struct {
 
 type NetworkConfigurationSpec struct {
 	// +kubebuilder:validation:Required
-	Name string `json:"name,omitempty"`
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=2
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	DatacenterName string `json:"datacenterName,omitempty"`
+
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=2
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
+	NamespaceName string `json:"namespaceName,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=2
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
+	ClusterName string `json:"clusterName,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	Provider string `json:"provider,omitempty"`
 
 	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`

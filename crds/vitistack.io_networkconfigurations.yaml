@@ -59,9 +59,20 @@ spec:
             type: object
           spec:
             properties:
-              datacenterName:
+              clusterName:
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
                 type: string
-              name:
+              datacenterName:
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
+                type: string
+              namespaceName:
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
                 type: string
               networkInterfaces:
                 items:
@@ -108,10 +119,14 @@ spec:
                   type: object
                 type: array
               provider:
+                maxLength: 32
+                minLength: 1
+                pattern: ^[A-Za-z0-9_-]+$
                 type: string
             required:
+            - clusterName
             - datacenterName
-            - name
+            - namespaceName
             - provider
             type: object
           status:

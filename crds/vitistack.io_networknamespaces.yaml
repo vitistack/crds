@@ -57,20 +57,35 @@ spec:
             type: object
           spec:
             properties:
-              datacenterName:
+              clusterName:
+                maxLength: 32
+                minLength: 3
+                pattern: ^[A-Za-z0-9_-]+$
                 type: string
-              name:
+              datacenterName:
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
+                type: string
+              namespaceName:
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
                 type: string
               provider:
+                maxLength: 32
+                minLength: 1
+                pattern: ^[A-Za-z0-9_-]+$
                 type: string
             required:
+            - clusterName
             - datacenterName
-            - name
+            - namespaceName
             - provider
             type: object
           status:
             properties:
-              associated_kubernetes_cluster_ids:
+              associatedKubernetesClusterIds:
                 items:
                   type: string
                 type: array
@@ -132,25 +147,29 @@ spec:
               created:
                 format: date-time
                 type: string
-              ipv4_egress_ip:
+              datacenterName:
                 type: string
-              ipv4_prefix:
+              ipv4EgressIp:
                 type: string
-              ipv6_egress_ip:
+              ipv4Prefix:
                 type: string
-              ipv6_prefix:
+              ipv6EgressIp:
+                type: string
+              ipv6Prefix:
                 type: string
               message:
                 type: string
               name:
                 type: string
-              namespace_id:
+              namespaceId:
+                type: string
+              namespaceName:
                 type: string
               phase:
                 type: string
               status:
                 type: string
-              vlan_id:
+              vlanId:
                 type: integer
             type: object
         type: object

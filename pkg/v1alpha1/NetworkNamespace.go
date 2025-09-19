@@ -34,10 +34,27 @@ type NetworkNamespaceList struct {
 
 type NetworkNamespaceSpec struct {
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=2
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	DatacenterName string `json:"datacenterName,omitempty"` // <country>-<region>-<availability zone> ex: no-west-az1
+
 	// +kubebuilder:validation:Required
-	Name string `json:"name,omitempty"` // <unique name per availability zone> ex: my-name
+	// +kubebuilder:validation:MinLength=2
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
+	NamespaceName string `json:"namespaceName,omitempty"` // <unique name per datacenter> ex: my-namespace
+
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=3
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
+	ClusterName string `json:"clusterName,omitempty"` // <unique name per availability zone> ex: my-name
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	Provider string `json:"provider,omitempty"`
 }
 
@@ -48,13 +65,15 @@ type NetworkNamespaceStatus struct {
 	Message    string             `json:"message,omitempty"`
 	Created    metav1.Time        `json:"created,omitempty"`
 
-	NamespaceID  string `json:"namespace_id,omitempty"`
-	Name         string `json:"name,omitempty"`
-	IPv4Prefix   string `json:"ipv4_prefix,omitempty"`
-	IPv6Prefix   string `json:"ipv6_prefix,omitempty"`
-	IPv4EgressIP string `json:"ipv4_egress_ip,omitempty"`
-	IPv6EgressIP string `json:"ipv6_egress_ip,omitempty"`
-	VlanID       int    `json:"vlan_id,omitempty"`
+	DataCenterName string `json:"datacenterName,omitempty"`
+	NamespaceName  string `json:"namespaceName,omitempty"`
+	NamespaceID    string `json:"namespaceId,omitempty"`
+	ClusterName    string `json:"name,omitempty"`
+	IPv4Prefix     string `json:"ipv4Prefix,omitempty"`
+	IPv6Prefix     string `json:"ipv6Prefix,omitempty"`
+	IPv4EgressIP   string `json:"ipv4EgressIp,omitempty"`
+	IPv6EgressIP   string `json:"ipv6EgressIp,omitempty"`
+	VlanID         int    `json:"vlanId,omitempty"`
 
-	AssociatedKubernetesClusterIDs []string `json:"associated_kubernetes_cluster_ids,omitempty"`
+	AssociatedKubernetesClusterIDs []string `json:"associatedKubernetesClusterIds,omitempty"`
 }
