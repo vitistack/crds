@@ -33,8 +33,12 @@ type NetworkNamespaceList struct {
 }
 
 type NetworkNamespaceSpec struct {
+	// +kubebuilder:validation:Required
 	DatacenterName string `json:"datacenterName,omitempty"` // <country>-<region>-<availability zone> ex: no-west-az1
-	Name           string `json:"name,omitempty"`           // <unique name per availability zone> ex: my-name
+	// +kubebuilder:validation:Required
+	Name string `json:"name,omitempty"` // <unique name per availability zone> ex: my-name
+	// +kubebuilder:validation:Required
+	Provider string `json:"provider,omitempty"`
 }
 
 type NetworkNamespaceStatus struct {

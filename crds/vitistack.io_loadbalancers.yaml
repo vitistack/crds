@@ -40,6 +40,10 @@ spec:
             type: object
           spec:
             properties:
+              clusterName:
+                type: string
+              datacenterName:
+                type: string
               loadBalancerIpv4:
                 items:
                   type: string
@@ -48,6 +52,12 @@ spec:
                 items:
                   type: string
                 type: array
+              provider:
+                type: string
+            required:
+            - clusterName
+            - datacenterName
+            - provider
             type: object
           status:
             properties:

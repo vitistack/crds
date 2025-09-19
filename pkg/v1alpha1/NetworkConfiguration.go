@@ -33,7 +33,13 @@ type NetworkConfigurationList struct {
 }
 
 type NetworkConfigurationSpec struct {
-	Name              string              `json:"name,omitempty"`
+	// +kubebuilder:validation:Required
+	Name string `json:"name,omitempty"`
+	// +kubebuilder:validation:Required
+	DatacenterName string `json:"datacenterName,omitempty"`
+	// +kubebuilder:validation:Required
+	Provider string `json:"provider,omitempty"`
+
 	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`
 }
 

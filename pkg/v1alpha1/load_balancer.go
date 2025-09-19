@@ -29,7 +29,15 @@ type LoadBalancerList struct {
 }
 
 type LoadBalancerSpec struct {
+	// +kubebuilder:validation:Required
+	DatacenterName string `json:"datacenterName,omitempty"`
+	// +kubebuilder:validation:Required
+	ClusterName string `json:"clusterName,omitempty"`
+	// +kubebuilder:validation:Required
+	Provider string `json:"provider,omitempty"`
+
 	LoadBalancerIpv4s []string `json:"loadBalancerIpv4,omitempty"`
+
 	LoadBalancerIpv6s []string `json:"loadBalancerIpv6,omitempty"`
 }
 

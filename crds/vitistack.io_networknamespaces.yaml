@@ -61,6 +61,12 @@ spec:
                 type: string
               name:
                 type: string
+              provider:
+                type: string
+            required:
+            - datacenterName
+            - name
+            - provider
             type: object
           status:
             properties:

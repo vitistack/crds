@@ -59,6 +59,8 @@ spec:
             type: object
           spec:
             properties:
+              datacenterName:
+                type: string
               name:
                 type: string
               networkInterfaces:
@@ -105,6 +107,12 @@ spec:
                       type: string
                   type: object
                 type: array
+              provider:
+                type: string
+            required:
+            - datacenterName
+            - name
+            - provider
             type: object
           status:
             properties:
