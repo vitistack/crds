@@ -56,6 +56,12 @@ type NetworkNamespaceSpec struct {
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	Provider string `json:"provider,omitempty"`
+
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=128
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9._-]+$`
+	Environment string `json:"environment,omitempty"`
 }
 
 type NetworkNamespaceStatus struct {

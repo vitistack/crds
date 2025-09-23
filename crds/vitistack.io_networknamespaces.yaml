@@ -67,6 +67,11 @@ spec:
                 minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
+              environment:
+                maxLength: 128
+                minLength: 1
+                pattern: ^[A-Za-z0-9._-]+$
+                type: string
               namespaceName:
                 maxLength: 32
                 minLength: 2
@@ -80,6 +85,7 @@ spec:
             required:
             - clusterName
             - datacenterName
+            - environment
             - namespaceName
             - provider
             type: object
