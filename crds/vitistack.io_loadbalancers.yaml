@@ -44,19 +44,27 @@ spec:
                 type: string
               datacenterName:
                 type: string
-              loadBalancerIpv4:
+              method:
+                default: first-alive
+                description: round-robin, least-session, first-alive
+                enum:
+                - round-robin
+                - least-session
+                - first-alive
+                type: string
+              poolMembers:
+                description: example control plane ips
                 items:
                   type: string
+                minItems: 1
                 type: array
-              loadBalancerIpv6:
-                items:
-                  type: string
-                type: array
+                uniqueItems: true
               provider:
                 type: string
             required:
             - clusterName
             - datacenterName
+            - poolMembers
             - provider
             type: object
           status:
@@ -119,10 +127,20 @@ spec:
               created:
                 format: date-time
                 type: string
+              loadBalancerIps:
+                items:
+                  type: string
+                type: array
               message:
+                type: string
+              method:
                 type: string
               phase:
                 type: string
+              poolMembers:
+                items:
+                  type: string
+                type: array
               status:
                 type: string
             type: object

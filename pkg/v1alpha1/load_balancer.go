@@ -31,14 +31,24 @@ type LoadBalancerList struct {
 type LoadBalancerSpec struct {
 	// +kubebuilder:validation:Required
 	DatacenterName string `json:"datacenterName,omitempty"`
+
 	// +kubebuilder:validation:Required
 	ClusterName string `json:"clusterName,omitempty"`
+
 	// +kubebuilder:validation:Required
 	Provider string `json:"provider,omitempty"`
 
-	LoadBalancerIpv4s []string `json:"loadBalancerIpv4,omitempty"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default:=first-alive
+	// +kubebuilder:validation:Enum=round-robin;least-session;first-alive
+	// round-robin, least-session, first-alive
+	Method string `json:"method,omitempty"`
 
-	LoadBalancerIpv6s []string `json:"loadBalancerIpv6,omitempty"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinItems:=1
+	// +kubebuilder:validation:UniqueItems:=true
+	// example control plane ips
+	PoolMembers []string `json:"poolMembers,omitempty"`
 }
 
 type LoadBalancerStatus struct {
@@ -47,4 +57,8 @@ type LoadBalancerStatus struct {
 	Status     string             `json:"status,omitempty"`
 	Message    string             `json:"message,omitempty"`
 	Created    metav1.Time        `json:"created,omitempty"`
+
+	LoadBalancerIps []string `json:"loadBalancerIps,omitempty"`
+	Method          string   `json:"method,omitempty"`
+	PoolMembers     []string `json:"poolMembers,omitempty"`
 }
