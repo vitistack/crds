@@ -16,7 +16,27 @@ spec:
     singular: loadbalancer
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.datacenterName
+      name: DatacenterName
+      type: string
+    - jsonPath: .spec.clusterName
+      name: ClusterName
+      type: string
+    - jsonPath: .spec.provider
+      name: Provider
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - description: Creation Timestamp
+      jsonPath: .status.created
+      name: Created
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: LoadBalancer is the Schema for the LoadBalancer API
@@ -58,7 +78,6 @@ spec:
                   type: string
                 minItems: 1
                 type: array
-                uniqueItems: true
               provider:
                 type: string
             required:

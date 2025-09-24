@@ -11,6 +11,12 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=loadbalancers,scope=Namespaced,shortName=lb
+// +kubebuilder:printcolumn:name="DatacenterName",type=string,JSONPath=`.spec.datacenterName`
+// +kubebuilder:printcolumn:name="ClusterName",type=string,JSONPath=`.spec.clusterName`
+// +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.provider`
+// +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
+// +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
+// +kubebuilder:printcolumn:name="Created",type=string,JSONPath=`.status.created`,description="Creation Timestamp"
 type LoadBalancer struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -46,7 +52,6 @@ type LoadBalancerSpec struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinItems:=1
-	// +kubebuilder:validation:UniqueItems:=true
 	// example control plane ips
 	PoolMembers []string `json:"poolMembers,omitempty"`
 }
