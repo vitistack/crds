@@ -18,7 +18,9 @@ CONTROLLER_GEN = $(LOCALBIN)/controller-gen
 GO_VERSION := $(shell awk '/^go /{print $$2}' go.mod)
 GO_TOOLCHAIN := go$(GO_VERSION)
 GOSEC ?= $(LOCALBIN)/gosec
-GOSEC_VERSION ?= v2.22.8
+GOSEC_VERSION ?= latest
+CONTROLLER_TOOLS_VERSION ?= latest
+GOLANGCI_LINT_VERSION ?= latest
 
 ##@ Help
 .PHONY: help
@@ -113,19 +115,16 @@ update-deps: ## Update dependencies
 	@go mod tidy
 	@echo "Dependencies updated!"
 
-##@ kubernetes
-.PHONY: install-crds
-install-crds: manifests ## Install CRDs into a Kubernetes cluster.
+##@ Kubernetes
+.PHONY: k8s-install-crds
+k8s-install-crds: manifests ## Install CRDs into a Kubernetes cluster.
 	kubectl apply -f crds
 
-.PHONY: uninstall-crds
-uninstall-crds: ## Uninstall CRDs from a Kubernetes cluster.
+.PHONY: k8s-uninstall-crds
+k8s-uninstall-crds: ## Uninstall CRDs from a Kubernetes cluster.
 	kubectl delete -f crds
 
 ##@ Tools
-
-CONTROLLER_TOOLS_VERSION ?= latest
-GOLANGCI_LINT_VERSION ?= latest
 
 .PHONY: controller-gen
 controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary.
