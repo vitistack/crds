@@ -42,6 +42,9 @@ type LoadBalancerSpec struct {
 	ClusterName string `json:"clusterName,omitempty"`
 
 	// +kubebuilder:validation:Required
+	NamespaceName string `json:"namespaceName,omitempty"`
+
+	// +kubebuilder:validation:Required
 	Provider string `json:"provider,omitempty"`
 
 	// +kubebuilder:validation:Optional
@@ -63,6 +66,10 @@ type LoadBalancerStatus struct {
 	Message    string             `json:"message,omitempty"`
 	Created    metav1.Time        `json:"created,omitempty"`
 
+	DatacenterName  string   `json:"datacenterName,omitempty"`
+	ClusterName     string   `json:"clusterName,omitempty"`
+	Provider        string   `json:"provider,omitempty"`
+	NamespaceName   string   `json:"namespaceName,omitempty"`
 	LoadBalancerIps []string `json:"loadBalancerIps,omitempty"`
 	Method          string   `json:"method,omitempty"`
 	PoolMembers     []string `json:"poolMembers,omitempty"`

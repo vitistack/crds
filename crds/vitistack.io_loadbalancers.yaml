@@ -72,6 +72,8 @@ spec:
                 - least-session
                 - first-alive
                 type: string
+              namespaceName:
+                type: string
               poolMembers:
                 description: example control plane ips
                 items:
@@ -83,11 +85,14 @@ spec:
             required:
             - clusterName
             - datacenterName
+            - namespaceName
             - poolMembers
             - provider
             type: object
           status:
             properties:
+              clusterName:
+                type: string
               conditions:
                 items:
                   description: Condition contains details for one aspect of the current
@@ -146,6 +151,8 @@ spec:
               created:
                 format: date-time
                 type: string
+              datacenterName:
+                type: string
               loadBalancerIps:
                 items:
                   type: string
@@ -154,12 +161,16 @@ spec:
                 type: string
               method:
                 type: string
+              namespaceName:
+                type: string
               phase:
                 type: string
               poolMembers:
                 items:
                   type: string
                 type: array
+              provider:
+                type: string
               status:
                 type: string
             type: object
