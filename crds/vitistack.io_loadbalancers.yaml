@@ -72,8 +72,6 @@ spec:
                 - least-session
                 - first-alive
                 type: string
-              namespaceName:
-                type: string
               poolMembers:
                 description: example control plane ips
                 items:
@@ -85,7 +83,6 @@ spec:
             required:
             - clusterName
             - datacenterName
-            - namespaceName
             - poolMembers
             - provider
             type: object
@@ -160,8 +157,6 @@ spec:
               message:
                 type: string
               method:
-                type: string
-              namespaceName:
                 type: string
               phase:
                 type: string
