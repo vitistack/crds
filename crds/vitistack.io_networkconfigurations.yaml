@@ -69,6 +69,16 @@ spec:
                 minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
+              description:
+                description: Description of the NetworkConfiguration
+                maxLength: 256
+                type: string
+              name:
+                description: Name of the NetworkConfiguration
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
+                type: string
               networkInterfaces:
                 items:
                   properties:
@@ -124,10 +134,7 @@ spec:
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
             required:
-            - clusterName
-            - datacenterName
-            - provider
-            - supervisorName
+            - name
             type: object
           status:
             properties:

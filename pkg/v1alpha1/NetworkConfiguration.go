@@ -33,25 +33,37 @@ type NetworkConfigurationList struct {
 }
 
 type NetworkConfigurationSpec struct {
+	// Name of the NetworkConfiguration
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=2
+	// +kubebuilder:validation:MaxLength=32
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
+	Name string `json:"name"`
+
+	// Description of the NetworkConfiguration
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:MaxLength=256
+	Description string `json:"description,omitempty"`
+
+	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	DatacenterName string `json:"datacenterName,omitempty"`
 
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	SupervisorName string `json:"supervisorName,omitempty"`
 
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	ClusterName string `json:"clusterName,omitempty"`
 
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
