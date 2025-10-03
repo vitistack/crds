@@ -43,7 +43,7 @@ type NetworkNamespaceSpec struct {
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	NamespaceName string `json:"namespaceName,omitempty"` // <unique name per datacenter> ex: my-namespace
+	SupervisorName string `json:"supervisorName,omitempty"` // <unique name per datacenter> ex: my-namespace
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=3
@@ -72,7 +72,7 @@ type NetworkNamespaceStatus struct {
 	Created    metav1.Time        `json:"created,omitempty"`
 
 	DataCenterName string `json:"datacenterName,omitempty"`
-	NamespaceName  string `json:"namespaceName,omitempty"`
+	SupervisorName string `json:"supervisorName,omitempty"`
 	NamespaceID    string `json:"namespaceId,omitempty"`
 	ClusterName    string `json:"name,omitempty"`
 	IPv4Prefix     string `json:"ipv4Prefix,omitempty"`

@@ -43,7 +43,7 @@ type NetworkConfigurationSpec struct {
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	NamespaceName string `json:"namespaceName,omitempty"`
+	SupervisorName string `json:"supervisorName,omitempty"`
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=2

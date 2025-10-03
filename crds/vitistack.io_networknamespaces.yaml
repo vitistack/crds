@@ -72,22 +72,22 @@ spec:
                 minLength: 1
                 pattern: ^[A-Za-z0-9._-]+$
                 type: string
-              namespaceName:
-                maxLength: 32
-                minLength: 2
-                pattern: ^[A-Za-z0-9_-]+$
-                type: string
               provider:
                 maxLength: 32
                 minLength: 1
+                pattern: ^[A-Za-z0-9_-]+$
+                type: string
+              supervisorName:
+                maxLength: 32
+                minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
             required:
             - clusterName
             - datacenterName
             - environment
-            - namespaceName
             - provider
+            - supervisorName
             type: object
           status:
             properties:
@@ -169,11 +169,11 @@ spec:
                 type: string
               namespaceId:
                 type: string
-              namespaceName:
-                type: string
               phase:
                 type: string
               status:
+                type: string
+              supervisorName:
                 type: string
               vlanId:
                 type: integer

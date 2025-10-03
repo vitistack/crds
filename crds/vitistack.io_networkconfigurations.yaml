@@ -69,11 +69,6 @@ spec:
                 minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
-              namespaceName:
-                maxLength: 32
-                minLength: 2
-                pattern: ^[A-Za-z0-9_-]+$
-                type: string
               networkInterfaces:
                 items:
                   properties:
@@ -123,11 +118,16 @@ spec:
                 minLength: 1
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
+              supervisorName:
+                maxLength: 32
+                minLength: 2
+                pattern: ^[A-Za-z0-9_-]+$
+                type: string
             required:
             - clusterName
             - datacenterName
-            - namespaceName
             - provider
+            - supervisorName
             type: object
           status:
             properties:

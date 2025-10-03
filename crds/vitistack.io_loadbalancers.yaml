@@ -80,11 +80,14 @@ spec:
                 type: array
               provider:
                 type: string
+              supervisorName:
+                type: string
             required:
             - clusterName
             - datacenterName
             - poolMembers
             - provider
+            - supervisorName
             type: object
           status:
             properties:
@@ -167,6 +170,8 @@ spec:
               provider:
                 type: string
               status:
+                type: string
+              supervisorName:
                 type: string
             type: object
         type: object
