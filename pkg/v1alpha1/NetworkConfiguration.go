@@ -57,19 +57,19 @@ type NetworkConfigurationSpec struct {
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
 	Provider string `json:"provider,omitempty"`
 
-	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`
+	NetworkInterfaces []NetworkConfigurationInterface `json:"networkInterfaces,omitempty"`
 }
 
 type NetworkConfigurationStatus struct {
-	Conditions        []metav1.Condition  `json:"conditions,omitempty"`
-	Phase             string              `json:"phase,omitempty"`
-	Status            string              `json:"status,omitempty"`
-	Message           string              `json:"message,omitempty"`
-	Created           metav1.Time         `json:"created,omitempty"`
-	NetworkInterfaces []NetworkInterfaces `json:"networkInterfaces,omitempty"`
+	Conditions        []metav1.Condition              `json:"conditions,omitempty"`
+	Phase             string                          `json:"phase,omitempty"`
+	Status            string                          `json:"status,omitempty"`
+	Message           string                          `json:"message,omitempty"`
+	Created           metav1.Time                     `json:"created,omitempty"`
+	NetworkInterfaces []NetworkConfigurationInterface `json:"networkInterfaces,omitempty"`
 }
 
-type NetworkInterfaces struct {
+type NetworkConfigurationInterface struct {
 	// Name
 	Name string `json:"name,omitempty"`
 	// Mac address
