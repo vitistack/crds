@@ -18,13 +18,10 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.name
-      name: DatacenterName
+      name: Name
       type: string
-    - jsonPath: .spec.url
-      name: ClusterName
-      type: string
-    - jsonPath: .spec.provider
-      name: Provider
+    - jsonPath: .spec.endpoint
+      name: Endpoint
       type: string
     - jsonPath: .status.phase
       name: Phase

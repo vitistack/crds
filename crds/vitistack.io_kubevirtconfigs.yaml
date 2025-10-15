@@ -17,11 +17,8 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.datacenterName
-      name: DatacenterName
-      type: string
-    - jsonPath: .spec.clusterName
-      name: ClusterName
+    - jsonPath: .spec.name
+      name: Name
       type: string
     - jsonPath: .spec.provider
       name: Provider
@@ -60,12 +57,12 @@ spec:
             type: object
           spec:
             properties:
-              kubeconfig:
+              kubeconfigSecretRef:
                 type: string
               name:
                 type: string
             required:
-            - kubeconfig
+            - kubeconfigSecretRef
             - name
             type: object
           status:
@@ -73,6 +70,8 @@ spec:
               created:
                 type: string
               message:
+                type: string
+              name:
                 type: string
               phase:
                 type: string

@@ -11,8 +11,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=kubevirtconfigs,scope=Namespaced,shortName=kvc
-// +kubebuilder:printcolumn:name="DatacenterName",type=string,JSONPath=`.spec.datacenterName`
-// +kubebuilder:printcolumn:name="ClusterName",type=string,JSONPath=`.spec.clusterName`
+// +kubebuilder:printcolumn:name="Name",type=string,JSONPath=`.spec.name`
 // +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.provider`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
@@ -39,10 +38,11 @@ type KubevirtConfigSpec struct {
 	Name string `json:"name,omitempty"`
 
 	// +kubebuilder:validation:Required
-	Kubeconfig string `json:"kubeconfig,omitempty"`
+	KubeconfigSecretRef string `json:"kubeconfigSecretRef,omitempty"`
 }
 
 type KubevirtConfigStatus struct {
+	Name    string `json:"name,omitempty"`
 	Phase   string `json:"phase,omitempty"`
 	Status  string `json:"status,omitempty"`
 	Message string `json:"message,omitempty"`
