@@ -74,3 +74,7 @@ type LoadBalancerStatus struct {
 	Method          string   `json:"method,omitempty"`
 	PoolMembers     []string `json:"poolMembers,omitempty"`
 }
+
+func init() {
+	SchemeBuilder.Register(&LoadBalancer{}, &LoadBalancerList{})
+}

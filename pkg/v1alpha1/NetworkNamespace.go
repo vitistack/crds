@@ -83,3 +83,7 @@ type NetworkNamespaceStatus struct {
 
 	AssociatedKubernetesClusterIDs []string `json:"associatedKubernetesClusterIds,omitempty"`
 }
+
+func init() {
+	SchemeBuilder.Register(&NetworkNamespace{}, &NetworkNamespaceList{})
+}

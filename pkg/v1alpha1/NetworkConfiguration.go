@@ -105,3 +105,7 @@ type NetworkConfigurationInterface struct {
 	// DHCP reserved in dchp server(s)
 	DHCPReserved bool `json:"dhcpReserved,omitempty"`
 }
+
+func init() {
+	SchemeBuilder.Register(&NetworkConfiguration{}, &NetworkConfigurationList{})
+}

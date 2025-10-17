@@ -48,3 +48,7 @@ type KubevirtConfigStatus struct {
 	Message string `json:"message,omitempty"`
 	Created string `json:"created,omitempty"`
 }
+
+func init() {
+	SchemeBuilder.Register(&KubevirtConfig{}, &KubevirtConfigList{})
+}

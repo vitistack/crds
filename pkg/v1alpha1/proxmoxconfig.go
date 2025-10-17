@@ -56,3 +56,7 @@ type ProxmoxConfigStatus struct {
 	Message string `json:"message,omitempty"`
 	Created string `json:"created,omitempty"`
 }
+
+func init() {
+	SchemeBuilder.Register(&ProxmoxConfig{}, &ProxmoxConfigList{})
+}
