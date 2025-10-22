@@ -49,19 +49,19 @@ type NetworkConfigurationSpec struct {
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	DatacenterName string `json:"datacenterName,omitempty"`
+	DatacenterIdentifier string `json:"datacenterIdentifier,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	SupervisorName string `json:"supervisorName,omitempty"`
+	SupervisorIdentifier string `json:"supervisorIdentifier,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	ClusterName string `json:"clusterName,omitempty"`
+	ClusterIdentifier string `json:"clusterIdentifier,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:validation:MinLength=1

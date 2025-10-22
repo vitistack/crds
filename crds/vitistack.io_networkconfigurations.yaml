@@ -59,12 +59,12 @@ spec:
             type: object
           spec:
             properties:
-              clusterName:
+              clusterIdentifier:
                 maxLength: 32
                 minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
-              datacenterName:
+              datacenterIdentifier:
                 maxLength: 32
                 minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$
@@ -128,7 +128,7 @@ spec:
                 minLength: 1
                 pattern: ^[A-Za-z0-9_-]+$
                 type: string
-              supervisorName:
+              supervisorIdentifier:
                 maxLength: 32
                 minLength: 2
                 pattern: ^[A-Za-z0-9_-]+$

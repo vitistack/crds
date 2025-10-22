@@ -11,8 +11,8 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=loadbalancers,scope=Namespaced,shortName=lb
-// +kubebuilder:printcolumn:name="DatacenterName",type=string,JSONPath=`.spec.datacenterName`
-// +kubebuilder:printcolumn:name="ClusterName",type=string,JSONPath=`.spec.clusterName`
+// +kubebuilder:printcolumn:name="DatacenterIdentifier",type=string,JSONPath=`.spec.datacenterIdentifier`
+// +kubebuilder:printcolumn:name="ClusterIdentifier",type=string,JSONPath=`.spec.clusterIdentifier`
 // +kubebuilder:printcolumn:name="Provider",type=string,JSONPath=`.spec.provider`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
@@ -36,13 +36,13 @@ type LoadBalancerList struct {
 
 type LoadBalancerSpec struct {
 	// +kubebuilder:validation:Required
-	DatacenterName string `json:"datacenterName,omitempty"`
+	DatacenterIdentifier string `json:"datacenterIdentifier,omitempty"`
 
 	// +kubebuilder:validation:Required
-	ClusterName string `json:"clusterName,omitempty"`
+	ClusterIdentifier string `json:"clusterIdentifier,omitempty"`
 
 	// +kubebuilder:validation:Required
-	SupervisorName string `json:"supervisorName,omitempty"`
+	SupervisorIdentifier string `json:"supervisorIdentifier,omitempty"`
 
 	// +kubebuilder:validation:Required
 	Provider string `json:"provider,omitempty"`
@@ -66,13 +66,12 @@ type LoadBalancerStatus struct {
 	Message    string             `json:"message,omitempty"`
 	Created    metav1.Time        `json:"created,omitempty"`
 
-	DatacenterName  string   `json:"datacenterName,omitempty"`
-	SupervisorName  string   `json:"supervisorName,omitempty"`
-	ClusterName     string   `json:"clusterName,omitempty"`
-	Provider        string   `json:"provider,omitempty"`
-	LoadBalancerIps []string `json:"loadBalancerIps,omitempty"`
-	Method          string   `json:"method,omitempty"`
-	PoolMembers     []string `json:"poolMembers,omitempty"`
+	DatacenterIdentifier string   `json:"datacenterIdentifier,omitempty"`
+	SupervisorIdentifier string   `json:"supervisorIdentifier,omitempty"`
+	ClusterIdentifier    string   `json:"clusterIdentifier,omitempty"`
+	LoadBalancerIps      []string `json:"loadBalancerIps,omitempty"`
+	Method               string   `json:"method,omitempty"`
+	PoolMembers          []string `json:"poolMembers,omitempty"`
 }
 
 func init() {

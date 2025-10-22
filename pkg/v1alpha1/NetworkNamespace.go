@@ -11,8 +11,8 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=networknamespaces,scope=Namespaced,shortName=nn
-// +kubebuilder:printcolumn:name="Name",type=string,JSONPath=`.spec.name`
-// +kubebuilder:printcolumn:name="DatacenterName",type=string,JSONPath=`.spec.datacenterName`
+// +kubebuilder:printcolumn:name="Name",type=string,JSONPath=`.spec.clusterIdentifier`
+// +kubebuilder:printcolumn:name="DatacenterIdentifier",type=string,JSONPath=`.spec.datacenterIdentifier`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Status",type=string,JSONPath=`.status.status`
 // +kubebuilder:printcolumn:name="Created",type=string,JSONPath=`.status.created`,description="Creation Timestamp"
@@ -37,19 +37,19 @@ type NetworkNamespaceSpec struct {
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	DatacenterName string `json:"datacenterName,omitempty"` // <country>-<region>-<availability zone> ex: no-west-az1
+	DatacenterIdentifier string `json:"datacenterIdentifier,omitempty"` // <country>-<region>-<availability zone> ex: no-west-az1
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=2
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	SupervisorName string `json:"supervisorName,omitempty"` // <unique name per datacenter> ex: my-namespace
+	SupervisorIdentifier string `json:"supervisorIdentifier,omitempty"` // <unique name per datacenter> ex: my-namespace
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=3
 	// +kubebuilder:validation:MaxLength=32
 	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9_-]+$`
-	ClusterName string `json:"clusterName,omitempty"` // <unique name per availability zone> ex: my-name
+	ClusterIdentifier string `json:"clusterIdentifier,omitempty"` // <unique name per availability zone> ex: my-name
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
@@ -71,15 +71,15 @@ type NetworkNamespaceStatus struct {
 	Message    string             `json:"message,omitempty"`
 	Created    metav1.Time        `json:"created,omitempty"`
 
-	DataCenterName string `json:"datacenterName,omitempty"`
-	SupervisorName string `json:"supervisorName,omitempty"`
-	NamespaceID    string `json:"namespaceId,omitempty"`
-	ClusterName    string `json:"name,omitempty"`
-	IPv4Prefix     string `json:"ipv4Prefix,omitempty"`
-	IPv6Prefix     string `json:"ipv6Prefix,omitempty"`
-	IPv4EgressIP   string `json:"ipv4EgressIp,omitempty"`
-	IPv6EgressIP   string `json:"ipv6EgressIp,omitempty"`
-	VlanID         int    `json:"vlanId,omitempty"`
+	DataCenterIdentifier string `json:"datacenterIdentifier,omitempty"`
+	SupervisorIdentifier string `json:"supervisorIdentifier,omitempty"`
+	NamespaceID          string `json:"namespaceId,omitempty"`
+	ClusterIdentifier    string `json:"clusterIdentifier,omitempty"`
+	IPv4Prefix           string `json:"ipv4Prefix,omitempty"`
+	IPv6Prefix           string `json:"ipv6Prefix,omitempty"`
+	IPv4EgressIP         string `json:"ipv4EgressIp,omitempty"`
+	IPv6EgressIP         string `json:"ipv6EgressIp,omitempty"`
+	VlanID               int    `json:"vlanId,omitempty"`
 
 	AssociatedKubernetesClusterIDs []string `json:"associatedKubernetesClusterIds,omitempty"`
 }

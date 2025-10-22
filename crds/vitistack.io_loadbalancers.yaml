@@ -17,11 +17,11 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.datacenterName
-      name: DatacenterName
+    - jsonPath: .spec.datacenterIdentifier
+      name: DatacenterIdentifier
       type: string
-    - jsonPath: .spec.clusterName
-      name: ClusterName
+    - jsonPath: .spec.clusterIdentifier
+      name: ClusterIdentifier
       type: string
     - jsonPath: .spec.provider
       name: Provider
@@ -60,9 +60,9 @@ spec:
             type: object
           spec:
             properties:
-              clusterName:
+              clusterIdentifier:
                 type: string
-              datacenterName:
+              datacenterIdentifier:
                 type: string
               method:
                 default: first-alive
@@ -80,18 +80,18 @@ spec:
                 type: array
               provider:
                 type: string
-              supervisorName:
+              supervisorIdentifier:
                 type: string
             required:
-            - clusterName
-            - datacenterName
+            - clusterIdentifier
+            - datacenterIdentifier
             - poolMembers
             - provider
-            - supervisorName
+            - supervisorIdentifier
             type: object
           status:
             properties:
-              clusterName:
+              clusterIdentifier:
                 type: string
               conditions:
                 items:
@@ -151,7 +151,7 @@ spec:
               created:
                 format: date-time
                 type: string
-              datacenterName:
+              datacenterIdentifier:
                 type: string
               loadBalancerIps:
                 items:
@@ -167,11 +167,9 @@ spec:
                 items:
                   type: string
                 type: array
-              provider:
-                type: string
               status:
                 type: string
-              supervisorName:
+              supervisorIdentifier:
                 type: string
             type: object
         type: object
