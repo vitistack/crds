@@ -19,8 +19,17 @@ make manifests
 
 - Install CRDs into your cluster
 
+Using kubectl:
+
 ```sh
-make install-crds
+make k8s-install-crds
+```
+
+Or using Helm:
+
+```sh
+make helm-install
+# or directly: helm install vitistack-crds ./charts/vitistack-crds
 ```
 
 - Verify
@@ -35,6 +44,34 @@ kubectl get crd | grep vitistack.io
 kubectl apply -f examples/machine-example.yaml
 kubectl apply -f examples/kubernetes-provider-example.yaml
 ```
+
+## Helm Chart
+
+The repository includes a Helm chart for installing the CRDs. The chart is published to GitHub Container Registry as an OCI artifact.
+
+**Install from OCI registry (recommended):**
+
+```sh
+helm install vitistack-crds oci://ghcr.io/vitistack/vitistack-crds --version 0.1.0
+```
+
+**Or install from source:**
+
+```sh
+make helm-install
+# or directly: helm install vitistack-crds ./charts/vitistack-crds
+```
+
+**Development commands:**
+
+- `make helm-lint` - Lint the chart
+- `make helm-template` - Test rendering templates
+- `make helm-package` - Package the chart
+- `make helm-install` - Install the chart from source
+- `make helm-upgrade` - Upgrade the chart
+- `make helm-uninstall` - Uninstall the chart
+
+For detailed information, see [docs/helm-guide.md](./docs/helm-guide.md).
 
 ## Development
 
@@ -104,8 +141,29 @@ typed, err := unstructuredutil.MachineFromUnstructured(u)
   - [docs/deployment-automation.md](./docs/deployment-automation.md)
   - [docs/performance-optimization.md](./docs/performance-optimization.md)
   - [docs/testing-guide.md](./docs/testing-guide.md)
+  - [docs/helm-guide.md](./docs/helm-guide.md)
+  - [docs/release-process.md](./docs/release-process.md)
 
 Examples are in `examples/`.
+
+## Releases
+
+Releases are automated via GitHub Actions. To create a new release:
+
+```bash
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+This will automatically:
+
+- Generate and validate CRDs
+- Run tests
+- Package the Helm chart
+- Push to `ghcr.io/vitistack/vitistack-crds` as an OCI image
+- Create a GitHub Release
+
+See [docs/release-process.md](./docs/release-process.md) for details.
 
 ## Contributing
 

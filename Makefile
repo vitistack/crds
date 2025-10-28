@@ -124,6 +124,31 @@ k8s-install-crds: manifests ## Install CRDs into a Kubernetes cluster.
 k8s-uninstall-crds: ## Uninstall CRDs from a Kubernetes cluster.
 	kubectl delete -f crds
 
+##@ Helm
+.PHONY: helm-lint
+helm-lint: ## Lint the Helm chart
+	helm lint charts/vitistack-crds
+
+.PHONY: helm-template
+helm-template: ## Test rendering the Helm chart templates
+	helm template vitistack-crds charts/vitistack-crds
+
+.PHONY: helm-package
+helm-package: ## Package the Helm chart
+	helm package charts/vitistack-crds -d charts/
+
+.PHONY: helm-install
+helm-install: ## Install the Helm chart
+	helm install vitistack-crds charts/vitistack-crds
+
+.PHONY: helm-upgrade
+helm-upgrade: ## Upgrade the Helm chart
+	helm upgrade vitistack-crds charts/vitistack-crds
+
+.PHONY: helm-uninstall
+helm-uninstall: ## Uninstall the Helm chart
+	helm uninstall vitistack-crds
+
 ##@ Tools
 
 .PHONY: controller-gen
