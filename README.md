@@ -1,6 +1,10 @@
 # Vitistack CRDs
 
-Vitistack’s Kubernetes CustomResourceDefinitions (CRDs) and typed Go APIs.
+> **⚠️ DEPRECATION NOTICE**  
+> This repository is scheduled for deletion. Please migrate to [github.com/vitistack/common](https://github.com/vitistack/common) instead.  
+> This repository will be removed pretty soon.
+
+Vitistack's Kubernetes CustomResourceDefinitions (CRDs) and typed Go APIs.
 
 Provided CRDs (see docs for details):
 
